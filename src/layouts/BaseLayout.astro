@@ -1,0 +1,41 @@
+---
+// Page shell shared by every page: <head>, fonts, theme init, header, and the global scroll engine.
+import "../styles/global.css";
+import Nav from "../components/Nav.astro";
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+const {
+  title = "Tokkey — Own your intelligence",
+  description = "Tokkey is a USB-C local-AI key for Mac. 0 tokens, runs on-device.",
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Brand rule: theme init must be the first thing in <head> -->
+    <script is:inline>document.documentElement.setAttribute("data-theme", "dark");</script>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="icon" type="image/svg+xml" href="/assets/icons/tokkey_logo.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+  </head>
+  <body>
+    <Nav />
+    <main>
+      <slot />
+    </main>
+    <script>
+      // Start Lenis + GSAP ScrollTrigger once for the whole page
+      import { ScrollEngine } from "../scripts/ScrollEngine";
+      ScrollEngine.instance.start();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,25 @@
+---
+// Pinned full-screen canvas scene; slot content is layered above the frames.
+import type { SequenceName } from "../config/frames";
+
+interface Props {
+  id?: string;
+  /** Frame sequence folder under public/assets/frames */
+  sequence: SequenceName;
+  /** How far the user scrolls while pinned, e.g. "200%" = two viewport heights */
+  scrollLength?: string;
+}
+const { id, sequence, scrollLength = "200%" } = Astro.props;
+---
+
+<section id={id} class="relative h-svh overflow-hidden bg-black" data-frame-scene data-sequence={sequence} data-scroll-length={scrollLength}>
+  <canvas class="absolute inset-0 size-full"></canvas>
+  <div class="relative z-10 h-full">
+    <slot />
+  </div>
+</section>
+
+<script>
+  import { FrameScene } from "../scripts/FrameScene";
+  FrameScene.mountAll();
+</script>

@@ -1,2 +1,6 @@
 .DS_Store
-assets/.DS_Store
+node_modules/
+dist/
+.astro/
+.wrangler/
+.dev.vars

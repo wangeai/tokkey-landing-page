@@ -1,0 +1,27 @@
+---
+// Homepage (Astro rewrite in progress). The full original page stays live at /legacy.html for side-by-side comparison.
+import BaseLayout from "../layouts/BaseLayout.astro";
+import FrameScene from "../components/FrameScene.astro";
+---
+
+<BaseLayout>
+  <!-- Pipeline demo: pinned canvas scrubbing frame sequence "a" -->
+  <FrameScene id="hero" sequence="a" scrollLength="150%">
+    <div class="flex h-full flex-col items-center justify-end px-gutter-sm pb-24 text-center text-white md:px-gutter">
+      <p class="label text-ash">Tokkey AI Computing Device</p>
+      <h1 class="mt-4 text-hero-sm font-bold md:text-display lg:text-hero">
+        Own Your Intelligence<span class="period">.</span>
+      </h1>
+    </div>
+  </FrameScene>
+
+  <!-- Placeholder until the remaining sections are ported -->
+  <section class="mx-auto max-w-page px-gutter-sm py-24 md:px-gutter md:py-32">
+    <p class="label text-graphite">Migration</p>
+    <h2 class="mt-4 text-h2-sm font-bold md:text-h2">Porting in progress<span class="period">.</span></h2>
+    <p class="mt-6 max-w-[60ch] text-body">
+      Sections are being moved from the legacy page one at a time. Compare against the original at
+      <a class="underline" href="/legacy.html">/legacy.html</a>.
+    </p>
+  </section>
+</BaseLayout>

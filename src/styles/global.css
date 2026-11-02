@@ -1,0 +1,180 @@
+/* Tokkey global styles: Tailwind v4 + brand tokens from docs/tokkey-brand-web/SKILL.md */
+@import "tailwindcss";
+/* Lenis base styles (its package does not export the CSS file) */
+@import "../../node_modules/lenis/dist/lenis.css";
+
+/* Commit Mono (OFL), served from public/assets/fonts */
+@font-face {
+  font-family: "Commit Mono";
+  src: url("/assets/fonts/CommitMono-400-Regular.otf") format("opentype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Commit Mono";
+  src: url("/assets/fonts/CommitMono-400-Italic.otf") format("opentype");
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Commit Mono";
+  src: url("/assets/fonts/CommitMono-700-Regular.otf") format("opentype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Commit Mono";
+  src: url("/assets/fonts/CommitMono-700-Italic.otf") format("opentype");
+  font-weight: 700;
+  font-style: italic;
+  font-display: swap;
+}
+
+/* Theme-dependent values (dark-first). Light overrides follow below. */
+:root {
+  --bg: #111110;
+  --bg-2: #1a1a18;
+  --card: #1a1a18;
+  --hair: #2e2e2b;
+  --text: #f2f2f2;
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    --bg: #ffffff;
+    --bg-2: #f2f2f2;
+    --card: #f2f2f2;
+    --hair: #dadad6;
+    --text: #111110;
+    color-scheme: light;
+  }
+}
+:root[data-theme="light"] {
+  --bg: #ffffff;
+  --bg-2: #f2f2f2;
+  --card: #f2f2f2;
+  --hair: #dadad6;
+  --text: #111110;
+  color-scheme: light;
+}
+:root[data-theme="dark"] {
+  --bg: #111110;
+  --bg-2: #1a1a18;
+  --card: #1a1a18;
+  --hair: #2e2e2b;
+  --text: #f2f2f2;
+  color-scheme: dark;
+}
+
+/* Tailwind tokens: generate utilities like bg-ink, text-accent, font-mono, text-h2, p-gutter */
+@theme {
+  /* Fixed brand colors */
+  --color-ink: #111110;
+  --color-black: #000000;
+  --color-white: #ffffff;
+  --color-fog: #f2f2f2;
+  --color-silver: #dadad6;
+  --color-ash: #b0b0ac;
+  --color-graphite: #5c5c58;
+  --color-accent: #4abe18;
+  --color-studio: #f4f4f2;
+  --color-negative: #f83830;
+
+  /* Theme-following colors (bg-bg, text-text, border-hair, ...) */
+  --color-bg: var(--bg);
+  --color-bg-2: var(--bg-2);
+  --color-card: var(--card);
+  --color-hair: var(--hair);
+  --color-text: var(--text);
+
+  /* Fonts: Inter + Commit Mono only */
+  --font-sans: "Inter", sans-serif;
+  --font-mono: "Commit Mono", "Courier New", monospace;
+
+  /* Type scale: size / line-height / tracking. `-sm` variants are the brand's mobile sizes,
+     e.g. class="text-hero-sm md:text-display lg:text-hero" */
+  --text-hero: 160px;
+  --text-hero--line-height: 152px;
+  --text-hero--letter-spacing: -0.02em;
+  --text-display: 96px;
+  --text-display--line-height: 104px;
+  --text-display--letter-spacing: -0.02em;
+  --text-h2: 64px;
+  --text-h2--line-height: 72px;
+  --text-h2--letter-spacing: -0.02em;
+  --text-hero-sm: 48px;
+  --text-hero-sm--line-height: 56px;
+  --text-hero-sm--letter-spacing: -0.02em;
+  --text-h2-sm: 40px;
+  --text-h2-sm--line-height: 48px;
+  --text-h2-sm--letter-spacing: -0.02em;
+  --text-figure-sm: 48px;
+  --text-figure-sm--line-height: 48px;
+  --text-figure: 64px;
+  --text-figure--line-height: 64px;
+  --text-h3: 32px;
+  --text-h3--line-height: 40px;
+  --text-lead: 24px;
+  --text-lead--line-height: 32px;
+  --text-body: 16px;
+  --text-body--line-height: 24px;
+
+  /* Layout: 1200px container, 40px gutter (16px on mobile), 72px header */
+  --container-page: 1200px;
+  --spacing-gutter: 40px;
+  --spacing-gutter-sm: 16px;
+  --spacing-header: 72px;
+
+  /* Breakpoints per brand spec: tablet 768, desktop 1200 */
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1200px;
+}
+
+/* Reusable brand patterns that are clumsy as utility strings */
+@layer components {
+  /* Eyebrow label: Commit Mono, uppercase, +3% tracking */
+  .label {
+    font-family: var(--font-mono);
+    font-feature-settings: "ss03", "ss04", "ss05";
+    font-size: 16px;
+    line-height: 24px;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+  /* Accent period at the end of short headlines */
+  .period {
+    color: var(--color-accent);
+  }
+  /* Buttons use theme tokens so they stay visible in both themes */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    height: 48px;
+    padding: 0 24px;
+    border-radius: 16px;
+    border: 1px solid var(--text);
+    background: var(--text);
+    color: var(--bg);
+    font-weight: 600;
+  }
+  .btn:hover {
+    opacity: 0.88;
+  }
+  .btn-on-black {
+    background: #fff;
+    color: #000;
+    border-color: #fff;
+  }
+}
+
+@layer base {
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+}

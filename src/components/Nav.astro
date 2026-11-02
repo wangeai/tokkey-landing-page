@@ -1,0 +1,21 @@
+---
+// Fixed site header: logo, primary links (hidden on mobile), early-access CTA.
+import Logo from "./Logo.astro";
+
+// Primary nav links (same targets as the legacy page)
+const links = [
+  { label: "Software", href: "/software" },
+  { label: "Models", href: "/models" },
+  { label: "Pricing", href: "/pricing" },
+  { label: "Dev Doc", href: "/devdoc" },
+  { label: "FAQ", href: "/faq" },
+];
+---
+
+<nav class="fixed inset-x-0 top-0 z-30 flex h-header items-center justify-between px-gutter-sm md:px-gutter">
+  <Logo />
+  <ul class="hidden gap-8 md:flex">
+    {links.map((link) => <li><a href={link.href} class="hover:opacity-88">{link.label}</a></li>)}
+  </ul>
+  <a class="btn h-10 px-4" href="/software#early">Get early access</a>
+</nav>

@@ -10,14 +10,17 @@ Design: Heather · for amis / cpilot.net. This repo is the hand-off for developm
 
 ## 1. Run it
 
-No build step, no dependencies. It must be served over HTTP (not `file://`) because frame sequences and fonts are loaded by relative URL.
+Requires Node >= 22.23 (`nvm use` picks it up from `.nvmrc`).
 
 ```bash
-python3 -m http.server 8765      # then open http://localhost:8765
-# or: just open index.html
+npm install
+npm run dev        # http://localhost:4321
+npm run build      # static output in dist/
+npx wrangler deploy  # deploy dist/ to Cloudflare Workers (static assets, see wrangler.jsonc)
 ```
 
-Deploy: upload the folder as-is to any static host (Vercel / Netlify / Cloudflare Pages / S3). Keep the folder structure unchanged.
+Migration status: the site is being rewritten in Astro + Tailwind + GSAP. Ported sections live in `src/`; the original
+page is still served at `/legacy.html` (from `public/`) for side-by-side comparison until every section is moved.
 
 ## 2. What's in the folder
 
