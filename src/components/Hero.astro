@@ -1,0 +1,113 @@
+---
+// Hero section: plays the scenes in src/config/scenes.ts one per scroll gesture, driven by src/scripts/scenes/HeroScene.ts.
+// Elements tagged data-ref are looked up by name in HeroScene.
+import { AGENTS } from "../config/agents";
+import AgentScreen from "./AgentScreen.astro";
+---
+
+<section id="hero" class="relative h-svh overflow-hidden bg-black" data-hero>
+  <!-- ASCII dot field behind everything -->
+  <canvas data-ref="dots" class="absolute inset-0 size-full"></canvas>
+  <!-- Scene "pullBack": ASCII glow around the laptop, behind the frames -->
+  <canvas data-ref="laptopField" class="pointer-events-none absolute inset-0 size-full"></canvas>
+
+  <!-- Scene frames: two stacked canvases so ScenePlayer can crossfade between scenes.
+       HeroScene shrinks/zooms the stage around 50% 90%; the app UI sits on the laptop screen and moves with it -->
+  <div data-ref="stage" class="absolute inset-0 origin-[50%_90%]">
+    <canvas data-frames class="absolute inset-0 size-full"></canvas>
+    <canvas data-frames class="absolute inset-0 size-full"></canvas>
+    <AgentScreen />
+  </div>
+
+  <!-- Scene "logoReveal": "Own Your Intelligence." -->
+  <div data-ref="partA" class="absolute inset-0">
+    <h1
+      data-ref="title1"
+      class="text-chrome absolute inset-x-0 top-[9vh] z-[6] px-gutter-sm text-center text-[clamp(36px,5.6vw,96px)] leading-[1.02] font-semibold tracking-[-0.045em] opacity-0"
+    >
+      Own Your Intelligence<span class="period">.</span>
+    </h1>
+    <div data-ref="caption" class="absolute inset-x-0 bottom-[7vh] text-center font-mono text-[11.5px] tracking-[0.14em] text-[#a1a1a6] uppercase">
+      Scroll
+    </div>
+    <div class="scroll-hint absolute bottom-7 left-1/2 h-[46px] w-px bg-linear-to-b from-white to-transparent opacity-50"></div>
+  </div>
+
+  <!-- Scene "pullBack": "A private agent. Working on your Mac." over soft blue/purple glows -->
+  <div data-ref="partC" class="pointer-events-none absolute inset-0 opacity-0">
+    <div class="absolute top-[30%] -left-[10%] h-[500px] w-[700px] rounded-full bg-[#5e9bff] opacity-[0.14] blur-[120px]"></div>
+    <div class="absolute top-[20%] -right-[10%] h-[500px] w-[700px] rounded-full bg-[#b678ff] opacity-[0.14] blur-[120px]"></div>
+    <h2
+      data-ref="title3"
+      class="text-chrome absolute inset-x-0 top-[11vh] px-gutter-sm text-center text-[clamp(34px,4.6vw,76px)] leading-[1.02] font-semibold tracking-[-0.045em] opacity-0"
+    >
+      A private agent.<br />Working on your Mac<span class="period">.</span>
+    </h2>
+  </div>
+
+  <!-- Scene "plugIn": "Turn your Mac into an AI Mac.", agents fly into the key -->
+  <div data-ref="partB" class="absolute inset-0 opacity-0">
+    <!-- Darkens the left side so the headline and chips stay readable -->
+    <div
+      data-ref="plugShade"
+      class="absolute inset-0 bg-[linear-gradient(90deg,rgb(0_0_0/78%),rgb(0_0_0/25%)_48%,transparent_70%),linear-gradient(0deg,rgb(0_0_0/50%),transparent_30%)] opacity-0"
+    >
+    </div>
+    <canvas data-ref="glow" class="pointer-events-none absolute inset-0 z-[3] size-full mix-blend-screen"></canvas>
+    <!-- Anchor positioned on the key by HeroScene; holds the halo -->
+    <div data-ref="key" class="pointer-events-none absolute z-[4] -mt-[79px] -ml-[105px] h-[158px] w-[210px]">
+      <div
+        data-ref="halo"
+        class="absolute top-1/2 left-1/2 -z-10 -mt-[260px] -ml-[260px] size-[520px] rounded-full bg-[radial-gradient(circle,rgb(255_255_255/50%),transparent_62%)] opacity-0"
+      >
+      </div>
+    </div>
+    <h2
+      data-ref="title2"
+      class="text-chrome absolute top-[15vh] left-[7vw] pr-gutter-sm text-[clamp(40px,5.6vw,96px)] leading-[1.02] font-semibold tracking-[-0.045em] opacity-0"
+    >
+      Turn your Mac<br />into an AI Mac<span class="period">.</span>
+    </h2>
+    {
+      AGENTS.map((agent) => (
+        <div
+          data-agent
+          class="glass absolute top-0 left-0 z-[5] flex items-center gap-2.5 rounded-full py-1.5 pr-4 pl-1.5 text-[14px] font-medium whitespace-nowrap opacity-0 will-change-transform md:gap-3.5 md:py-[9px] md:pr-[26px] md:pl-[9px] md:text-[18px] md:tracking-[-0.01em]"
+        >
+          <i class="grid size-8 place-items-center rounded-full border border-white/16 bg-white/10 md:size-11 [&>svg]:size-5 md:[&>svg]:size-6">
+            <Fragment set:html={agent.icon} />
+          </i>
+          {agent.name}
+        </div>
+      ))
+    }
+  </div>
+</section>
+
+<script>
+  import { HeroScene } from "../scripts/scenes/HeroScene";
+  const section = document.querySelector<HTMLElement>("[data-hero]");
+  if (section) new HeroScene(section);
+</script>
+
+<style>
+  /* Pulsing scroll hint under the caption */
+  .scroll-hint {
+    transform: translateX(-50%);
+    animation: scroll-hint 2s infinite;
+  }
+  @keyframes scroll-hint {
+    50% {
+      transform: translateX(-50%) scaleY(0.5);
+    }
+  }
+  /* Frosted chip behind each agent */
+  .glass {
+    background: linear-gradient(150deg, rgb(255 255 255 / 12%), rgb(255 255 255 / 4%));
+    border: 1px solid rgb(255 255 255 / 20%);
+    backdrop-filter: blur(28px) saturate(1.4);
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 20%),
+      0 30px 80px rgb(0 0 0 / 50%);
+  }
+</style>

@@ -144,9 +144,18 @@
     text-transform: uppercase;
     letter-spacing: 0.03em;
   }
-  /* Accent period at the end of short headlines */
+  /* Accent period at the end of short headlines (fill-color wins over gradient text) */
   .period {
     color: var(--color-accent);
+    -webkit-text-fill-color: var(--color-accent);
+  }
+  /* Cool chrome gradient text used by the hero headlines */
+  .text-chrome {
+    background: linear-gradient(95deg, #f3f7ff 0%, #bcd7ff 26%, #8fbfff 42%, #f6f9ff 62%, #fff 78%, #cfe2ff 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
   }
   /* Buttons use theme tokens so they stay visible in both themes */
   .btn {

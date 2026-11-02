@@ -1,73 +1,36 @@
-// Draws a pre-rendered webp frame sequence onto a <canvas>, picking the frame for a 0..1 progress value.
-import { FRAME_COUNTS, type SequenceName } from "../config/frames";
+// Draws frames from any FrameSequence onto one <canvas>, fitted like CSS object-fit, and repaints on resize.
+import type { FrameSequence } from "./FrameSequence";
 
-export interface FramePlayerOptions {
-  /** Load every Nth frame (2 = half the downloads, used on mobile) */
-  step?: number;
-  /** Cap on devicePixelRatio to limit canvas memory on phones */
-  maxDpr?: number;
-}
+export type FrameFit = "cover" | "contain";
 
 export class FramePlayer {
-  private readonly frames: HTMLImageElement[] = [];
   private readonly ctx: CanvasRenderingContext2D;
-  private readonly maxDpr: number;
-  private lastDrawn = -1;
-  private progress = 0;
   private readonly resizeObserver: ResizeObserver;
+  private current: { sequence: FrameSequence; index: number; fit: FrameFit } | null = null;
+  private lastDrawn: HTMLImageElement | null = null;
 
   constructor(
-    private readonly canvas: HTMLCanvasElement,
-    sequence: SequenceName,
-    { step = 1, maxDpr = 2 }: FramePlayerOptions = {},
+    readonly canvas: HTMLCanvasElement,
+    /** Cap on devicePixelRatio to limit canvas memory on phones */
+    private readonly maxDpr = 2,
   ) {
     this.ctx = canvas.getContext("2d")!;
-    this.maxDpr = maxDpr;
-    this.preload(sequence, step);
     // Keep the canvas backing store in sync with its CSS size
     this.resizeObserver = new ResizeObserver(() => this.resize());
     this.resizeObserver.observe(canvas);
   }
 
-  /** Start downloading frames; the first frame paints as soon as it arrives */
-  private preload(sequence: SequenceName, step: number): void {
-    for (let i = 1; i <= FRAME_COUNTS[sequence]; i += step) {
-      const img = new Image();
-      img.decoding = "async";
-      img.src = `/assets/frames/${sequence}/${String(i).padStart(3, "0")}.webp`;
-      if (this.frames.length === 0) img.onload = () => this.redraw();
-      this.frames.push(img);
-    }
-  }
+  /** Show frame `index` of `sequence`; skips work if that exact image is already on screen */
+  draw(sequence: FrameSequence, index: number, fit: FrameFit = "cover"): void {
+    const changed = this.current?.fit !== fit;
+    this.current = { sequence, index, fit };
+    const img = sequence.nearestLoaded(Math.round(index));
+    if (!img || (img === this.lastDrawn && !changed)) return;
+    this.lastDrawn = img;
 
-  /** Paint the frame matching progress (0..1); skips work if that frame is already shown */
-  render(progress: number): void {
-    this.progress = Math.min(1, Math.max(0, progress));
-    const target = Math.round(this.progress * (this.frames.length - 1));
-    const index = this.nearestLoaded(target);
-    if (index < 0 || index === this.lastDrawn) return;
-    this.lastDrawn = index;
-    this.drawCover(this.frames[index]);
-  }
-
-  /** Force a repaint at the current progress (after resize or first load) */
-  private redraw(): void {
-    this.lastDrawn = -1;
-    this.render(this.progress);
-  }
-
-  /** Closest already-decoded frame, searching backwards first so motion never jumps ahead */
-  private nearestLoaded(target: number): number {
-    const ready = (i: number) => this.frames[i]?.complete && this.frames[i].naturalWidth > 0;
-    for (let i = target; i >= 0; i--) if (ready(i)) return i;
-    for (let i = target + 1; i < this.frames.length; i++) if (ready(i)) return i;
-    return -1;
-  }
-
-  /** Draw like CSS `object-fit: cover` so frames fill any aspect ratio (phones are portrait) */
-  private drawCover(img: HTMLImageElement): void {
     const { width: cw, height: ch } = this.canvas;
-    const scale = Math.max(cw / img.naturalWidth, ch / img.naturalHeight);
+    const pick = fit === "cover" ? Math.max : Math.min;
+    const scale = pick(cw / img.naturalWidth, ch / img.naturalHeight);
     const w = img.naturalWidth * scale;
     const h = img.naturalHeight * scale;
     this.ctx.clearRect(0, 0, cw, ch);
@@ -78,11 +41,8 @@ export class FramePlayer {
     const dpr = Math.min(window.devicePixelRatio || 1, this.maxDpr);
     this.canvas.width = Math.round(this.canvas.clientWidth * dpr);
     this.canvas.height = Math.round(this.canvas.clientHeight * dpr);
-    this.redraw();
-  }
-
-  destroy(): void {
-    this.resizeObserver.disconnect();
-    this.frames.length = 0;
+    // Resizing clears the canvas, so repaint what was showing
+    this.lastDrawn = null;
+    if (this.current) this.draw(this.current.sequence, this.current.index, this.current.fit);
   }
 }

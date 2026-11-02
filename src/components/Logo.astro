@@ -2,12 +2,15 @@
 // Tokkey logo (symbol + wordmark). SVG copied verbatim from docs/tokkey-brand-web/SKILL.md — never edit the paths.
 interface Props {
   class?: string;
+  /** "full" = symbol + wordmark; "wordmark" crops the same SVG to the letters only */
+  variant?: "full" | "wordmark";
 }
-const { class: className = "h-8 w-auto" } = Astro.props;
+const { class: className = "h-8 w-auto", variant = "full" } = Astro.props;
+const viewBox = variant === "wordmark" ? "150 0 436 111" : "0 0 586 111";
 ---
 
 <a class="brand flex items-center text-text no-underline" href="/" aria-label="Tokkey">
-<svg class={className} viewBox="0 0 586 111" fill="none" xmlns="http://www.w3.org/2000/svg">
+<svg class={className} viewBox={viewBox} fill="none" xmlns="http://www.w3.org/2000/svg">
   <rect width="110.032" height="110.032" rx="18.0521" fill="black"/>
   <rect x="44.1279" y="81.9507" width="32.0926" height="32.0926" rx="4.58466" transform="rotate(-180 44.1279 81.9507)" fill="white"/>
   <rect x="86.5356" y="92.2662" width="32.0926" height="32.0926" rx="16.0463" transform="rotate(-180 86.5356 92.2662)" fill="white"/>
