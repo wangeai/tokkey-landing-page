@@ -4,7 +4,7 @@ Scroll-driven marketing homepage for **Tokkey**, a USB-C local-AI key for Mac (0
 Design: Heather · for amis / cpilot.net. This repo is the hand-off for development.
 **The root of this repo is the latest version. `v1/` is the old version — do not build from it.**
 
-> 中文简述：这是 Tokkey 官网首页的静态成品（纯 HTML/CSS/JS，无构建步骤）。`index.html` 是页面本体，`f/` 是滚动动画的帧序列，`fonts/` 是 Commit Mono。品牌规范见下方 **Brand design spec**（完整中文原版在 `docs/`）。
+> 中文简述：这是 Tokkey 官网首页的静态成品（纯 HTML/CSS/JS，无构建步骤）。`index.html` 是页面本体，样式和脚本在 `assets/css`、`assets/js`，`assets/frames/` 是滚动动画的帧序列，`assets/fonts/` 是 Commit Mono。品牌规范见下方 **Brand design spec**（完整中文原版在 `docs/`）。
 
 ---
 
@@ -14,7 +14,7 @@ No build step, no dependencies. It must be served over HTTP (not `file://`) beca
 
 ```bash
 python3 -m http.server 8765      # then open http://localhost:8765
-# or: npx serve .
+# or: just open index.html
 ```
 
 Deploy: upload the folder as-is to any static host (Vercel / Netlify / Cloudflare Pages / S3). Keep the folder structure unchanged.
@@ -22,19 +22,21 @@ Deploy: upload the folder as-is to any static host (Vercel / Netlify / Cloudflar
 ## 2. What's in the folder
 
 ```
-index.html          the whole page: HTML + CSS + one <script> (≈190 KB)
-fonts/              Commit Mono (4 files, OFL) + its licence
-f/a … f/g/          7 scroll-scrubbed frame sequences (webp, NNN.webp), 411 frames total
-tokkey.png          product render (transparent)      lid.png      laptop lid render
-bg4–bg7.webp        section backgrounds               flow.webp    hero flow background
-k4_plate / k4_close laptop open / closed plates       cl.webp      closed-laptop overlay
-s3_*.svg  s7_*.svg  small UI icons
+index.html                 page markup (links the CSS/JS below)
+assets/
+  css/main.css             all page styles
+  js/main.js               scroll scenes, frame players, interactions
+  images/                  tokkey.png product render · lid.png lid render · bg4–bg7.webp backgrounds
+                           flow.webp hero flow bg · k4_plate/k4_close laptop plates · cl.webp overlay · s7_photo.webp
+  icons/                   s3_*.svg  s7_*.svg  small UI icons
+  frames/a … g/            7 scroll-scrubbed frame sequences (webp, NNN.webp), 411 frames total
+  fonts/                   Commit Mono (4 files, OFL) + its licence
 docs/tokkey-brand-web/SKILL.md   full brand skill (Chinese original)
-AGENTS.md           tells AI coding tools to read the brand skill first
-v1/                 previous version (Home through screen 4), kept for reference only
+AGENTS.md                  tells AI coding tools to read the brand skill first
+v1/                        previous version (Home through screen 4), kept for reference only
 ```
 
-How the frames work: `index.html` builds URLs as `f/<seq>/<NNN>.webp` (`String(i).padStart(3,'0')`), preloads them into `Image` objects and paints the frame that matches scroll progress onto a `<canvas>`. If you add/remove frames, change the count for that sequence in the script; do not rename files.
+How the frames work: `assets/js/main.js` builds URLs as `assets/frames/<seq>/<NNN>.webp` (`String(i).padStart(3,'0')`), preloads them into `Image` objects and paints the frame that matches scroll progress onto a `<canvas>`. If you add/remove frames, change the count for that sequence in the script; do not rename files.
 
 Page structure (top → bottom, tall `.pin` wrappers with a `position:sticky` child drive each scroll scene):
 `#sx` hero + "idea" scene · `#s3` laptop UI scene · `#s4` feature list + showcase card · `#sr` "Release the True Power" tabs scene · `#s6` compare scene · `#s7` quote wall · `#s8` rent-vs-own · `#s9`/`#s10` privacy, waitlist, memory compare · `#faq` · `#end` CTA + footer.
@@ -42,7 +44,7 @@ Page structure (top → bottom, tall `.pin` wrappers with a `position:sticky` ch
 ## 3. Notes for developers
 
 - Desktop-first design at **1440 px** wide. Breakpoint rules exist at 900 px but mobile is **not fully designed** yet — treat as TODO.
-- Fonts: **Inter** (Google Fonts `<link>` in `<head>`) and **Commit Mono** (local `@font-face`, `fonts/`). **Nothing else.** See §5.
+- Fonts: **Inter** (Google Fonts `<link>` in `<head>`) and **Commit Mono** (local `@font-face`, `assets/fonts/`). **Nothing else.** See §5.
 - Performance: ~38 MB of frames/images. Before launch: serve behind a CDN with long cache headers, keep `webp`, lazy-load later sequences, and consider halving frame counts on mobile.
 - Several scenes are pure CSS "renders" (laptop, glass cards). Real product photography is **not** generated — product images come from the design team (see Photography rule below).
 - Copy is placeholder where marked (performance numbers, testimonials). Do not ship claims without the test report.
@@ -97,7 +99,7 @@ Never use Commit Mono for nav, buttons, captions, paragraphs or footer. **Do not
 
 **Download**
 - Inter — https://fonts.google.com/specimen/Inter · or releases at https://github.com/rsms/inter/releases (SIL OFL)
-- Commit Mono — https://commitmono.com · or https://github.com/eigilnikolajsen/commit-mono/releases (SIL OFL; the 4 `.otf` files used here are already in `fonts/`)
+- Commit Mono — https://commitmono.com · or https://github.com/eigilnikolajsen/commit-mono/releases (SIL OFL; the 4 `.otf` files used here are already in `assets/fonts/`)
 
 ```html
 <!-- Inter -->
@@ -107,8 +109,8 @@ Never use Commit Mono for nav, buttons, captions, paragraphs or footer. **Do not
 ```
 ```css
 /* Commit Mono (local) */
-@font-face{font-family:'Commit Mono';src:url('fonts/CommitMono-400-Regular.otf') format('opentype');font-weight:400;font-style:normal;font-display:swap}
-@font-face{font-family:'Commit Mono';src:url('fonts/CommitMono-700-Regular.otf') format('opentype');font-weight:700;font-style:normal;font-display:swap}
+@font-face{font-family:'Commit Mono';src:url('../fonts/CommitMono-400-Regular.otf') format('opentype');font-weight:400;font-style:normal;font-display:swap}
+@font-face{font-family:'Commit Mono';src:url('../fonts/CommitMono-700-Regular.otf') format('opentype');font-weight:700;font-style:normal;font-display:swap}
 --mono:'Commit Mono','Courier New',monospace;
 .mono-text{font-family:var(--mono);font-feature-settings:'ss03','ss04','ss05'}
 ```
@@ -211,4 +213,4 @@ Copy the SVG **verbatim** from `docs/tokkey-brand-web/SKILL.md` (§ Logo). Do no
 
 ---
 
-© Tokkey / amis. Commit Mono © Eigil Nikolajsen (SIL OFL 1.1, `fonts/LICENSE-CommitMono-OFL.txt`). Inter © The Inter Project Authors (SIL OFL 1.1).
+© Tokkey / amis. Commit Mono © Eigil Nikolajsen (SIL OFL 1.1, `assets/fonts/LICENSE-CommitMono-OFL.txt`). Inter © The Inter Project Authors (SIL OFL 1.1).
