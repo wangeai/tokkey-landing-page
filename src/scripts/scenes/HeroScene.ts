@@ -10,7 +10,7 @@ import { LuminanceMap } from "../LuminanceMap";
 import { ModeTabs, type TokkeyMode } from "../ModeTabs";
 import { PowerPanel } from "../PowerPanel";
 import { MOBILE_MAX_WIDTH } from "../../config/frames";
-import { SCENES, type SceneConfig, type SceneId } from "../../config/scenes";
+import { SCENES, SCENE_FPS, SCENE_TIMING_FPS, type SceneConfig, type SceneId } from "../../config/scenes";
 
 /** Where the key sits in the 1600×900 plug frames (fraction of the frame, cover-fitted) */
 const KEY_IN_FRAME = { x: 0.4275, y: 0.569 };
@@ -241,7 +241,7 @@ export class HeroScene {
       .fromTo(this.ref("plugShade"), { opacity: 0 }, { opacity: 1 }, 0.6)
       .fromTo(s, { glowIn: 0 }, { glowIn: 1 }, 0.6)
       .fromTo(this.ref("title2"), { opacity: 0, y: 24 }, { opacity: 1, y: 0 }, 0.8);
-    // Then the agents fly into the key one by one
+    // Scene "agentsFly", on the next scroll: the agents fly into the key one by one
     const agentsFly = timeline();
     s.agents.forEach((agent, i) => {
       plugIn.fromTo(agent, { in: 0 }, { in: 1, duration: 0.3 }, 0.9 + i * 0.05);
@@ -266,7 +266,7 @@ export class HeroScene {
         { opacity: 1, y: 0, filter: "blur(0px)" },
         1.7,
       );
-    // Then the headline leaves, the camera zooms into the screen, and the app UI's backdrop fades in over it
+    // Scene "screenZoom", on the next scroll: the headline leaves, the camera zooms into the screen, and the app UI's backdrop fades in over it
     const screenZoom = timeline()
       .fromTo(this.ref("title3"), { opacity: 1 }, { opacity: 0, duration: 0.4 }, 0.2)
       .fromTo(s, { zoom: 0 }, { zoom: 1, duration: 1 }, 0.2)
@@ -319,14 +319,21 @@ export class HeroScene {
       .fromTo(this.ref("powerCallouts"), { opacity: 0 }, { opacity: 1 }, 1.3)
       .fromTo(this.ref("powerStrip"), { opacity: 0, y: 26 }, { opacity: 1, y: 0 }, 1.3);
 
-    return {
+    const steps: Record<SceneId, SceneStep[]> = {
       logoReveal: [{ frames: true, timeline: logoReveal }],
-      plugIn: [{ frames: true, timeline: plugIn }, { timeline: agentsFly }],
-      pullBack: [{ frames: true, timeline: pullBack }, { timeline: screenZoom }, { timeline: screenPanels }],
+      plugIn: [{ frames: true, timeline: plugIn }],
+      agentsFly: [{ timeline: agentsFly }],
+      pullBack: [{ frames: true, timeline: pullBack }],
+      screenZoom: [{ timeline: screenZoom }, { timeline: screenPanels }],
       flipOver: [{ timeline: zoomOut }, { frames: true }, { timeline: release }],
       xray: [{ frames: true, timeline: tabsIn }],
       powerFlow: [{ frames: true }, { timeline: powerIn }],
     };
+    // Timelines running alongside frames keep pace with the frame rate
+    Object.values(steps)
+      .flat()
+      .forEach((step) => step.frames && step.timeline?.timeScale(SCENE_FPS / SCENE_TIMING_FPS));
+    return steps;
   }
 
   /** Apply state to chips and glow — called on every overlay/intro update */

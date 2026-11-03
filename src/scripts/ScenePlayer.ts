@@ -14,6 +14,8 @@ export class ScenePlayer {
   private current: { scene: SceneConfig; progress: number } | null = null;
   /** Mobile loads every other frame and uses each scene's mobileFit */
   private profile = { step: 1, mobile: false };
+  /** Running frame loop of a scene with `loopFrom` */
+  private loop?: gsap.core.Tween;
 
   constructor(canvases: HTMLCanvasElement[]) {
     this.players = canvases.map((canvas) => new FramePlayer(canvas));
@@ -31,15 +33,21 @@ export class ScenePlayer {
     this.sequence(scene).load();
   }
 
-  /** Crossfade to `scene` and play its frames forward; resolves when the last frame is shown */
+  /** Crossfade to `scene` and play its frames forward; resolves when the last frame is shown, or, for a scene with
+   *  `loopFrom`, when that frame is reached (the loop then keeps running until the scene is rewound or left) */
   async play(scene: SceneConfig): Promise<void> {
     await this.crossfadeTo(scene, 0);
     // The frames start running while the crossfade is still going
-    await this.animateTo(1);
+    const loopStart = this.loopStart(scene);
+    await this.animateTo(loopStart);
+    if (loopStart < 1) this.startLoop(loopStart);
   }
 
-  /** Play the current scene backward to its first frame */
+  /** Play the current scene backward to its first frame; a looping scene stops its loop and rewinds from `loopFrom` */
   rewind(): Promise<void> {
+    this.stopLoop();
+    const current = this.current!;
+    current.progress = Math.min(current.progress, this.loopStart(current.scene));
     return this.animateTo(0);
   }
 
@@ -57,6 +65,8 @@ export class ScenePlayer {
   /** Show `scene` at `progress` on the back canvas and fade it over the front one; returns the running fade */
   private async crossfadeTo(scene: SceneConfig, progress: number): Promise<gsap.core.Timeline> {
     await this.sequence(scene).ready();
+    // Leaving a looping scene (e.g. toggling to "Without Tokkey") ends its loop
+    this.stopLoop();
     const outgoing = this.players[this.front].canvas;
     this.front = 1 - this.front;
     const incoming = this.players[this.front].canvas;
@@ -88,6 +98,28 @@ export class ScenePlayer {
         onInterrupt: resolve,
       });
     });
+  }
+
+  /** Progress (0..1) of the scene's `loopFrom` frame; 1 when the scene doesn't loop */
+  private loopStart(scene: SceneConfig): number {
+    if (scene.loopFrom === undefined) return 1;
+    return scene.loopFrom / (FRAME_SEQUENCES[scene.sequence].count - 1);
+  }
+
+  /** Repeat the current scene's frames from `start` to the last frame, forever, at SCENE_FPS */
+  private startLoop(start: number): void {
+    const current = this.current!;
+    const duration = (FRAME_SEQUENCES[current.scene.sequence].count / SCENE_FPS) * (1 - start);
+    this.loop = gsap.fromTo(
+      current,
+      { progress: start },
+      { progress: 1, duration, ease: "none", repeat: -1, onUpdate: () => this.draw() },
+    );
+  }
+
+  private stopLoop(): void {
+    this.loop?.kill();
+    this.loop = undefined;
   }
 
   /** Paint the current scene's frame on the front canvas */
