@@ -1,14 +1,16 @@
-// Frame sequences under public/assets/frames/<name>/NNN.webp — update the count when frames are added/removed.
-export const FRAME_COUNTS = {
-  a: 31,
-  b: 47,
-  c: 41,
-  d: 60,
-  e: 99,
-  g: 133,
+// Frame sequences under public/assets/frames/<name>/<prefix>_NNNNN.<jpg|webp> (numbered from 00000) — update the count
+// when frames are added/removed. The format is detected at load time: jpg if present, otherwise webp.
+// "webp" frames have a transparent background; "jpg" frames have a black one.
+export const FRAME_SEQUENCES = {
+  "001": { prefix: "001", count: 47 },
+  "002": { prefix: "002", count: 70 },
+  "003": { prefix: "003", count: 61 },
+  "004": { prefix: "004", count: 90 },
+  "005": { prefix: "底板飘散", count: 149 },
+  "006": { prefix: "底板传输", count: 199 },
 } as const;
 
-export type SequenceName = keyof typeof FRAME_COUNTS;
+export type SequenceName = keyof typeof FRAME_SEQUENCES;
 
 // Viewport breakpoint (px) below which the lighter mobile setup is used; matches Tailwind `md`
 export const MOBILE_MAX_WIDTH = 767;

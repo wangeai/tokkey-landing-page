@@ -3,7 +3,7 @@
 import { gsap } from "./gsap";
 import { FramePlayer } from "./FramePlayer";
 import { FrameSequence } from "./FrameSequence";
-import { FRAME_COUNTS } from "../config/frames";
+import { FRAME_SEQUENCES } from "../config/frames";
 import { SCENE_CROSSFADE, SCENE_FPS, type SceneConfig } from "../config/scenes";
 
 export class ScenePlayer {
@@ -44,8 +44,13 @@ export class ScenePlayer {
   }
 
   /** Crossfade back to `previous` on its last frame (the reverse of play()'s crossfade) */
-  async returnTo(previous: SceneConfig): Promise<void> {
-    const fade = await this.crossfadeTo(previous, 1);
+  returnTo(previous: SceneConfig): Promise<void> {
+    return this.show(previous, 1);
+  }
+
+  /** Crossfade to `scene` held at `progress` (0 = first frame, 1 = last); resolves when the fade ends */
+  async show(scene: SceneConfig, progress: number): Promise<void> {
+    const fade = await this.crossfadeTo(scene, progress);
     await fade.then();
   }
 
@@ -61,17 +66,27 @@ export class ScenePlayer {
     this.draw();
     return gsap
       .timeline()
-      .to(incoming, { opacity: 1, duration: SCENE_CROSSFADE }, 0)
-      .to(outgoing, { opacity: 0, duration: SCENE_CROSSFADE }, 0);
+      // overwrite: a newer crossfade (e.g. a quick mode toggle) takes over the canvases from a running one
+      .to(incoming, { opacity: 1, duration: SCENE_CROSSFADE, overwrite: "auto" }, 0)
+      .to(outgoing, { opacity: 0, duration: SCENE_CROSSFADE, overwrite: "auto" }, 0);
   }
 
-  /** Run the current scene's frames from where they are to `progress` (0 = first frame, 1 = last) */
+  /** Run the current scene's frames from where they are to `progress` (0 = first frame, 1 = last). A newer run takes
+   *  over a running one (e.g. a mode toggle mid-play); the interrupted promise resolves so nothing waits forever */
   private animateTo(progress: number): Promise<void> {
     const current = this.current!;
     // Duration comes from the full frame count, so mobile (half the frames) plays at the same speed
-    const duration = (FRAME_COUNTS[current.scene.sequence] / SCENE_FPS) * Math.abs(progress - current.progress);
+    const duration = (FRAME_SEQUENCES[current.scene.sequence].count / SCENE_FPS) * Math.abs(progress - current.progress);
     return new Promise((resolve) => {
-      gsap.to(current, { progress, duration, ease: "none", onUpdate: () => this.draw(), onComplete: resolve });
+      gsap.to(current, {
+        progress,
+        duration,
+        ease: "none",
+        overwrite: true,
+        onUpdate: () => this.draw(),
+        onComplete: resolve,
+        onInterrupt: resolve,
+      });
     });
   }
 

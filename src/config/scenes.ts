@@ -14,12 +14,12 @@ export interface SceneConfig {
 }
 
 export const SCENES: SceneConfig[] = [
-  { id: "logoReveal", sequence: "a", mobileFit: "contain", filter: "hue-rotate(28deg) saturate(1.1)" }, // lid lifts, TOKKEY glows behind it
-  { id: "plugIn", sequence: "b", mobileFit: "cover" }, // laptop opens, camera moves in to the plugged-in key
-  { id: "pullBack", sequence: "c", mobileFit: "contain" }, // camera pulls back to the laptop's front view
-  { id: "flipOver", sequence: "d", mobileFit: "contain" }, // zoom back out of the screen, then the laptop rotates to show its underside
-  { id: "xray", sequence: "e", mobileFit: "contain" }, // lightning reveals the internals
-  { id: "powerFlow", sequence: "g", mobileFit: "contain" }, // blue energy flows through the internals
+  { id: "logoReveal", sequence: "001", mobileFit: "contain", filter: "hue-rotate(28deg) saturate(1.1)" }, // lid lifts, TOKKEY glows behind it
+  { id: "plugIn", sequence: "002", mobileFit: "cover" }, // laptop opens, camera moves in to the plugged-in key
+  { id: "pullBack", sequence: "003", mobileFit: "contain" }, // camera pulls back to the laptop's front view
+  { id: "flipOver", sequence: "004", mobileFit: "contain" }, // zoom back out of the screen, then the laptop rotates to show its underside
+  { id: "xray", sequence: "005", mobileFit: "contain" }, // lightning reveals the internals
+  { id: "powerFlow", sequence: "006", mobileFit: "contain" }, // blue energy flows through the internals
 ];
 
 /** Playback speed for every scene */

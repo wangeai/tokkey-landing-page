@@ -1,0 +1,202 @@
+---
+// Scene "powerFlow" overlay: side cards, chips beside the laptop, hotspots + lines on the internals and a bottom strip.
+// Both "With Tokkey" and "Without Tokkey" versions are rendered; [data-mode] on the hero crossfades between them.
+// src/scripts/PowerPanel.ts positions and drives it; HeroScene fades the [data-power-item] pieces in.
+import { ICON_GRADIENTS, POWER, type PowerItem } from "../config/power";
+
+// Toned icons are stroked with a shared gradient from the <defs> below; the rest follow currentColor
+const icon = (item: PowerItem) =>
+  `<svg viewBox="0 0 24 24" fill="none" stroke="${item.tone ? `url(#power-icon-${item.tone})` : "currentColor"}" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${item.icon}</svg>`;
+---
+
+<div data-ref="power" class="pointer-events-none absolute inset-0 z-[5]">
+  <!-- Icon gradients, referenced by url(#power-icon-<tone>); zero-size rather than display:none so they still paint -->
+  <svg class="absolute size-0" aria-hidden="true">
+    <defs>
+      {
+        Object.entries(ICON_GRADIENTS).map(([tone, stops]) => (
+          <linearGradient id={`power-icon-${tone}`} gradientUnits="userSpaceOnUse" x1="2" y1="22" x2="22" y2="2">
+            {stops.map(([offset, color]) => <stop offset={offset} stop-color={color} />)}
+          </linearGradient>
+        ))
+      }
+    </defs>
+  </svg>
+  <!-- With Tokkey: lines from each card to its hotspots (desktop only) -->
+  <div class="power-with max-md:hidden">
+    <div data-ref="powerCallouts" class="absolute inset-0 opacity-0">
+      <svg data-power-lines class="absolute inset-0 size-full">
+        {POWER.with.cards.map(() => <><path /><circle r="3.5" /></>)}
+      </svg>
+      {
+        POWER.with.cards.map((card) => (
+          <div data-hotspot-group class="hotspot-group">
+            {card.hotspots!.map((box) => (
+              <i data-hotspot={`${box.x},${box.y},${box.width},${box.height}`} class="hotspot absolute" />
+            ))}
+          </div>
+        ))
+      }
+    </div>
+  </div>
+
+  <!-- Side cards (desktop only) -->
+  {
+    (["with", "without"] as const).map((mode) => (
+      <div data-power-cards class={`power-${mode} absolute left-gutter w-[264px] max-md:hidden`}>
+        {POWER[mode].cards.map((card, i) => (
+          <div
+            data-power-item
+            data-order={i}
+            {...(mode === "with" ? { "data-power-card": "" } : {})}
+            class="power-card pointer-events-auto absolute flex w-full gap-4 opacity-0"
+            style={`top: ${i * 104}px`}
+          >
+            <span class="size-6 flex-none" set:html={icon(card)} />
+            <span>
+              <b class="block text-body font-semibold text-white">{card.title}</b>
+              <small class="mt-1 block text-[14px] leading-5 text-ash">{card.text}</small>
+            </span>
+          </div>
+        ))}
+      </div>
+    ))
+  }
+
+  <!-- Chips beside the laptop (desktop only) -->
+  {
+    (["with", "without"] as const).map((mode) => (
+      <div data-power-tags class={`power-${mode} max-md:hidden`}>
+        {POWER[mode].tags.map((tag, i) => (
+          <div
+            data-power-item
+            data-order={i + 2}
+            data-power-tag={`${tag.at.x},${tag.at.y}`}
+            class="power-glass absolute flex items-center gap-4 rounded-3xl py-4 pr-6 pl-4 whitespace-nowrap opacity-0"
+          >
+            <span class="grid size-10 flex-none place-items-center rounded-2xl bg-white/10 [&>svg]:size-6" set:html={icon(tag)} />
+            <span>
+              <b class="block text-body font-semibold text-white">{tag.title}</b>
+              <small class="mt-1 flex items-center gap-2 font-mono text-[14px] leading-5 text-ash">
+                {tag.live && <i class="size-2 rounded-full bg-accent" />}
+                {tag.text}
+              </small>
+            </span>
+          </div>
+        ))}
+      </div>
+    ))
+  }
+
+  <!-- Bottom strip: 4 cells on desktop, 2×2 on phones -->
+  <div
+    data-ref="powerStrip"
+    class="power-glass absolute bottom-4 left-1/2 w-[calc(100%-32px)] max-w-[1120px] -translate-x-1/2 rounded-3xl opacity-0 md:bottom-2 md:w-[calc(100%-80px)]"
+  >
+    {
+      (["with", "without"] as const).map((mode) => (
+        <div class={`power-${mode} grid grid-cols-2 md:grid-cols-4 ${mode === "without" ? "absolute inset-0" : ""}`}>
+          {POWER[mode].strip.map((item) => (
+            <div class="power-cell flex items-center gap-3 p-4 md:gap-4 md:px-6 md:py-6">
+              <span class="size-6 flex-none" set:html={icon(item)} />
+              <span>
+                <b class="block text-[14px] leading-5 font-semibold text-white md:text-body">{item.title}</b>
+                <small class="block text-[12px] leading-4 text-ash md:text-[14px] md:leading-5">{item.text}</small>
+              </span>
+            </div>
+          ))}
+        </div>
+      ))
+    }
+  </div>
+</div>
+
+<style>
+  /* With / Without crossfade, driven by data-mode on the hero section */
+  .power-with,
+  .power-without {
+    transition: opacity 0.5s;
+  }
+  .power-without,
+  :global([data-mode="without"]) .power-with {
+    opacity: 0;
+  }
+  :global([data-mode="without"]) .power-without {
+    opacity: 1;
+  }
+  /* Only the visible mode's cards take hover */
+  :global([data-mode="without"]) .power-with .power-card,
+  :global([data-mode="with"]) .power-without .power-card {
+    pointer-events: none;
+  }
+
+  /* Cards: highlighted one at full strength; "With" icons bright, "Without" icons dimmed */
+  .power-card {
+    color: #fff;
+    transition: filter 0.4s;
+  }
+  .power-with .power-card:not(.is-active) {
+    filter: brightness(0.62);
+  }
+  .power-without .power-card,
+  .power-without .power-cell > span:first-child,
+  .power-without .power-glass > span:first-child {
+    color: var(--color-ash);
+  }
+
+  /* Hotspot outline on a part of the internals; only the active card's group shows */
+  .hotspot {
+    border: 2px solid rgb(255 255 255 / 90%);
+    border-radius: 8px;
+    box-shadow:
+      0 0 16px rgb(143 191 255 / 60%),
+      inset 0 0 16px rgb(143 191 255 / 30%);
+    opacity: 0;
+    transition: opacity 0.45s;
+  }
+  .hotspot-group.is-active .hotspot {
+    opacity: 1;
+  }
+
+  /* Elbow lines: dim, the active one bright */
+  [data-power-lines] path {
+    fill: none;
+    stroke: rgb(255 255 255 / 28%);
+    stroke-width: 1;
+    transition: stroke 0.4s;
+  }
+  [data-power-lines] circle {
+    fill: #fff;
+    opacity: 0.5;
+    transition: opacity 0.4s;
+  }
+  [data-power-lines] path.is-active {
+    stroke: rgb(255 255 255 / 90%);
+  }
+  [data-power-lines] circle.is-active {
+    opacity: 1;
+  }
+
+  /* Frosted glass shared by the chips and the strip */
+  .power-glass {
+    color: #fff;
+    background: linear-gradient(150deg, rgb(46 46 56 / 60%), rgb(12 12 16 / 66%));
+    border: 1px solid rgb(255 255 255 / 20%);
+    backdrop-filter: blur(24px) saturate(1.4);
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 20%),
+      0 24px 64px rgb(0 0 0 / 45%);
+  }
+  /* Hairline between strip cells (left on desktop; left + top on the 2×2 phone grid) */
+  .power-cell + .power-cell {
+    border-left: 1px solid rgb(255 255 255 / 12%);
+  }
+  @media (max-width: 767px) {
+    .power-cell:nth-child(3) {
+      border-left: 0;
+    }
+    .power-cell:nth-child(n + 3) {
+      border-top: 1px solid rgb(255 255 255 / 12%);
+    }
+  }
+</style>

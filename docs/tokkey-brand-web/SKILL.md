@@ -482,6 +482,17 @@ eyebrow -> H2: 16px · H2 -> Body: 24px · Body -> CTA: 32px
 
 同一区块内只用一个图标家族。绿色只点状态，不填整个图标。
 
+**例外：Hero「powerFlow」场景整块用线性图标（legacy 页面原图形，不用 pixelarticons）**：24×24、`fill="none"`、`stroke-width="1.6"`、圆角端点，图形定义在 `src/config/power.ts` 的 `ICONS`。With Tokkey 卡片与底部条的图标描边用渐变 `stroke="url(#渐变)"`，渐变从左下到右上（`gradientUnits="userSpaceOnUse" x1="2" y1="22" x2="22" y2="2"`），只用下面四组，定义在 `src/config/power.ts` 的 `ICON_GRADIENTS`：
+
+| Tone | 色标 | 用于 |
+|---|---|---|
+| orange | `#FF6A00` → `#FFB63D` | Tokkey Flash、No precision loss |
+| ai | `#FFB49A` · `#E8D58A` (.3) · `#9FE0A8` (.55) · `#8CC4FF` (.8) · `#D3A8FF` | Schedule Compute、Run bigger models |
+| green | `#6FE08A` → `#D2F58C` | Unified Memory、Plug in |
+| pink | `#FF3D8F` → `#C645FF` | SSD / Storage、No new computer |
+
+规则：渐变图标只出现在深色背景的「Tokkey 方」；「Without Tokkey」一侧和玻璃 chip 里的图标描边用 `currentColor`（灰或白）。其他区块不用线性图标和渐变图标。
+
 **直接可用的 SVG path（24×24 viewBox）：**
 
 ```html
@@ -504,7 +515,7 @@ eyebrow -> H2: 16px · H2 -> Body: 24px · Body -> CTA: 32px
 - 黑底区块和浅色区块交替出现
 - 每个区块都有 eyebrow 锚点标签（Commit Mono 大写）
 - 标题写短句 + 句号，句末用 Accent 绿点
-- 图标用 pixelarticons 风格内联 SVG，尺寸 24 的倍数
+- 图标用 pixelarticons 风格内联 SVG，尺寸 24 的倍数（powerFlow 场景例外：用线性图标，Tokkey 方可用四组渐变，见 Icons）
 - Logo 直接使用本 skill 中的 SVG 代码，不重新绘制
 - 发丝线分隔用 1px Silver，不做方框
 - 产品图占画面 1/4 到 1/3，其余留白
@@ -630,6 +641,7 @@ Pill Switch 按钮：
 - [ ] Commit Mono 未超过文字量的 10%，导航 / caption / 段落未误用等宽
 - [ ] 除 Hero 和金句区块外，其余区块左对齐
 - [ ] 图标全是 pixelarticons 风格、24 的倍数，同区块只用一个家族
+- [ ] 线性 / 渐变图标只出现在 powerFlow 场景，渐变只在 Tokkey 方且只用 Icons 里的四组
 - [ ] 分隔是 1px 发丝线，不是方框或粗线
 - [ ] Logo SVG 直接从 skill 复制，未修改任何 path 或颜色
 - [ ] `<head>` 第一行有 `setAttribute('data-theme','dark')` 初始化

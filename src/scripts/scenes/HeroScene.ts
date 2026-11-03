@@ -7,6 +7,8 @@ import { ScenePlayer } from "../ScenePlayer";
 import { SceneStepper } from "../SceneStepper";
 import { AsciiField, type AsciiCell } from "../AsciiField";
 import { LuminanceMap } from "../LuminanceMap";
+import { ModeTabs, type TokkeyMode } from "../ModeTabs";
+import { PowerPanel } from "../PowerPanel";
 import { MOBILE_MAX_WIDTH } from "../../config/frames";
 import { SCENES, type SceneConfig, type SceneId } from "../../config/scenes";
 
@@ -14,12 +16,15 @@ import { SCENES, type SceneConfig, type SceneId } from "../../config/scenes";
 const KEY_IN_FRAME = { x: 0.4275, y: 0.569 };
 /** Ripple origin of the dot field in the 1600×900 laptop frames (px, contain-fitted) */
 const RIPPLE_IN_FRAME = { x: 533, y: 592 };
-/** Laptop display (inside the bezel) in the last "pullBack" frame (1600×900 px), measured from frame c/041
+/** Laptop display (inside the bezel) in the last "pullBack" frame (1600×900 px), measured from frame 003_00060
  *  with ~2px bleed onto the dark bezel so no bright edge shows */
 const SCREEN_IN_FRAME = { x: 444, y: 100, width: 719, height: 460 };
+/** Center of the turned-over laptop in the last "flipOver" frame (1600×900 px) */
+const FLIPPED_LAPTOP_IN_FRAME = { x: 800, y: 452 };
 /** The app UI is laid out 1000px wide and scaled onto the display; its height follows the display's aspect ratio */
 const SCREEN_UI_WIDTH = 1000;
-/** Desktop stage scale during "pullBack", leaving room for the headline above the laptop */
+/** Desktop stage scale from "pullBack" on: scaling around the stage's 50% 90% origin lowers the laptop,
+ *  leaving room for the headlines and the With / Without Tokkey toggle above it */
 const STAGE_SHRINK = 0.74;
 /** Space kept free above (nav) and below the zoomed-in screen (px) */
 const ZOOM_MARGIN = { top: 90, bottom: 20 };
@@ -51,6 +56,10 @@ interface HeroState {
   /** App UI on the laptop screen and the ASCII field around the laptop */
   screenIn: number;
   laptopField: number;
+  /** ASCII glow around the turned-over laptop at the end of "flipOver" */
+  releaseField: number;
+  /** "powerFlow" overlay (cards, chips, lines) shown */
+  powerIn: number;
 }
 
 /** Viewport-dependent geometry, recomputed on resize */
@@ -65,22 +74,33 @@ interface HeroLayout {
   screen: { x: number; y: number; width: number; height: number };
   /** Stage transform when fully zoomed into the screen (around the stage's 50% 90% origin) */
   zoomTarget: { scale: number; x: number; y: number };
+  /** Center of the turned-over laptop at the end of "flipOver" */
+  flippedLaptop: { x: number; y: number };
 }
 
 export class HeroScene {
   private readonly ref: <T extends HTMLElement = HTMLElement>(name: string) => T;
   private readonly agentEls: HTMLElement[];
+  /** Frames layer + app UI layer, transformed together */
+  private readonly stageLayers: HTMLElement[];
   private readonly state: HeroState;
   private layout!: HeroLayout;
   private readonly player: ScenePlayer;
   private readonly steps: Record<SceneId, SceneStep[]>;
+  /** Scene whose end state is showing (undefined before the first scene) */
+  private sceneId?: SceneId;
   private readonly dots: AsciiField;
   private readonly glow: AsciiField;
   private readonly laptopField: AsciiField;
+  private readonly releaseField: AsciiField;
+  /** "With / Without Tokkey" toggle shown under "Release the True Power." */
+  readonly modeTabs: ModeTabs;
+  private readonly power: PowerPanel;
 
   constructor(private readonly section: HTMLElement) {
     this.ref = <T extends HTMLElement>(name: string) => section.querySelector<T>(`[data-ref="${name}"]`)!;
     this.agentEls = [...section.querySelectorAll<HTMLElement>("[data-agent]")];
+    this.stageLayers = [...section.querySelectorAll<HTMLElement>("[data-stage]")];
     this.state = {
       introDots: 0,
       dotsOut: 0,
@@ -90,20 +110,35 @@ export class HeroScene {
       zoom: 0,
       screenIn: 0,
       laptopField: 0,
+      releaseField: 0,
+      powerIn: 0,
     };
     this.dots = this.createDotField();
     this.glow = this.createGlowField();
-    this.laptopField = this.createLaptopField();
+    this.laptopField = this.createLaptopField("laptopField", () => ({ x: this.layout.width / 2, y: this.layout.height * 0.58 }));
+    this.releaseField = this.createLaptopField("releaseField", () => this.layout.flippedLaptop);
     gsap.ticker.add((time) => this.tickStats(time));
     this.player = new ScenePlayer([...section.querySelectorAll<HTMLCanvasElement>("[data-frames]")]);
+    this.power = new PowerPanel(this.ref("power"));
+    // The overlay's lines follow the animated cards, so redraw them every frame while it's shown
+    gsap.ticker.add((time) => {
+      if (this.state.powerIn > 0.01) this.power.tick(time);
+    });
 
     this.measure();
-    window.addEventListener("resize", () => {
+    const remeasure = () => {
       this.measure();
       this.render();
-    });
+    };
+    window.addEventListener("resize", remeasure);
+    // Web fonts change text heights (e.g. the powerFlow chips stacked above the strip), so measure again once they're in
+    document.fonts.ready.then(remeasure);
     gsap.set(this.ref("title1"), { y: 24, filter: "blur(10px)" });
     gsap.set(this.ref("title2"), { y: 24 });
+    gsap.set(this.ref("title4"), { y: 60, filter: "blur(10px)" });
+    gsap.set(this.ref("modeTabs"), { y: 40, pointerEvents: "none" });
+    this.modeTabs = new ModeTabs(this.ref("modeTabs"), section);
+    this.modeTabs.onChange((mode) => this.toggleMode(mode));
     // App UI panels wait hidden until the zoom into the screen finishes
     gsap.set("[data-screen-item]", { opacity: 0 });
     this.steps = this.createSteps();
@@ -124,28 +159,48 @@ export class HeroScene {
   }
 
   /** Move to scene `index`. Forward plays scene `index`'s steps in order; backward plays the steps of the scene after it
-   *  in reverse order, landing on scene `index`'s end state (index -1 = scene 0 rewound to its start) */
+   *  in reverse order, landing on scene `index`'s end state (index -1 = scene 0 rewound to its start).
+   *  From "xray" on the toggle picks a branch: "With Tokkey" plays (and rewinds) the frames; "Without Tokkey" keeps the
+   *  last "flipOver" frame on screen, so only the effects play */
   private async playScene(index: number, direction: 1 | -1): Promise<void> {
+    // Read the branch before the reset below: rewinding out of "xray" still follows the branch it was played in
+    const frames = this.modeTabs.mode === "with";
+    // Before "xray" the toggle is hidden; reset it quietly so the next pass through "xray" starts in "With Tokkey"
+    if (index < SCENES.findIndex((scene) => scene.id === "xray")) this.modeTabs.set("with", false);
+    this.sceneId = SCENES[index]?.id;
     if (direction > 0) {
       const scene = SCENES[index];
       const next = SCENES[index + 1];
-      if (next) this.player.preload(next);
-      for (const step of this.steps[scene.id]) await this.playStep(scene, step);
+      if (next && frames) this.player.preload(next);
+      for (const step of this.steps[scene.id]) await this.playStep(scene, step, frames);
       return;
     }
     const rewound = SCENES[index + 1];
-    for (const step of [...this.steps[rewound.id]].reverse()) await this.rewindStep(step, SCENES[index]);
+    for (const step of [...this.steps[rewound.id]].reverse()) await this.rewindStep(step, frames, SCENES[index]);
   }
 
-  /** Forward: crossfade in and play the frames (with their timeline alongside), or play the timeline */
-  private async playStep(scene: SceneConfig, step: SceneStep): Promise<void> {
-    await Promise.all([step.timeline && this.runTimeline(step.timeline, 1), step.frames && this.player.play(scene)]);
+  /** Switch branch on "xray" / "powerFlow": "Without Tokkey" crossfades back to the last "flipOver" frame,
+   *  "With Tokkey" plays the current scene's frames from there */
+  private toggleMode(mode: TokkeyMode): void {
+    const scene = SCENES.find((s) => s.id === this.sceneId);
+    if (scene?.id !== "xray" && scene?.id !== "powerFlow") return;
+    if (mode === "with") this.player.play(scene);
+    else this.player.show(SCENES.find((s) => s.id === "flipOver")!, 1);
   }
 
-  /** Backward: rewind the frames (with their timeline alongside) and crossfade back to `previous`, or reverse the timeline */
-  private async rewindStep(step: SceneStep, previous?: SceneConfig): Promise<void> {
-    await Promise.all([step.timeline && this.runTimeline(step.timeline, -1), step.frames && this.player.rewind()]);
-    if (step.frames && previous) await this.player.returnTo(previous);
+  /** Forward: crossfade in and play the frames (with their timeline alongside), or play the timeline.
+   *  `frames` false ("Without Tokkey") skips the frames and plays only the timeline */
+  private async playStep(scene: SceneConfig, step: SceneStep, frames: boolean): Promise<void> {
+    const play = step.frames && frames;
+    await Promise.all([step.timeline && this.runTimeline(step.timeline, 1), play && this.player.play(scene)]);
+  }
+
+  /** Backward: rewind the frames (with their timeline alongside) and crossfade back to `previous`, or reverse the timeline.
+   *  `frames` false ("Without Tokkey") leaves the frames alone and only reverses the timeline */
+  private async rewindStep(step: SceneStep, frames: boolean, previous?: SceneConfig): Promise<void> {
+    const rewind = step.frames && frames;
+    await Promise.all([step.timeline && this.runTimeline(step.timeline, -1), rewind && this.player.rewind()]);
+    if (rewind && previous) await this.player.returnTo(previous);
   }
 
   /** Play a timeline forward, or reverse it; resolves when it ends */
@@ -217,20 +272,58 @@ export class HeroScene {
     // Then the panels pop in one by one
     const screenPanels = timeline().fromTo(screenItems, { opacity: 0, y: 26 }, { opacity: 1, y: 0, stagger: 0.14 }, 0);
 
-    // Scene "flipOver": the app UI and glows fade away and the camera zooms back out to the full-size laptop,
-    // then the laptop turns over
+    // Scene "flipOver": the app UI and glows fade away and the camera zooms back out to the lowered laptop
+    // (stage stays shrunk for the scenes after it), then the laptop turns over
     const zoomOut = timeline()
       .fromTo([...screenItems, this.ref("partC")], { opacity: 1 }, { opacity: 0, duration: 0.4 }, 0)
       .fromTo(s, { screenIn: 1, laptopField: 1 }, { screenIn: 0, laptopField: 0, duration: 0.4 }, 0)
-      .fromTo(s, { zoom: 1, shrink: 1 }, { zoom: 0, shrink: 0, duration: 0.7 }, 0.2);
+      .fromTo(s, { zoom: 1 }, { zoom: 0, duration: 0.7 }, 0.2);
+    // After the turn: "Release the True Power." rises in over colored glows and an ASCII glow around the laptop
+    const release = timeline()
+      .fromTo(this.ref("releaseGlow"), { opacity: 0 }, { opacity: 1, duration: 0.8 }, 0)
+      .fromTo(s, { releaseField: 0 }, { releaseField: 1, duration: 0.8 }, 0)
+      .fromTo(
+        this.ref("title4"),
+        { opacity: 0, y: 60, filter: "blur(10px)" },
+        { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.7, ease: "power3.out" },
+        0.2,
+      );
+
+    // Scene "xray", with the frames: the With / Without Tokkey toggle rises in under the headline; it only takes clicks while shown
+    const tabsIn = timeline().fromTo(
+      this.ref("modeTabs"),
+      { opacity: 0, y: 40, pointerEvents: "none" },
+      { opacity: 1, y: 0, pointerEvents: "auto", duration: 0.6, ease: "power3.out" },
+      0,
+    );
+
+    // Scene "powerFlow", after the frames: side cards slide in, chips rise beside the laptop, then the lines,
+    // hotspots and bottom strip (both modes' pieces animate; data-mode decides which are visible)
+    const order = (_: number, el: HTMLElement) => Number(el.dataset.order) * 0.08;
+    const powerIn = timeline()
+      .fromTo(s, { powerIn: 0 }, { powerIn: 1, duration: 0.3 }, 0)
+      .fromTo(
+        this.section.querySelectorAll("[data-power-cards] [data-power-item]"),
+        { opacity: 0, x: -18 },
+        { opacity: 1, x: 0, stagger: order },
+        0.6,
+      )
+      .fromTo(
+        this.section.querySelectorAll("[data-power-tag]"),
+        { opacity: 0, y: 22 },
+        { opacity: 1, y: 0, stagger: order },
+        0.8,
+      )
+      .fromTo(this.ref("powerCallouts"), { opacity: 0 }, { opacity: 1 }, 1.3)
+      .fromTo(this.ref("powerStrip"), { opacity: 0, y: 26 }, { opacity: 1, y: 0 }, 1.3);
 
     return {
       logoReveal: [{ frames: true, timeline: logoReveal }],
       plugIn: [{ frames: true, timeline: plugIn }, { timeline: agentsFly }],
       pullBack: [{ frames: true, timeline: pullBack }, { timeline: screenZoom }, { timeline: screenPanels }],
-      flipOver: [{ timeline: zoomOut }, { frames: true }],
-      xray: [{ frames: true }],
-      powerFlow: [{ frames: true }],
+      flipOver: [{ timeline: zoomOut }, { frames: true }, { timeline: release }],
+      xray: [{ frames: true, timeline: tabsIn }],
+      powerFlow: [{ frames: true }, { timeline: powerIn }],
     };
   }
 
@@ -260,14 +353,15 @@ export class HeroScene {
     this.glow.setVisibility(s.glowIn * (0.55 + 0.45 * charge));
     this.dots.setVisibility(s.introDots * (1 - s.dotsOut) * 0.85);
     this.laptopField.setVisibility(s.laptopField * 0.6);
+    this.releaseField.setVisibility(s.releaseField * 0.55);
 
     // Stage: shrink for the headline, then zoom into the screen; the keyboard below the screen is clipped while zoomed
     const z = L.zoomTarget;
     const scale = lerp(lerp(1, L.mobile ? 1 : STAGE_SHRINK, s.shrink), z.scale, s.zoom);
-    const stage = this.ref("stage");
-    stage.style.transform = `translate(${z.x * s.zoom}px, ${z.y * s.zoom}px) scale(${scale})`;
+    const transform = `translate(${z.x * s.zoom}px, ${z.y * s.zoom}px) scale(${scale})`;
     const cut = L.height - (L.screen.y + L.screen.height + (34 * L.screen.width) / SCREEN_UI_WIDTH);
-    stage.style.clipPath = s.zoom > 0.001 ? `inset(-${L.height}px -${L.width}px ${cut * s.zoom}px)` : "none";
+    const clipPath = s.zoom > 0.001 ? `inset(-${L.height}px -${L.width}px ${cut * s.zoom}px)` : "none";
+    this.stageLayers.forEach((layer) => Object.assign(layer.style, { transform, clipPath }));
     this.ref("screen").style.opacity = String(s.screenIn);
   }
 
@@ -279,10 +373,24 @@ export class HeroScene {
     });
   }
 
-  /** Map 1600×900 frame pixels to viewport pixels for a frame drawn full-viewport with `fit` */
+  /** Map 1600×900 frame pixels to viewport pixels (frames are 3840×2160, same 16:9, so positions are measured
+   *  on a 1600×900 downscale) for a frame drawn full-viewport with `fit` */
   private fitFrame(width: number, height: number, fit: "cover" | "contain"): (x: number, y: number) => { x: number; y: number } {
     const k = (fit === "cover" ? Math.max : Math.min)(width / 1600, height / 900);
     return (x, y) => ({ x: (width - 1600 * k) / 2 + x * k, y: (height - 900 * k) / 2 + y * k });
+  }
+
+  /** Map 1600×900 frame pixels of scene `id` to viewport pixels while the stage is shrunk (desktop) around its
+   *  50% 90% origin; frames use cover on desktop and the scene's mobileFit on phones */
+  private shrunkFrame(id: SceneId, width: number, height: number, mobile: boolean): (x: number, y: number) => { x: number; y: number } {
+    const scene = SCENES.find((s) => s.id === id)!;
+    const fit = this.fitFrame(width, height, mobile ? scene.mobileFit : "cover");
+    const shrink = mobile ? 1 : STAGE_SHRINK;
+    const origin = { x: width / 2, y: height * 0.9 };
+    return (x, y) => {
+      const p = fit(x, y);
+      return { x: origin.x + (p.x - origin.x) * shrink, y: origin.y + (p.y - origin.y) * shrink };
+    };
   }
 
   /** Recompute viewport geometry (key position, ripple origin, agent grid) */
@@ -323,6 +431,10 @@ export class HeroScene {
       y: target.y - origin.y - zoomScale * (screen.y + screen.height / 2 - origin.y),
     };
 
+    // From "flipOver" on the laptop sits in the shrunk stage: map frame points through the scene's fit, then the shrink
+    const flippedLaptop = this.shrunkFrame("flipOver", width, height, mobile)(FLIPPED_LAPTOP_IN_FRAME.x, FLIPPED_LAPTOP_IN_FRAME.y);
+    this.power.layout(this.shrunkFrame("powerFlow", width, height, mobile));
+
     // Agent grid sits 56px under the second headline (layout box, ignoring its animated offset)
     const title2 = this.ref("title2");
     const chipHeight = this.agentEls[0]?.offsetHeight || 64;
@@ -334,7 +446,7 @@ export class HeroScene {
       chipHeight,
     };
 
-    this.layout = { width, height, mobile, key, ripple, agentGrid, screen, zoomTarget };
+    this.layout = { width, height, mobile, key, ripple, agentGrid, screen, zoomTarget, flippedLaptop };
   }
 
   /** Background dots: scrolling luminance texture plus a ripple from the laptop's port */
@@ -350,14 +462,16 @@ export class HeroScene {
     });
   }
 
-  /** Glow around the laptop in "pullBack": breathing radial falloff with ripples and luminance texture */
-  private createLaptopField(): AsciiField {
+  /** Glow around the laptop ("pullBack" front view, "flipOver" underside): breathing radial falloff around `center`
+   *  with ripples and luminance texture, drawn on canvas `name` */
+  private createLaptopField(name: string, center: () => { x: number; y: number }): AsciiField {
     const lum = LuminanceMap.instance;
-    return new AsciiField(this.ref<HTMLCanvasElement>("laptopField"), {
+    return new AsciiField(this.ref<HTMLCanvasElement>(name), {
       stepAlpha: 0.09,
       maxAlpha: 0.8,
       sample: ({ x, y, width, height, time }) => {
-        const d = Math.hypot(x - width / 2, (y - height * 0.58) * 1.3);
+        const c = center();
+        const d = Math.hypot(x - c.x, (y - c.y) * 1.3);
         const n = d / (Math.max(width, height) * 0.7);
         const falloff = Math.exp(-n * n * 0.85);
         const breathe = 0.5 + 0.5 * Math.sin(time * 0.9);

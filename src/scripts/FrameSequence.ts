@@ -1,5 +1,5 @@
-// Loads one frame folder (public/assets/frames/<name>/NNN.webp) as Image objects; shared via a cache.
-import { FRAME_COUNTS, type SequenceName } from "../config/frames";
+// Loads one frame folder (public/assets/frames/<name>/<prefix>_NNNNN.<jpg|webp>) as Image objects; shared via a cache.
+import { FRAME_SEQUENCES, type SequenceName } from "../config/frames";
 
 export class FrameSequence {
   private static readonly cache = new Map<string, FrameSequence>();
@@ -22,13 +22,35 @@ export class FrameSequence {
   load(): this {
     if (this.loaded) return this;
     this.loaded = true;
-    for (let i = 1; i <= FRAME_COUNTS[this.name]; i += this.step) {
+    const { count } = FRAME_SEQUENCES[this.name];
+    for (let i = 0; i < count; i += this.step) {
       const img = new Image();
       img.decoding = "async";
-      img.src = `/assets/frames/${this.name}/${String(i).padStart(3, "0")}.webp`;
       this.frames.push(img);
     }
+    // Probe the first frame as jpg; if it's missing, fall back to webp. The rest follow the detected format.
+    const first = this.frames[0];
+    const loadRest = (ext: string) => this.frames.slice(1).forEach((img, i) => (img.src = this.url((i + 1) * this.step, ext)));
+    // Remove both listeners once either fires, so the webp fallback's own "load" doesn't re-trigger the jpg path
+    const onLoad = () => {
+      first.removeEventListener("error", onError);
+      loadRest("jpg");
+    };
+    const onError = () => {
+      first.removeEventListener("load", onLoad);
+      first.src = this.url(0, "webp");
+      loadRest("webp");
+    };
+    first.addEventListener("load", onLoad, { once: true });
+    first.addEventListener("error", onError, { once: true });
+    first.src = this.url(0, "jpg");
     return this;
+  }
+
+  /** URL of the frame with the given source index and extension */
+  private url(index: number, ext: string): string {
+    const { prefix } = FRAME_SEQUENCES[this.name];
+    return `/assets/frames/${this.name}/${prefix}_${String(index).padStart(5, "0")}.${ext}`;
   }
 
   get length(): number {
