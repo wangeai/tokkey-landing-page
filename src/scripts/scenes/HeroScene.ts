@@ -273,11 +273,18 @@ export class HeroScene {
       .fromTo(s, { screenIn: 0 }, { screenIn: 1, duration: 0.4 }, 1.2);
     // Then the panels pop in one by one
     const screenPanels = timeline().fromTo(screenItems, { opacity: 0, y: 26 }, { opacity: 1, y: 0, stagger: 0.14 }, 0);
+    // Scene "flipOver" starts with the panels leaving the way screenPanels rewinds: last one first, sinking as they fade
+    const panelsOut = timeline().fromTo(
+      screenItems,
+      { opacity: 1, y: 0 },
+      { opacity: 0, y: 26, stagger: { each: 0.14, from: "end" } },
+      0,
+    );
 
-    // Scene "flipOver": the app UI and glows fade away and the camera zooms back out to the lowered laptop
+    // Then the screen backdrop and glows fade away and the camera zooms back out to the lowered laptop
     // (stage stays shrunk for the scenes after it), then the laptop turns over
     const zoomOut = timeline()
-      .fromTo([...screenItems, this.ref("partC")], { opacity: 1 }, { opacity: 0, duration: 0.4 }, 0)
+      .fromTo(this.ref("partC"), { opacity: 1 }, { opacity: 0, duration: 0.4 }, 0)
       .fromTo(s, { screenIn: 1, laptopField: 1 }, { screenIn: 0, laptopField: 0, duration: 0.4 }, 0)
       .fromTo(s, { zoom: 1 }, { zoom: 0, duration: 0.7 }, 0.2);
     // After the turn: "Release the True Power." rises in over colored glows and an ASCII glow around the laptop
@@ -325,7 +332,7 @@ export class HeroScene {
       agentsFly: [{ timeline: agentsFly }],
       pullBack: [{ frames: true, timeline: pullBack }],
       screenZoom: [{ timeline: screenZoom }, { timeline: screenPanels }],
-      flipOver: [{ timeline: zoomOut }, { frames: true }, { timeline: release }],
+      flipOver: [{ timeline: panelsOut }, { timeline: zoomOut }, { frames: true }, { timeline: release }],
       xray: [{ frames: true, timeline: tabsIn }],
       powerFlow: [{ frames: true }, { timeline: powerIn }],
     };
