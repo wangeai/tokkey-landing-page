@@ -11,12 +11,12 @@ export interface SceneConfig {
   mobileFit: "cover" | "contain";
   /** Optional CSS filter on the canvas while this scene shows (color-matches older renders) */
   filter?: string;
-  /** Optional source frame index: once play reaches it, frames loop from here to the last frame until the scene is left */
-  loopFrom?: number;
+  /** Optional playback speed for this scene's frames; defaults to SCENE_FPS */
+  fps?: number;
 }
 
 export const SCENES: SceneConfig[] = [
-  { id: "logoReveal", sequence: "001", mobileFit: "contain", filter: "hue-rotate(28deg) saturate(1.1)" }, // lid lifts, TOKKEY glows behind it
+  { id: "logoReveal", sequence: "001", mobileFit: "contain", fps: 30, filter: "hue-rotate(28deg) saturate(1.1)" }, // lid lifts, TOKKEY glows behind it
   { id: "plugIn", sequence: "002", mobileFit: "cover" }, // laptop opens, camera moves in to the plugged-in key
   // No frames of its own: holds plugIn's last frame while the agents fly into the key on their own scroll gesture
   { id: "agentsFly", sequence: "002", mobileFit: "cover" },
@@ -27,12 +27,15 @@ export const SCENES: SceneConfig[] = [
   { id: "zoomOut", sequence: "003", mobileFit: "contain" },
   { id: "flipOver", sequence: "004", mobileFit: "contain" }, // the laptop rotates to show its underside
   { id: "xray", sequence: "005", mobileFit: "contain" }, // lightning reveals the internals
-  { id: "powerFlow", sequence: "006", mobileFit: "contain", loopFrom: 178 }, // blue energy flows through the internals
+  { id: "powerFlow", sequence: "006", mobileFit: "contain", fps: 45 }, // blue energy flows through the internals
 ];
 
-/** Playback speed for every scene */
+/** Default playback speed (scenes can override it with `fps`) */
 export const SCENE_FPS = 60;
-/** Frame rate the frame-synced timelines' timings were authored at; they're sped up by SCENE_FPS / SCENE_TIMING_FPS */
+/** Playback speed of a scene's frames */
+export const sceneFps = (scene: SceneConfig): number => scene.fps ?? SCENE_FPS;
+
+/** Frame rate the frame-synced timelines' timings were authored at; they're sped up by the scene's fps / SCENE_TIMING_FPS */
 export const SCENE_TIMING_FPS = 30;
 /** Crossfade between two scenes' canvases (seconds) */
 export const SCENE_CROSSFADE = 0.35;

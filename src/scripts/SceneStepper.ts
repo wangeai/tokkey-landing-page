@@ -44,6 +44,11 @@ export class SceneStepper {
     this.lock();
   }
 
+  /** Play scene 0 without a gesture; does nothing once a gesture has already moved off the start */
+  autoplay(): void {
+    if (this.index === -1) this.goTo(0, 1);
+  }
+
   private step(direction: 1 | -1): void {
     if (this.busy && direction === this.direction) return;
     const next = this.index + direction;

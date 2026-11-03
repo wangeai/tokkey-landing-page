@@ -10,7 +10,7 @@ import { LuminanceMap } from "../LuminanceMap";
 import { ModeTabs, type TokkeyMode } from "../ModeTabs";
 import { PowerPanel } from "../PowerPanel";
 import { MOBILE_MAX_WIDTH } from "../../config/frames";
-import { SCENES, SCENE_FPS, SCENE_TIMING_FPS, type SceneConfig, type SceneId } from "../../config/scenes";
+import { SCENES, SCENE_TIMING_FPS, sceneFps, type SceneConfig, type SceneId } from "../../config/scenes";
 
 /** Where the key sits in the 1600×900 plug frames (fraction of the frame, cover-fitted) */
 const KEY_IN_FRAME = { x: 0.4275, y: 0.569 };
@@ -26,6 +26,8 @@ const SCREEN_UI_WIDTH = 1000;
 /** Desktop stage scale from "pullBack" on: scaling around the stage's 50% 90% origin lowers the laptop,
  *  leaving room for the headlines and the With / Without Tokkey toggle above it */
 const STAGE_SHRINK = 0.74;
+/** Seconds scene 0's first frame holds on page load before the scene plays */
+const INTRO_HOLD = 1;
 /** Space kept free above (nav) and below the zoomed-in screen (px) */
 const ZOOM_MARGIN = { top: 90, bottom: 20 };
 /** Live readings in the app's task bar: value = base + amp * sin(time * speed) */
@@ -86,6 +88,7 @@ export class HeroScene {
   private readonly state: HeroState;
   private layout!: HeroLayout;
   private readonly player: ScenePlayer;
+  private readonly stepper: SceneStepper;
   private readonly steps: Record<SceneId, SceneStep[]>;
   /** Scene whose end state is showing (undefined before the first scene) */
   private sceneId?: SceneId;
@@ -152,12 +155,13 @@ export class HeroScene {
       .add(`(min-width: ${MOBILE_MAX_WIDTH + 1}px)`, () => this.player.setProfile(1, false))
       .add(`(max-width: ${MOBILE_MAX_WIDTH}px)`, () => this.player.setProfile(2, true));
 
-    new SceneStepper(SCENES.length, (index, direction) => this.playScene(index, direction));
+    this.stepper = new SceneStepper(SCENES.length, (index, direction) => this.playScene(index, direction));
   }
 
-  /** On page load: scene 0's first frame fades in (the first scroll plays it), and so does the dot field */
+  /** On page load: scene 0's first frame fades in and holds for INTRO_HOLD seconds, then scene 0 plays on its own;
+   *  the dot field fades in alongside */
   private playIntro(): void {
-    this.player.show(SCENES[0], 0);
+    this.player.show(SCENES[0], 0).then(() => gsap.delayedCall(INTRO_HOLD, () => this.stepper.autoplay()));
     gsap.to(this.state, { introDots: 1, duration: 1.6, delay: 0.2, ease: "none", onUpdate: () => this.render() });
   }
 
@@ -352,10 +356,10 @@ export class HeroScene {
       xray: [{ frames: true, timeline: tabsIn }],
       powerFlow: [{ frames: true }, { timeline: powerIn }],
     };
-    // Timelines running alongside frames keep pace with the frame rate
-    Object.values(steps)
-      .flat()
-      .forEach((step) => step.frames && step.timeline?.timeScale(SCENE_FPS / SCENE_TIMING_FPS));
+    // Timelines running alongside frames keep pace with their scene's frame rate
+    SCENES.forEach((scene) =>
+      steps[scene.id].forEach((step) => step.frames && step.timeline?.timeScale(sceneFps(scene) / SCENE_TIMING_FPS)),
+    );
     return steps;
   }
 

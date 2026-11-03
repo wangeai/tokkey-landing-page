@@ -156,6 +156,17 @@
     background-clip: text;
     color: transparent;
     -webkit-text-fill-color: transparent;
+    /* background-clip only paints inside the box: tight leading would cut descenders (g) and the last letter's
+       overhang. Pad the box out and pull it back with equal negative margins, so the layout doesn't move */
+    padding-block: 0.1em 0.2em;
+    margin-block: -0.1em -0.2em;
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+  }
+  /* Inline chrome text (e.g. before an accent period) also needs room for the last letter's right edge */
+  span.text-chrome {
+    padding-inline-end: 0.1em;
+    margin-inline-end: -0.1em;
   }
   /* Buttons use theme tokens so they stay visible in both themes */
   .btn {
