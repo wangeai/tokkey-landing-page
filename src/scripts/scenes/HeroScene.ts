@@ -256,13 +256,15 @@ export class HeroScene {
       .fromTo(s, { glowIn: 1 }, { glowIn: 0 }, 0)
       .fromTo(this.ref("partC"), { opacity: 0 }, { opacity: 1, duration: 0.6 }, 0.7)
       .fromTo(s, { laptopField: 0 }, { laptopField: 1, duration: 0.6 }, 0.7)
-      // Desktop frames fill the screen top to bottom, so shrink the laptop to make room for the headline above it
-      .fromTo(s, { shrink: 0 }, { shrink: 1, duration: 0.8 }, 0.6)
+      // Desktop frames fill the screen top to bottom, so shrink the laptop to make room for the headline above it.
+      // Starts once the camera has settled (~frame 45 of 61): shrinking while the frames still pull back makes the
+      // 60fps CSS scale and the 30fps camera move fight each other, and the laptop shakes
+      .fromTo(s, { shrink: 0 }, { shrink: 1, duration: 0.6 }, 1.5)
       .fromTo(
         this.ref("title3"),
         { opacity: 0, y: 24, filter: "blur(10px)" },
         { opacity: 1, y: 0, filter: "blur(0px)" },
-        0.9,
+        1.7,
       );
     // Then the headline leaves, the camera zooms into the screen, and the app UI's backdrop fades in over it
     const screenZoom = timeline()

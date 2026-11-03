@@ -72,12 +72,12 @@ const icon = (item: PowerItem) =>
             data-power-item
             data-order={i + 2}
             data-power-tag={`${tag.at.x},${tag.at.y}`}
-            class="power-glass absolute flex items-center gap-4 rounded-3xl py-4 pr-6 pl-4 whitespace-nowrap opacity-0"
+            class="power-glass absolute flex items-center gap-4 rounded-3xl py-2 pr-6 pl-4 whitespace-nowrap opacity-0"
           >
             <span class="grid size-10 flex-none place-items-center rounded-2xl bg-white/10 [&>svg]:size-6" set:html={icon(tag)} />
             <span>
               <b class="block text-body font-semibold text-white">{tag.title}</b>
-              <small class="mt-1 flex items-center gap-2 font-mono text-[14px] leading-5 text-ash">
+              <small class="flex items-center gap-2 font-mono text-[14px] leading-5 text-ash">
                 {tag.live && <i class="size-2 rounded-full bg-accent" />}
                 {tag.text}
               </small>
@@ -97,7 +97,7 @@ const icon = (item: PowerItem) =>
       (["with", "without"] as const).map((mode) => (
         <div class={`power-${mode} grid grid-cols-2 md:grid-cols-4 ${mode === "without" ? "absolute inset-0" : ""}`}>
           {POWER[mode].strip.map((item) => (
-            <div class="power-cell flex items-center gap-3 p-4 md:gap-4 md:px-6 md:py-6">
+            <div class="power-cell flex items-center gap-3 p-4 md:gap-4 md:px-6 md:py-4">
               <span class="size-6 flex-none" set:html={icon(item)} />
               <span>
                 <b class="block text-[14px] leading-5 font-semibold text-white md:text-body">{item.title}</b>
