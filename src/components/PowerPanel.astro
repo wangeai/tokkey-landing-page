@@ -49,7 +49,7 @@ const icon = (item: PowerItem) =>
             data-power-item
             data-order={i}
             {...(mode === "with" ? { "data-power-card": "" } : {})}
-            class="power-card pointer-events-auto absolute flex w-full gap-4 opacity-0"
+            class="power-card pointer-events-auto absolute cursor-pointer flex w-full gap-4 opacity-0"
             style={`top: ${i * 104}px`}
           >
             <span class="size-6 flex-none" set:html={icon(card)} />
