@@ -16,6 +16,10 @@ export class ScenePlayer {
   private profile = { step: 1, mobile: false };
   /** Running frame loop of a scene with `loopFrom` */
   private loop?: gsap.core.Tween;
+  /** Running crossfade; a newer one takes over from it */
+  private fade?: gsap.core.Timeline;
+  /** Bumped by every play / rewind / show, so a call that was taken over doesn't carry on after its awaits */
+  private epoch = 0;
 
   constructor(canvases: HTMLCanvasElement[]) {
     this.players = canvases.map((canvas) => new FramePlayer(canvas));
@@ -34,17 +38,26 @@ export class ScenePlayer {
   }
 
   /** Crossfade to `scene` and play its frames forward; resolves when the last frame is shown, or, for a scene with
-   *  `loopFrom`, when that frame is reached (the loop then keeps running until the scene is rewound or left) */
+   *  `loopFrom`, when that frame is reached (the loop then keeps running until the scene is rewound or left).
+   *  If `scene` is already on screen (a rewind turned around midway), play on from the frame showing */
   async play(scene: SceneConfig): Promise<void> {
-    await this.crossfadeTo(scene, 0);
-    // The frames start running while the crossfade is still going
+    const epoch = ++this.epoch;
+    if (!this.isShowing(scene)) {
+      await this.sequence(scene).ready();
+      if (epoch !== this.epoch) return;
+      // The frames start running while the crossfade is still going
+      this.crossfadeTo(scene, 0);
+    }
     const loopStart = this.loopStart(scene);
     await this.animateTo(loopStart);
-    if (loopStart < 1) this.startLoop(loopStart);
+    if (epoch === this.epoch && loopStart < 1) this.startLoop(loopStart);
   }
 
-  /** Play the current scene backward to its first frame; a looping scene stops its loop and rewinds from `loopFrom` */
-  rewind(): Promise<void> {
+  /** Play `scene` backward from the frame showing to its first frame; a looping scene stops its loop and rewinds
+   *  from `loopFrom`. Does nothing if `scene` isn't on screen (its play was turned around before the crossfade) */
+  rewind(scene: SceneConfig): Promise<void> {
+    ++this.epoch;
+    if (!this.isShowing(scene)) return Promise.resolve();
     this.stopLoop();
     const current = this.current!;
     current.progress = Math.min(current.progress, this.loopStart(current.scene));
@@ -58,13 +71,21 @@ export class ScenePlayer {
 
   /** Crossfade to `scene` held at `progress` (0 = first frame, 1 = last); resolves when the fade ends */
   async show(scene: SceneConfig, progress: number): Promise<void> {
-    const fade = await this.crossfadeTo(scene, progress);
-    await fade.then();
+    const epoch = ++this.epoch;
+    await this.sequence(scene).ready();
+    if (epoch !== this.epoch) return;
+    await this.crossfadeTo(scene, progress).then();
   }
 
-  /** Show `scene` at `progress` on the back canvas and fade it over the front one; returns the running fade */
-  private async crossfadeTo(scene: SceneConfig, progress: number): Promise<gsap.core.Timeline> {
-    await this.sequence(scene).ready();
+  /** True when the front canvas shows `scene`'s frames (scenes sharing a sequence count, e.g. plugIn / agentsFly) */
+  private isShowing(scene: SceneConfig): boolean {
+    return this.current?.scene.sequence === scene.sequence;
+  }
+
+  /** Show `scene` at `progress` on the back canvas, bring it on top and fade it in over the front one, which stays
+   *  opaque underneath until the fade ends (fading both at once lets the page show through mid-fade, a visible flash
+   *  between scenes whose frames match). Returns the running fade. The scene's frames must be loaded */
+  private crossfadeTo(scene: SceneConfig, progress: number): gsap.core.Timeline {
     // Leaving a looping scene (e.g. toggling to "Without Tokkey") ends its loop
     this.stopLoop();
     const outgoing = this.players[this.front].canvas;
@@ -74,11 +95,16 @@ export class ScenePlayer {
 
     this.current = { scene, progress };
     this.draw();
-    return gsap
+    // A newer crossfade (e.g. a quick mode toggle) takes over: finish the running one first (which also resolves
+    // anything awaiting it), so the canvas it brought in is fully opaque underneath the new one
+    this.fade?.progress(1);
+    gsap.set(incoming, { zIndex: 1 });
+    gsap.set(outgoing, { zIndex: 0 });
+    this.fade = gsap
       .timeline()
-      // overwrite: a newer crossfade (e.g. a quick mode toggle) takes over the canvases from a running one
-      .to(incoming, { opacity: 1, duration: SCENE_CROSSFADE, overwrite: "auto" }, 0)
-      .to(outgoing, { opacity: 0, duration: SCENE_CROSSFADE, overwrite: "auto" }, 0);
+      .to(incoming, { opacity: 1, duration: SCENE_CROSSFADE })
+      .set(outgoing, { opacity: 0 });
+    return this.fade;
   }
 
   /** Run the current scene's frames from where they are to `progress` (0 = first frame, 1 = last). A newer run takes

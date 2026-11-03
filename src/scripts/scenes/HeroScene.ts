@@ -89,6 +89,8 @@ export class HeroScene {
   private readonly steps: Record<SceneId, SceneStep[]>;
   /** Scene whose end state is showing (undefined before the first scene) */
   private sceneId?: SceneId;
+  /** Scene whose steps are playing or rewinding, and the index of the running step; undefined when idle */
+  private transition?: { scene: SceneConfig; at: number };
   private readonly dots: AsciiField;
   private readonly glow: AsciiField;
   private readonly laptopField: AsciiField;
@@ -161,22 +163,33 @@ export class HeroScene {
   /** Move to scene `index`. Forward plays scene `index`'s steps in order; backward plays the steps of the scene after it
    *  in reverse order, landing on scene `index`'s end state (index -1 = scene 0 rewound to its start).
    *  From "xray" on the toggle picks a branch: "With Tokkey" plays (and rewinds) the frames; "Without Tokkey" keeps the
-   *  last "flipOver" frame on screen, so only the effects play */
+   *  last "flipOver" frame on screen, so only the effects play.
+   *  Called against a running transition, it turns that one around from its running step */
   private async playScene(index: number, direction: 1 | -1): Promise<void> {
     // Read the branch before the reset below: rewinding out of "xray" still follows the branch it was played in
     const frames = this.modeTabs.mode === "with";
     // Before "xray" the toggle is hidden; reset it quietly so the next pass through "xray" starts in "With Tokkey"
     if (index < SCENES.findIndex((scene) => scene.id === "xray")) this.modeTabs.set("with", false);
     this.sceneId = SCENES[index]?.id;
-    if (direction > 0) {
-      const scene = SCENES[index];
-      const next = SCENES[index + 1];
-      if (next && frames) this.player.preload(next);
-      for (const step of this.steps[scene.id]) await this.playStep(scene, step, frames);
-      return;
+    // Forward plays scene `index`; backward rewinds the scene after it
+    const scene = direction > 0 ? SCENES[index] : SCENES[index + 1];
+    const steps = this.steps[scene.id];
+    const next = SCENES[index + 1];
+    if (direction > 0 && next && frames) this.player.preload(next);
+    const running = this.transition;
+    const transition = {
+      scene,
+      at: running?.scene === scene ? running.at : direction > 0 ? 0 : steps.length - 1,
+    };
+    this.transition = transition;
+    for (; transition.at >= 0 && transition.at < steps.length; transition.at += direction) {
+      const step = steps[transition.at];
+      if (direction > 0) await this.playStep(scene, step, frames);
+      else await this.rewindStep(scene, step, frames, SCENES[index]);
+      // A newer gesture took over (and turned this transition around)
+      if (this.transition !== transition) return;
     }
-    const rewound = SCENES[index + 1];
-    for (const step of [...this.steps[rewound.id]].reverse()) await this.rewindStep(step, frames, SCENES[index]);
+    this.transition = undefined;
   }
 
   /** Switch branch on "xray" / "powerFlow": "Without Tokkey" crossfades back to the last "flipOver" frame,
@@ -188,26 +201,27 @@ export class HeroScene {
     else this.player.show(SCENES.find((s) => s.id === "flipOver")!, 1);
   }
 
-  /** Forward: crossfade in and play the frames (with their timeline alongside), or play the timeline.
-   *  `frames` false ("Without Tokkey") skips the frames and plays only the timeline */
+  /** Forward: crossfade in and play the frames (with their timeline alongside), or play the timeline; a step turned
+   *  around midway plays on from where it is. `frames` false ("Without Tokkey") skips the frames and plays only the timeline */
   private async playStep(scene: SceneConfig, step: SceneStep, frames: boolean): Promise<void> {
     const play = step.frames && frames;
     await Promise.all([step.timeline && this.runTimeline(step.timeline, 1), play && this.player.play(scene)]);
   }
 
-  /** Backward: rewind the frames (with their timeline alongside) and crossfade back to `previous`, or reverse the timeline.
-   *  `frames` false ("Without Tokkey") leaves the frames alone and only reverses the timeline */
-  private async rewindStep(step: SceneStep, frames: boolean, previous?: SceneConfig): Promise<void> {
+  /** Backward: rewind `scene`'s frames (with their timeline alongside) and crossfade back to `previous`, or reverse the
+   *  timeline, from wherever they are. `frames` false ("Without Tokkey") leaves the frames alone and only reverses the timeline */
+  private async rewindStep(scene: SceneConfig, step: SceneStep, frames: boolean, previous?: SceneConfig): Promise<void> {
     const rewind = step.frames && frames;
-    await Promise.all([step.timeline && this.runTimeline(step.timeline, -1), rewind && this.player.rewind()]);
+    await Promise.all([step.timeline && this.runTimeline(step.timeline, -1), rewind && this.player.rewind(scene)]);
     if (rewind && previous) await this.player.returnTo(previous);
   }
 
-  /** Play a timeline forward, or reverse it; resolves when it ends */
+  /** Play a timeline forward, or reverse it, from where it is; resolves when it reaches that end */
   private runTimeline(tl: gsap.core.Timeline, direction: 1 | -1): Promise<void> {
+    if (tl.progress() === (direction > 0 ? 1 : 0)) return Promise.resolve();
     return new Promise((resolve) => {
       tl.eventCallback(direction > 0 ? "onComplete" : "onReverseComplete", () => resolve());
-      if (direction > 0) tl.play(0);
+      if (direction > 0) tl.play();
       else tl.reverse();
     });
   }
