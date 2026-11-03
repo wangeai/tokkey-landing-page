@@ -4,7 +4,7 @@ import { gsap } from "./gsap";
 import { FramePlayer } from "./FramePlayer";
 import { FrameSequence } from "./FrameSequence";
 import { FRAME_SEQUENCES } from "../config/frames";
-import { SCENE_CROSSFADE, sceneFps, type SceneConfig } from "../config/scenes";
+import { SCENE_CROSSFADE, SCENE_FADE, sceneFps, type SceneConfig } from "../config/scenes";
 
 export class ScenePlayer {
   private readonly players: FramePlayer[];
@@ -30,6 +30,11 @@ export class ScenePlayer {
     this.draw();
   }
 
+  /** Draw every scene's frames `y` CSS px lower */
+  setOffsetY(y: number): void {
+    this.players.forEach((player) => player.setOffsetY(y));
+  }
+
   /** Start downloading a scene's frames ahead of time */
   preload(scene: SceneConfig): void {
     this.sequence(scene).load();
@@ -42,8 +47,10 @@ export class ScenePlayer {
     if (!this.isShowing(scene)) {
       await this.sequence(scene).ready();
       if (epoch !== this.epoch) return;
-      // The frames start running while the crossfade is still going
-      this.crossfadeTo(scene, 0);
+      // The frames start running while the crossfade is still going; after a fade-out-then-in, once it's done
+      const fade = this.crossfadeTo(scene, 0, scene.fadeIn);
+      if (scene.fadeIn) await fade.then();
+      if (epoch !== this.epoch) return;
     }
     await this.animateTo(1);
   }
@@ -56,17 +63,18 @@ export class ScenePlayer {
     return this.animateTo(0);
   }
 
-  /** Crossfade back to `previous` on its last frame (the reverse of play()'s crossfade) */
+  /** Crossfade back to `previous` on its last frame (the reverse of play()'s crossfade, fading if that one faded) */
   returnTo(previous: SceneConfig): Promise<void> {
-    return this.show(previous, 1);
+    return this.show(previous, 1, this.current?.scene.fadeIn);
   }
 
-  /** Crossfade to `scene` held at `progress` (0 = first frame, 1 = last); resolves when the fade ends */
-  async show(scene: SceneConfig, progress: number): Promise<void> {
+  /** Crossfade to `scene` held at `progress` (0 = first frame, 1 = last); resolves when the fade ends.
+   *  `fade` fades the front scene out, then `scene` in, instead of cutting */
+  async show(scene: SceneConfig, progress: number, fade = false): Promise<void> {
     const epoch = ++this.epoch;
     await this.sequence(scene).ready();
     if (epoch !== this.epoch) return;
-    await this.crossfadeTo(scene, progress).then();
+    await this.crossfadeTo(scene, progress, fade).then();
   }
 
   /** True when the front canvas shows `scene`'s frames (scenes sharing a sequence count, e.g. plugIn / agentsFly) */
@@ -75,15 +83,16 @@ export class ScenePlayer {
   }
 
   /** Show `scene` at `progress` on the back canvas, bring it on top and hide the front one. The first scene fades in;
-   *  later ones cut straight over (a fade would show the outgoing frame through the transparent WebP background).
+   *  later ones cut straight over (a fade would show the outgoing frame through the transparent WebP background),
+   *  unless `fade`: then the front one fades out, and the new one fades in after it.
    *  Returns the running fade. The scene's frames must be loaded */
-  private crossfadeTo(scene: SceneConfig, progress: number): gsap.core.Timeline {
+  private crossfadeTo(scene: SceneConfig, progress: number, fade = false): gsap.core.Timeline {
     const outgoing = this.players[this.front].canvas;
     this.front = 1 - this.front;
     const incoming = this.players[this.front].canvas;
     incoming.style.filter = scene.filter ?? "";
-    // Only the very first scene fades in; later ones cut, since transparent WebP frames would show the old scene through
-    const duration = this.current ? 0 : SCENE_CROSSFADE;
+    // The very first scene and `fade` ones fade in; others cut, since transparent WebP frames would show the old scene through
+    const duration = fade ? SCENE_FADE : this.current ? 0 : SCENE_CROSSFADE;
 
     this.current = { scene, progress };
     this.draw();
@@ -94,8 +103,8 @@ export class ScenePlayer {
     gsap.set(outgoing, { zIndex: 0 });
     this.fade = gsap
       .timeline()
-      .to(incoming, { opacity: 1, duration })
-      .set(outgoing, { opacity: 0 });
+      .to(outgoing, { opacity: 0, duration: fade ? SCENE_FADE : 0, ease: "sine.inOut" })
+      .to(incoming, { opacity: 1, duration, ease: "sine.inOut" });
     return this.fade;
   }
 

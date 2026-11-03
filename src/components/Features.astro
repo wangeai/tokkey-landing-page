@@ -1,0 +1,575 @@
+---
+// Features section: four tabs on the left ("Run large AI models", "Light guidance", "Lid closed", "Private memory"),
+// each showing a panel in the glass frame on the right. Driven by src/scripts/scenes/FeaturesScene.ts; elements tagged
+// data-ref are looked up by name there. Content lives in src/config/features.ts and src/config/games.ts.
+import { FEATURES, GAME_DEMO_CAPTION, MEMORY_ROWS, MODEL_FOOTPRINTS } from "../config/features";
+import { GAME_THUMB, GAME_VIEW, GAMES } from "../config/games";
+
+const total = String(FEATURES.length).padStart(2, "0");
+// Chevron paths for the carousel buttons
+const arrows = { prev: "M15 5l-7 7 7 7", next: "M9 5l7 7-7 7" };
+---
+
+<section id="features" data-features class="relative overflow-hidden bg-black text-white [--peek:4.1vw] md:h-svh">
+  <!-- Backdrop: WebGL liquid noise, a left-side darkening and film grain -->
+  <div class="backdrop pointer-events-none absolute inset-0">
+    <canvas data-ref="background" class="backdrop-fade absolute inset-0 size-full"></canvas>
+    <div class="backdrop-fade backdrop-shade absolute inset-0"></div>
+    <div class="backdrop-grain absolute inset-0"></div>
+  </div>
+
+  <div
+    class="relative z-[1] grid gap-8 px-gutter-sm pt-[96px] pb-24 md:absolute md:inset-0 md:grid-cols-[minmax(320px,0.78fr)_1.4fr] md:gap-[2.4vw] md:px-[4vw] md:pb-9"
+  >
+    <!-- Tabs -->
+    <div role="tablist" aria-label="Tokkey features" class="flex flex-col justify-center gap-1.5">
+      {
+        FEATURES.map((feature, i) => (
+          <div role="tab" tabindex="0" aria-selected="false" data-feature-tab class="feature-tab">
+            <span class="feature-tab-number">{String(i + 1).padStart(2, "0")}</span>
+            <h3>
+              {feature.title}
+              {feature.pro && <> <span class="pro-badge">PRO</span></>}
+            </h3>
+            <p>{feature.text}</p>
+          </div>
+        ))
+      }
+    </div>
+
+    <!-- Glass frame with one panel per tab -->
+    <div data-ref="visual" class="visual relative h-[560px] md:h-full">
+      <div class="visual-header">
+        <span class="panel-counter"><b data-ref="counter">01</b> / {total}</span>
+        <span data-ref="caption" class="panel-caption"></span>
+      </div>
+
+      <!-- 1. Run large AI models: carousel of model memory cards and the game demo -->
+      <div data-feature-panel class="panel panel-carousel">
+        <div data-ref="carousel" class="carousel">
+          <div class="slide">
+            <span class="panel-counter"><b>01</b> / {total}</span>
+            <span class="panel-caption">{FEATURES[0].caption}</span>
+            <div class="slide-body gap-[3.6%]">
+              {
+                MODEL_FOOTPRINTS.map((model, i) => (
+                  <div role="button" tabindex="0" aria-pressed={i === 0 ? "true" : "false"} data-model-card class="model-card">
+                    <small class="font-mono text-[11px] tracking-[0.08em] text-white/70 uppercase">{model.params}</small>
+                    <h5 class="mt-2 mb-4 text-[clamp(22px,2.4vw,34px)] font-semibold tracking-[-0.03em]">{model.name}</h5>
+                    <div class="flex flex-wrap items-baseline gap-x-3">
+                      <b class="text-chrome text-[clamp(26px,2.9vw,42px)] font-semibold tracking-[-0.04em]">{model.withTokkey}</b>
+                      <span class="text-[12px] text-white/70">of memory with Tokkey</span>
+                      <em class="ml-auto font-mono text-[12px] text-white/50 not-italic">vs {model.without} without</em>
+                    </div>
+                  </div>
+                ))
+              }
+            </div>
+          </div>
+
+          <div class="slide">
+            <span class="panel-counter"><b>01</b> / {total}</span>
+            <span class="panel-caption">{GAME_DEMO_CAPTION}</span>
+            <div data-ref="games" class="slide-body gap-4">
+              <div class="relative min-h-0 flex-[1_1_0] overflow-hidden rounded-[28px] bg-black">
+                <canvas data-game-view width={GAME_VIEW.width} height={GAME_VIEW.height} class="block size-full object-cover"></canvas>
+                <div class="game-info">
+                  <div class="font-mono text-[11px] tracking-[0.08em] text-[#a1a1a6] uppercase">
+                    Now playing · <span data-game-title></span>
+                  </div>
+                  <h3 data-game-title class="mt-1.5 mb-2.5 text-[20px] font-semibold tracking-[-0.03em]"></h3>
+                  <span class="inline-flex h-[26px] items-center gap-2 max-md:hidden rounded-full border border-white/20 bg-white/8 px-3.5 font-mono text-[11px] text-[#e8e8ec]">
+                    <i class="size-[7px] rounded-full bg-accent"></i>Qwen3.6 35B-A3B · local · 0 tokens
+                  </span>
+                </div>
+              </div>
+              <div class="game-thumbs">
+                {
+                  GAMES.map((game) => (
+                    <button type="button" data-game aria-pressed="false" class="game-thumb">
+                      <canvas width={GAME_THUMB.width} height={GAME_THUMB.height} class="block aspect-video w-full" />
+                      <b>{game.name}</b>
+                    </button>
+                  ))
+                }
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="absolute right-(--peek) bottom-1 flex gap-2">
+          <button type="button" data-ref="carouselPrev" class="carousel-button" aria-label="Previous">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d={arrows.prev} /></svg>
+          </button>
+          <button type="button" data-ref="carouselNext" class="carousel-button" aria-label="Next">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d={arrows.next} /></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- 2. Light guidance: the key's back with its light ring breathing (LightRing) -->
+      <div data-feature-panel class="panel">
+        <img src="/assets/images/k4_close.webp" alt="Tokkey plugged into a MacBook Pro" loading="lazy" class="absolute inset-0 size-full object-cover opacity-60" />
+        <div class="light-shade absolute inset-0"></div>
+        <div class="absolute top-[24.8%] left-[2.3%] flex h-[62.6%] w-[67.3%] items-center justify-center">
+          <div data-ref="ringGlow" class="ring-glow"></div>
+          <img data-ref="ringPlate" src="/assets/images/k4_plate.webp" alt="Tokkey back, light ring" loading="lazy" class="ring-plate" />
+        </div>
+        <div class="glass-card light-legend">
+          <div class="mb-2.5 font-mono text-[11px] tracking-[0.08em] text-white/70 uppercase">Light states</div>
+          <div class="flex items-center gap-3 py-1.5 text-[14px] text-[#c8c8ce]">
+            <i class="light-dot"></i>Done<em class="ml-auto font-mono text-[10.5px] text-[#8d8d95] not-italic">WHITE PULSE</em>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. Lid closed -->
+      <div data-feature-panel class="panel">
+        <img src="/assets/images/lid.png" alt="MacBook lid closed with Tokkey plugged in" width="1800" height="1237" loading="lazy" class="lid-photo" />
+        <div class="glass-card bottom-[7%] left-[6%] w-[min(430px,88%)] md:w-[min(430px,52%)]">
+          <div class="card-label">Lid closed</div>
+          <div class="card-figure">Still working<span class="period">.</span></div>
+          <div class="mt-[18px] flex flex-wrap gap-2.5">
+            <span class="status-chip"><i></i>Agent running</span>
+            <span class="status-chip">04:12:09 uptime</span>
+          </div>
+          <p class="mt-4 max-w-[340px] text-[15px] leading-normal text-[#d0d0d6]">Contract review finished. Weekly report is drafting.</p>
+        </div>
+      </div>
+
+      <!-- 4. Private memory -->
+      <div data-feature-panel class="panel">
+        <div class="glass-card top-1/2 left-1/2 w-[min(560px,88%)] -translate-x-1/2 -translate-y-[46%] md:w-[min(560px,82%)]">
+          <div class="card-label">Private memory · stored on the key</div>
+          <div class="card-figure">12.4 GB<span class="period">.</span></div>
+          <div class="mt-[18px] grid gap-2.5">
+            {
+              MEMORY_ROWS.map((row) => (
+                <div class="flex justify-between rounded-2xl border border-white/10 bg-black/28 px-[18px] py-3.5 text-[14px] text-[#a1a1a6]">
+                  <b class="font-semibold text-white">{row.label}</b>
+                  {row.value}
+                </div>
+              ))
+            }
+          </div>
+          <div class="mt-[18px]"><span class="status-chip"><i></i>Encrypted · never uploaded</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  import { FeaturesScene } from "../scripts/scenes/FeaturesScene";
+  const section = document.querySelector<HTMLElement>("[data-features]");
+  if (section) new FeaturesScene(section);
+</script>
+
+<style>
+  /* ---------- Backdrop ---------- */
+  .backdrop {
+    background: radial-gradient(120% 80% at 70% 30%, #2a2a2e 0%, #0a0a0c 55%, #000 100%);
+  }
+  /* Fade the noise in from the top so the section blends into the black hero above */
+  .backdrop-fade {
+    mask-image: linear-gradient(180deg, transparent 0, rgb(0 0 0 / 55%) 22%, #000 55%);
+  }
+  .backdrop-shade {
+    background: linear-gradient(90deg, rgb(0 0 0 / 60%), rgb(0 0 0 / 30%) 55%, rgb(0 0 0 / 24%));
+  }
+  .backdrop-grain {
+    opacity: 0.22;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* ---------- Tabs: inactive ones show only the title; the active one grows and reveals its text ---------- */
+  .feature-tab {
+    position: relative;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    outline: none;
+    transition: background 0.4s;
+  }
+  .feature-tab h3 {
+    font-size: clamp(30px, 3.5vw, 52px);
+    font-weight: 600;
+    letter-spacing: -0.035em;
+    line-height: 1.08;
+    color: rgb(255 255 255 / 62%);
+    text-shadow: 0 2px 22px rgb(0 25 45 / 75%), 0 0 2px rgb(0 25 45 / 35%);
+    transition: color 0.4s, font-size 0.4s, letter-spacing 0.4s;
+  }
+  .feature-tab:hover h3 {
+    color: rgb(255 255 255 / 55%);
+  }
+  .feature-tab p {
+    max-width: 380px;
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    font-size: 15px;
+    line-height: 1.5;
+    color: var(--color-ash);
+    transition: max-height 0.5s, opacity 0.5s, margin 0.5s;
+  }
+  .feature-tab-number {
+    position: absolute;
+    top: 12px;
+    right: 16px;
+    font: 11px var(--font-mono);
+    color: #6d6d74;
+    opacity: 0;
+    transition: opacity 0.4s;
+  }
+  .feature-tab[aria-selected="true"] {
+    padding-bottom: 16px;
+    background: rgb(255 255 255 / 6%);
+  }
+  .feature-tab[aria-selected="true"] h3 {
+    font-size: clamp(34px, 3.7vw, 56px);
+    letter-spacing: -0.045em;
+    color: #fff;
+  }
+  .feature-tab[aria-selected="true"] p {
+    max-height: 120px;
+    margin-top: 10px;
+    opacity: 1;
+  }
+  .feature-tab[aria-selected="true"] .feature-tab-number {
+    opacity: 1;
+  }
+  .feature-tab:focus-visible {
+    box-shadow: 0 0 0 1px var(--color-accent);
+  }
+  @media (width < 768px) {
+    .feature-tab h3 {
+      font-size: 26px;
+    }
+    .feature-tab[aria-selected="true"] h3 {
+      font-size: 34px;
+    }
+  }
+  .pro-badge {
+    margin-left: 4px;
+    padding: 3px 9px;
+    border-radius: 99px;
+    background: linear-gradient(100deg, #ff9a62 0%, #ff5e9c 28%, #b678ff 55%, #5e9bff 78%, #4fe3d4 100%);
+    font: 600 11px var(--font-mono);
+    letter-spacing: 0;
+    color: #000;
+    vertical-align: middle;
+    text-shadow: none;
+  }
+
+  /* ---------- Glass frame and panels ---------- */
+  .visual,
+  .slide {
+    border-radius: 38px;
+    background: linear-gradient(150deg, rgb(255 255 255 / 20%), rgb(255 255 255 / 7%));
+  }
+  .visual {
+    overflow: hidden;
+    border: 1px solid rgb(255 255 255 / 28%);
+    backdrop-filter: blur(34px) saturate(1.5);
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 35%), 0 40px 100px rgb(0 10 60 / 45%);
+  }
+  /* The carousel panel brings its own glass cards */
+  .visual[data-carousel] {
+    overflow: visible;
+    border-color: transparent;
+    background: none;
+    backdrop-filter: none;
+    box-shadow: none;
+  }
+  .visual[data-carousel] > .visual-header {
+    display: none;
+  }
+  .panel-counter {
+    position: absolute;
+    top: 26px;
+    left: 30px;
+    z-index: 6;
+    font: 12.5px var(--font-mono);
+    color: rgb(255 255 255 / 85%);
+  }
+  .panel-counter b {
+    font-weight: 400;
+    color: #fff;
+  }
+  .panel-caption {
+    position: absolute;
+    top: 24px;
+    right: 30px;
+    z-index: 6;
+    max-width: 60%;
+    text-align: right;
+    font-size: clamp(17px, 1.6vw, 24px);
+    line-height: 1.25;
+    letter-spacing: -0.02em;
+    color: #fff;
+  }
+  .panel {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.6s;
+  }
+  .panel[data-active] {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  /* Let the next slide peek in past the right edge */
+  .panel-carousel {
+    right: calc(-1 * var(--peek));
+  }
+  .glass-card {
+    position: absolute;
+    padding: 26px 28px;
+    border-radius: 28px;
+    border: 1px solid rgb(255 255 255 / 20%);
+    background: linear-gradient(150deg, rgb(255 255 255 / 13%), rgb(255 255 255 / 4%));
+    backdrop-filter: blur(26px) saturate(1.4);
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 20%), 0 30px 80px rgb(0 0 0 / 50%);
+  }
+  .card-label {
+    margin-bottom: 14px;
+    font: 11.5px var(--font-mono);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #a1a1a6;
+  }
+  .card-figure {
+    font-size: clamp(34px, 4vw, 60px);
+    font-weight: 600;
+    line-height: 1.05;
+    letter-spacing: -0.04em;
+  }
+  .status-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    border-radius: 99px;
+    border: 1px solid rgb(255 255 255 / 14%);
+    background: rgb(0 0 0 / 35%);
+    font: 11.5px var(--font-mono);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .status-chip i {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--color-accent);
+    box-shadow: 0 0 10px var(--color-accent);
+    animation: status-pulse 1.6s infinite;
+  }
+  @keyframes status-pulse {
+    50% {
+      opacity: 0.3;
+    }
+  }
+
+  /* ---------- Panel 1: carousel ---------- */
+  .carousel {
+    position: absolute;
+    inset: 0 0 50px;
+    display: flex;
+    gap: 24px;
+    overflow: auto hidden;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    cursor: grab;
+  }
+  .carousel::-webkit-scrollbar {
+    display: none;
+  }
+  /* Spacer so the last slide can snap flush left */
+  .carousel::after {
+    content: "";
+    flex: 0 0 var(--peek);
+  }
+  .carousel[data-dragging] {
+    cursor: grabbing;
+    scroll-snap-type: none;
+    user-select: none;
+  }
+  .slide {
+    position: relative;
+    flex: 0 0 calc(100% - var(--peek));
+    overflow: hidden;
+    scroll-snap-align: start;
+  }
+  .slide-body {
+    position: absolute;
+    inset: 13% 6.8% 8%;
+    display: flex;
+    flex-direction: column;
+  }
+  /* The caption wraps to two lines on phones; start the cards below it */
+  @media (width < 768px) {
+    .slide-body {
+      top: 96px;
+    }
+  }
+  .model-card {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 0 5%;
+    border-radius: 28px;
+    background: linear-gradient(150deg, rgb(255 255 255 / 12%), rgb(255 255 255 / 4%));
+    opacity: 0.72;
+    cursor: pointer;
+    transition: opacity 0.4s, background 0.4s;
+  }
+  .model-card[aria-pressed="true"] {
+    opacity: 1;
+    background: linear-gradient(150deg, rgb(70 70 82 / 92%), rgb(24 24 30 / 94%));
+  }
+  .game-info {
+    position: absolute;
+    bottom: 18px;
+    left: 18px;
+    width: min(330px, calc(100% - 36px));
+    padding: 16px 18px;
+    border-radius: 20px;
+    background: linear-gradient(150deg, rgb(40 40 48 / 62%), rgb(10 10 14 / 70%));
+    backdrop-filter: blur(30px) saturate(1.5);
+  }
+  .game-thumbs {
+    display: flex;
+    flex: none;
+    gap: 14px;
+    overflow-x: auto;
+    scroll-snap-type: x proximity;
+    scrollbar-width: none;
+  }
+  .game-thumbs::-webkit-scrollbar {
+    display: none;
+  }
+  .game-thumb {
+    flex: 0 0 calc((100% - 42px) / 4);
+    overflow: hidden;
+    border-radius: 18px;
+    background: #0a0a0c;
+    text-align: left;
+    opacity: 0.6;
+    cursor: pointer;
+    scroll-snap-align: start;
+    transition: transform 0.4s, opacity 0.4s;
+  }
+  .game-thumb:hover {
+    transform: translateY(-3px);
+  }
+  .game-thumb[aria-pressed="true"] {
+    opacity: 1;
+  }
+  .game-thumb b {
+    display: block;
+    padding: 8px 12px 10px;
+    font-size: 12.5px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: #c8c8ce;
+  }
+  .game-thumb[aria-pressed="true"] b {
+    color: #fff;
+  }
+  @media (width < 768px) {
+    .game-thumb {
+      flex-basis: calc((100% - 14px) / 2);
+    }
+  }
+  .carousel-button {
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: rgb(255 255 255 / 10%);
+    color: #fff;
+    cursor: pointer;
+    backdrop-filter: blur(12px);
+    transition: opacity 0.2s, background 0.2s;
+  }
+  .carousel-button:hover {
+    background: rgb(255 255 255 / 20%);
+  }
+  .carousel-button:disabled {
+    opacity: 0.3;
+    cursor: default;
+  }
+
+  /* ---------- Panel 2: light ring ---------- */
+  .light-shade {
+    background: linear-gradient(90deg, rgb(0 0 0 / 82%), rgb(0 0 0 / 30%) 55%, rgb(0 0 0 / 50%));
+  }
+  .ring-plate {
+    display: block;
+    width: 85.3%;
+    transform: rotate(15.72deg);
+    filter: drop-shadow(0 30px 50px rgb(0 0 0 / 60%));
+  }
+  /* Blurred glow over the ring; LightRing animates its opacity and gradient */
+  .ring-glow {
+    position: absolute;
+    top: 54.5%;
+    left: 28.5%;
+    z-index: 4;
+    width: 36%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    opacity: 0;
+    transform: translate(-50%, -50%);
+    mix-blend-mode: screen;
+    filter: blur(26px);
+    pointer-events: none;
+    transition: opacity 0.6s;
+  }
+  .light-legend {
+    top: 75.2%;
+    left: 49.2%;
+    width: 40%;
+    padding: 19px 22px 12px;
+    border-radius: 24px;
+    box-shadow: none;
+  }
+  @media (width < 768px) {
+    .light-legend {
+      left: auto;
+      right: 16px;
+      width: 60%;
+    }
+  }
+  .light-dot {
+    flex: none;
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    background: #fff;
+    animation: light-pulse 2.8s ease-in-out infinite;
+  }
+  @keyframes light-pulse {
+    0%,
+    100% {
+      box-shadow: 0 0 4px rgb(255 255 255 / 40%);
+    }
+    50% {
+      box-shadow: 0 0 16px #fff;
+    }
+  }
+
+  /* ---------- Panel 3: lid closed ---------- */
+  .lid-photo {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 78%;
+    transform: translate(-50%, -52%);
+    filter: drop-shadow(0 50px 70px rgb(0 0 0 / 70%)) brightness(0.78);
+  }
+</style>

@@ -9,110 +9,113 @@ import PowerPanel from "./PowerPanel.astro";
 <section id="hero" class="relative h-svh overflow-hidden bg-black" data-hero>
   <!-- ASCII dot field behind everything -->
   <canvas data-ref="dots" class="absolute inset-0 size-full"></canvas>
-  <!-- Scene "pullBack": ASCII glow around the laptop, behind the frames -->
-  <canvas data-ref="laptopField" class="pointer-events-none absolute inset-0 size-full"></canvas>
-  <!-- End of scene "flipOver": colored glows and an ASCII glow around the turned-over laptop, behind the frames -->
-  <div data-ref="releaseGlow" class="release-glow pointer-events-none absolute inset-0 opacity-0"></div>
-  <canvas data-ref="releaseField" class="pointer-events-none absolute inset-0 size-full"></canvas>
+  <!-- Pan: everything over the dot field; HeroScene slides it up in "powerFlow" to bring the strip below the viewport into view -->
+  <div data-ref="pan" class="absolute inset-0">
+    <!-- Scene "pullBack": ASCII glow around the laptop, behind the frames -->
+    <canvas data-ref="laptopField" class="pointer-events-none absolute inset-0 size-full"></canvas>
+    <!-- End of scene "flipOver": colored glows and an ASCII glow around the turned-over laptop, behind the frames -->
+    <div data-ref="releaseGlow" class="release-glow pointer-events-none absolute inset-0 opacity-0"></div>
+    <canvas data-ref="releaseField" class="pointer-events-none absolute inset-0 size-full"></canvas>
 
-  <!-- Stage: two layers HeroScene shrinks/zooms together around 50% 90%.
-       Frames: two stacked canvases so ScenePlayer can crossfade between scenes. Frames are drawn unblended so the
-       laptop stays opaque (WebP frames have a transparent background; JPG frames keep their black one).
-       App UI: sits on the laptop screen and moves with the frames -->
-  <div data-stage class="absolute inset-0 origin-[50%_90%]">
-    <canvas data-frames class="absolute inset-0 size-full"></canvas>
-    <canvas data-frames class="absolute inset-0 size-full"></canvas>
-  </div>
-  <div data-stage class="absolute inset-0 origin-[50%_90%]">
-    <AgentScreen />
-  </div>
-
-  <!-- Scene "logoReveal": "Own Your Intelligence." -->
-  <div data-ref="partA" class="absolute inset-0">
-    <h1
-      data-ref="title1"
-      class="text-chrome absolute inset-x-0 top-[9vh] z-[6] px-gutter-sm text-center text-[clamp(36px,5.6vw,96px)] leading-[1.02] font-semibold tracking-[-0.045em] opacity-0"
-    >
-      Own Your Intelligence<span class="period">.</span>
-    </h1>
-    <div data-ref="caption" class="absolute inset-x-0 bottom-[7vh] text-center font-mono text-[11.5px] tracking-[0.14em] text-[#a1a1a6] uppercase">
-      Scroll
+    <!-- Stage: two layers HeroScene zooms together around 50% 90%.
+         Frames: two stacked canvases so ScenePlayer can crossfade between scenes. Frames are drawn unblended so the
+         laptop stays opaque (WebP frames have a transparent background; JPG frames keep their black one).
+         App UI: sits on the laptop screen and moves with the frames -->
+    <div data-stage class="absolute inset-0 origin-[50%_90%]">
+      <canvas data-frames class="absolute inset-0 size-full"></canvas>
+      <canvas data-frames class="absolute inset-0 size-full"></canvas>
     </div>
-    <div class="scroll-hint absolute bottom-7 left-1/2 h-[46px] w-px bg-linear-to-b from-white to-transparent opacity-50"></div>
-  </div>
+    <div data-stage class="absolute inset-0 origin-[50%_90%]">
+      <AgentScreen />
+    </div>
 
-  <!-- Scene "pullBack": "A private agent. Working on your Mac." over soft blue/purple glows -->
-  <div data-ref="partC" class="pointer-events-none absolute inset-0 opacity-0">
-    <div class="absolute top-[30%] -left-[10%] h-[500px] w-[700px] rounded-full bg-[#5e9bff] opacity-[0.14] blur-[120px]"></div>
-    <div class="absolute top-[20%] -right-[10%] h-[500px] w-[700px] rounded-full bg-[#b678ff] opacity-[0.14] blur-[120px]"></div>
+    <!-- Scene "logoReveal": "Own Your Intelligence." -->
+    <div data-ref="partA" class="absolute inset-0">
+      <h1
+        data-ref="title1"
+        class="text-chrome absolute inset-x-0 top-[9vh] z-[6] px-gutter-sm text-center text-[clamp(36px,5.6vw,96px)] leading-[1.02] font-semibold tracking-[-0.045em] opacity-0"
+      >
+        Own Your Intelligence<span class="period">.</span>
+      </h1>
+      <div data-ref="caption" class="absolute inset-x-0 bottom-[7vh] text-center font-mono text-[11.5px] tracking-[0.14em] text-[#a1a1a6] uppercase">
+        Scroll
+      </div>
+      <div class="scroll-hint absolute bottom-7 left-1/2 h-[46px] w-px bg-linear-to-b from-white to-transparent opacity-50"></div>
+    </div>
+
+    <!-- Scene "pullBack": "A private agent. Working on your Mac." over soft blue/purple glows -->
+    <div data-ref="partC" class="pointer-events-none absolute inset-0 opacity-0">
+      <div class="absolute top-[30%] -left-[10%] h-[500px] w-[700px] rounded-full bg-[#5e9bff] opacity-[0.14] blur-[120px]"></div>
+      <div class="absolute top-[20%] -right-[10%] h-[500px] w-[700px] rounded-full bg-[#b678ff] opacity-[0.14] blur-[120px]"></div>
+      <h2
+        data-ref="title3"
+        class="text-chrome absolute inset-x-0 top-[11vh] px-gutter-sm text-center text-[clamp(34px,4.6vw,76px)] leading-[1.02] font-semibold tracking-[-0.045em] opacity-0"
+      >
+        A private agent.<br />Working on your Mac<span class="period">.</span>
+      </h2>
+    </div>
+
+    <!-- End of scene "flipOver": "Release the True Power." -->
     <h2
-      data-ref="title3"
-      class="text-chrome absolute inset-x-0 top-[11vh] px-gutter-sm text-center text-[clamp(34px,4.6vw,76px)] leading-[1.02] font-semibold tracking-[-0.045em] opacity-0"
+      data-ref="title4"
+      class="pointer-events-none absolute inset-x-0 top-[9vh] z-[6] px-gutter-sm text-center text-[clamp(34px,4.4vw,72px)] leading-[1.06] font-semibold tracking-[-0.045em] opacity-0"
     >
-      A private agent.<br />Working on your Mac<span class="period">.</span>
+      <span class="text-chrome">Release the True Power</span><span class="period">.</span>
     </h2>
-  </div>
+    <!-- Scene "powerFlow": cards, chips, hotspots and strip for With / Without Tokkey -->
+    <PowerPanel />
 
-  <!-- End of scene "flipOver": "Release the True Power." -->
-  <h2
-    data-ref="title4"
-    class="pointer-events-none absolute inset-x-0 top-[9vh] z-[6] px-gutter-sm text-center text-[clamp(34px,4.4vw,72px)] leading-[1.06] font-semibold tracking-[-0.045em] opacity-0"
-  >
-    <span class="text-chrome">Release the True Power</span><span class="period">.</span>
-  </h2>
-  <!-- Scene "powerFlow": cards, chips, hotspots and strip for With / Without Tokkey -->
-  <PowerPanel />
-
-  <!-- Scene "xray": With / Without Tokkey toggle under the headline; ModeTabs sets data-mode on the section, CSS slides the thumb -->
-  <div
-    data-ref="modeTabs"
-    class="mode-tabs absolute top-[calc(9vh+96px)] md:top-[calc(9vh+clamp(36px,4.6vw,76px)+24px)] left-1/2 z-[6] flex -translate-x-1/2 rounded-full p-[5px] opacity-0"
-  >
-    <i class="mode-thumb absolute top-[5px] left-[5px] h-10 w-[140px] rounded-full bg-white md:h-11 md:w-[172px]"></i>
-    <button data-mode="with" class="relative z-[1] h-10 w-[140px] rounded-full text-[14px] font-semibold md:h-11 md:w-[172px] md:text-[15px]">
-      With Tokkey
-    </button>
-    <button data-mode="without" class="relative z-[1] h-10 w-[140px] rounded-full text-[14px] font-semibold md:h-11 md:w-[172px] md:text-[15px]">
-      Without Tokkey
-    </button>
-  </div>
-
-  <!-- Scene "plugIn": "Turn your Mac into an AI Mac.", agents fly into the key -->
-  <div data-ref="partB" class="absolute inset-0 opacity-0">
-    <!-- Darkens the left side so the headline and chips stay readable -->
+    <!-- Scene "xray": With / Without Tokkey toggle under the headline; ModeTabs sets data-mode on the section, CSS slides the thumb -->
     <div
-      data-ref="plugShade"
-      class="absolute inset-0 bg-[linear-gradient(90deg,rgb(0_0_0/78%),rgb(0_0_0/25%)_48%,transparent_70%),linear-gradient(0deg,rgb(0_0_0/50%),transparent_30%)] opacity-0"
+      data-ref="modeTabs"
+      class="mode-tabs absolute top-[calc(9vh+96px)] md:top-[calc(9vh+clamp(36px,4.6vw,76px)+24px)] left-1/2 z-[6] flex -translate-x-1/2 rounded-full p-[5px] opacity-0"
     >
+      <i class="mode-thumb absolute top-[5px] left-[5px] h-10 w-[140px] rounded-full bg-white md:h-11 md:w-[172px]"></i>
+      <button data-mode="with" class="relative z-[1] h-10 w-[140px] rounded-full text-[14px] font-semibold md:h-11 md:w-[172px] md:text-[15px]">
+        With Tokkey
+      </button>
+      <button data-mode="without" class="relative z-[1] h-10 w-[140px] rounded-full text-[14px] font-semibold md:h-11 md:w-[172px] md:text-[15px]">
+        Without Tokkey
+      </button>
     </div>
-    <canvas data-ref="glow" class="pointer-events-none absolute inset-0 z-[3] size-full mix-blend-screen"></canvas>
-    <!-- Anchor positioned on the key by HeroScene; holds the halo -->
-    <div data-ref="key" class="pointer-events-none absolute z-[4] -mt-[79px] -ml-[105px] h-[158px] w-[210px]">
+
+    <!-- Scene "plugIn": "Turn your Mac into an AI Mac.", agents fly into the key -->
+    <div data-ref="partB" class="absolute inset-0 opacity-0">
+      <!-- Darkens the left side so the headline and chips stay readable -->
       <div
-        data-ref="halo"
-        class="absolute top-1/2 left-1/2 -z-10 -mt-[260px] -ml-[260px] size-[520px] rounded-full bg-[radial-gradient(circle,rgb(255_255_255/50%),transparent_62%)] opacity-0"
+        data-ref="plugShade"
+        class="absolute inset-0 bg-[linear-gradient(90deg,rgb(0_0_0/78%),rgb(0_0_0/25%)_48%,transparent_70%),linear-gradient(0deg,rgb(0_0_0/50%),transparent_30%)] opacity-0"
       >
       </div>
-    </div>
-    <h2
-      data-ref="title2"
-      class="text-chrome absolute top-[15vh] left-[7vw] pr-gutter-sm text-[clamp(40px,5.6vw,96px)] leading-[1.02] font-semibold tracking-[-0.045em] opacity-0"
-    >
-      Turn your Mac<br />into an AI Mac<span class="period">.</span>
-    </h2>
-    {
-      AGENTS.map((agent) => (
+      <canvas data-ref="glow" class="pointer-events-none absolute inset-0 z-[3] size-full mix-blend-screen"></canvas>
+      <!-- Anchor positioned on the key by HeroScene; holds the halo -->
+      <div data-ref="key" class="pointer-events-none absolute z-[4] -mt-[79px] -ml-[105px] h-[158px] w-[210px]">
         <div
-          data-agent
-          class="glass absolute top-0 left-0 z-[5] flex items-center gap-2.5 rounded-full py-1.5 pr-4 pl-1.5 text-[14px] font-medium whitespace-nowrap opacity-0 will-change-transform md:gap-3.5 md:py-[9px] md:pr-[26px] md:pl-[9px] md:text-[18px] md:tracking-[-0.01em]"
+          data-ref="halo"
+          class="absolute top-1/2 left-1/2 -z-10 -mt-[260px] -ml-[260px] size-[520px] rounded-full bg-[radial-gradient(circle,rgb(255_255_255/50%),transparent_62%)] opacity-0"
         >
-          <i class="grid size-8 place-items-center rounded-full border border-white/16 bg-white/10 md:size-11 [&>svg]:size-5 md:[&>svg]:size-6">
-            <Fragment set:html={agent.icon} />
-          </i>
-          {agent.name}
         </div>
-      ))
-    }
+      </div>
+      <h2
+        data-ref="title2"
+        class="text-chrome absolute top-[15vh] left-[7vw] pr-gutter-sm text-[clamp(40px,5.6vw,96px)] leading-[1.02] font-semibold tracking-[-0.045em] opacity-0"
+      >
+        Turn your Mac<br />into an AI Mac<span class="period">.</span>
+      </h2>
+      {
+        AGENTS.map((agent) => (
+          <div
+            data-agent
+            class="glass absolute top-0 left-0 z-[5] flex items-center gap-2.5 rounded-full py-1.5 pr-4 pl-1.5 text-[14px] font-medium whitespace-nowrap opacity-0 will-change-transform md:gap-3.5 md:py-[9px] md:pr-[26px] md:pl-[9px] md:text-[18px] md:tracking-[-0.01em]"
+          >
+            <i class="grid size-8 place-items-center rounded-full border border-white/16 bg-white/10 md:size-11 [&>svg]:size-5 md:[&>svg]:size-6">
+              <Fragment set:html={agent.icon} />
+            </i>
+            {agent.name}
+          </div>
+        ))
+      }
+    </div>
   </div>
 </section>
 

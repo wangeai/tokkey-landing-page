@@ -8,6 +8,8 @@ export class FramePlayer {
   private readonly resizeObserver: ResizeObserver;
   private current: { sequence: FrameSequence; index: number; fit: FrameFit } | null = null;
   private lastDrawn: HTMLImageElement | null = null;
+  /** Vertical shift of the drawn frame (CSS px, + = down) */
+  private offsetY = 0;
 
   constructor(
     readonly canvas: HTMLCanvasElement,
@@ -18,6 +20,14 @@ export class FramePlayer {
     // Keep the canvas backing store in sync with its CSS size
     this.resizeObserver = new ResizeObserver(() => this.resize());
     this.resizeObserver.observe(canvas);
+  }
+
+  /** Shift the frame down by `y` CSS px and repaint. Done in the draw instead of a CSS transform: transforming the
+   *  canvas while it redraws every frame made playback choppy */
+  setOffsetY(y: number): void {
+    if (y === this.offsetY) return;
+    this.offsetY = y;
+    this.repaint();
   }
 
   /** Show frame `index` of `sequence`; skips work if that exact image is already on screen */
@@ -34,7 +44,8 @@ export class FramePlayer {
     const w = img.naturalWidth * scale;
     const h = img.naturalHeight * scale;
     this.ctx.clearRect(0, 0, cw, ch);
-    this.ctx.drawImage(img, (cw - w) / 2, (ch - h) / 2, w, h);
+    const dy = this.offsetY * (ch / this.canvas.clientHeight || 1);
+    this.ctx.drawImage(img, (cw - w) / 2, (ch - h) / 2 + dy, w, h);
   }
 
   private resize(): void {
@@ -42,6 +53,11 @@ export class FramePlayer {
     this.canvas.width = Math.round(this.canvas.clientWidth * dpr);
     this.canvas.height = Math.round(this.canvas.clientHeight * dpr);
     // Resizing clears the canvas, so repaint what was showing
+    this.repaint();
+  }
+
+  /** Draw the current frame again, even if it's already on screen */
+  private repaint(): void {
     this.lastDrawn = null;
     if (this.current) this.draw(this.current.sequence, this.current.index, this.current.fit);
   }

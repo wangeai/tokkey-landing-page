@@ -23,11 +23,11 @@ const SCREEN_IN_FRAME = { x: 444, y: 100, width: 719, height: 460 };
 const FLIPPED_LAPTOP_IN_FRAME = { x: 800, y: 452 };
 /** The app UI is laid out 1000px wide and scaled onto the display; its height follows the display's aspect ratio */
 const SCREEN_UI_WIDTH = 1000;
-/** Desktop stage scale from "pullBack" on: scaling around the stage's 50% 90% origin lowers the laptop,
- *  leaving room for the headlines and the With / Without Tokkey toggle above it */
-const STAGE_SHRINK = 0.74;
+/** Desktop: every scene's frames are drawn this much lower (fraction of the viewport height),
+ *  leaving room for the headlines and the With / Without Tokkey toggle above the laptop */
+const LAPTOP_DROP = 0.15;
 /** Seconds scene 0's first frame holds on page load before the scene plays */
-const INTRO_HOLD = 1;
+const INTRO_HOLD = 0;
 /** Space kept free above (nav) and below the zoomed-in screen (px) */
 const ZOOM_MARGIN = { top: 90, bottom: 20 };
 /** Live readings in the app's task bar: value = base + amp * sin(time * speed) */
@@ -51,8 +51,6 @@ interface HeroState {
   dotsOut: number;
   glowIn: number;
   agents: { in: number; fly: number }[];
-  /** Stage shrink for the "pullBack" headline (0 = full size, 1 = STAGE_SHRINK on desktop) */
-  shrink: number;
   /** Zoom into the laptop screen (0 = off, 1 = screen fills the viewport) */
   zoom: number;
   /** App UI on the laptop screen and the ASCII field around the laptop */
@@ -62,6 +60,8 @@ interface HeroState {
   releaseField: number;
   /** "powerFlow" overlay (cards, chips, lines) shown */
   powerIn: number;
+  /** Hero panned up to show the strip below the viewport (0 = off, 1 = strip fully in view) */
+  pan: number;
 }
 
 /** Viewport-dependent geometry, recomputed on resize */
@@ -69,6 +69,8 @@ interface HeroLayout {
   width: number;
   height: number;
   mobile: boolean;
+  /** How far the frames are drawn below center (px; 0 on phones) */
+  drop: number;
   key: { x: number; y: number };
   ripple: { x: number; y: number };
   agentGrid: { left: number; top: number; colGap: number; rowGap: number; chipHeight: number };
@@ -78,6 +80,8 @@ interface HeroLayout {
   zoomTarget: { scale: number; x: number; y: number };
   /** Center of the turned-over laptop at the end of "flipOver" */
   flippedLaptop: { x: number; y: number };
+  /** How far the hero pans up to show the "powerFlow" strip (px) */
+  pan: number;
 }
 
 export class HeroScene {
@@ -111,16 +115,19 @@ export class HeroScene {
       dotsOut: 0,
       glowIn: 0,
       agents: this.agentEls.map(() => ({ in: 0, fly: 0 })),
-      shrink: 0,
       zoom: 0,
       screenIn: 0,
       laptopField: 0,
       releaseField: 0,
       powerIn: 0,
+      pan: 0,
     };
     this.dots = this.createDotField();
     this.glow = this.createGlowField();
-    this.laptopField = this.createLaptopField("laptopField", () => ({ x: this.layout.width / 2, y: this.layout.height * 0.58 }));
+    this.laptopField = this.createLaptopField("laptopField", () => ({
+      x: this.layout.width / 2,
+      y: this.layout.height * 0.58 + this.layout.drop,
+    }));
     this.releaseField = this.createLaptopField("releaseField", () => this.layout.flippedLaptop);
     gsap.ticker.add((time) => this.tickStats(time));
     this.player = new ScenePlayer([...section.querySelectorAll<HTMLCanvasElement>("[data-frames]")]);
@@ -275,10 +282,6 @@ export class HeroScene {
       .fromTo(s, { glowIn: 1 }, { glowIn: 0 }, 0)
       .fromTo(this.ref("partC"), { opacity: 0 }, { opacity: 1, duration: 0.6 }, 0.7)
       .fromTo(s, { laptopField: 0 }, { laptopField: 1, duration: 0.6 }, 0.7)
-      // Desktop frames fill the screen top to bottom, so shrink the laptop to make room for the headline above it.
-      // Starts once the camera has settled (~frame 45 of 61): shrinking while the frames still pull back makes the
-      // 60fps CSS scale and the 30fps camera move fight each other, and the laptop shakes
-      .fromTo(s, { shrink: 0 }, { shrink: 1, duration: 0.6 }, 1.5)
       .fromTo(
         this.ref("title3"),
         { opacity: 0, y: 24, filter: "blur(10px)" },
@@ -292,7 +295,7 @@ export class HeroScene {
       .fromTo(s, { screenIn: 0 }, { screenIn: 1, duration: 0.4 }, 1.2);
     // Then the panels pop in one by one
     const screenPanels = timeline().fromTo(screenItems, { opacity: 0, y: 26 }, { opacity: 1, y: 0, stagger: 0.14 }, 0);
-    // Scene "zoomOut" starts with the panels leaving the way screenPanels rewinds: last one first, sinking as they fade
+    // Scene "flipOver" starts with the panels leaving the way screenPanels rewinds: last one first, sinking as they fade
     const panelsOut = timeline().fromTo(
       screenItems,
       { opacity: 1, y: 0 },
@@ -300,8 +303,7 @@ export class HeroScene {
       0,
     );
 
-    // Then the screen backdrop and glows fade away and the camera zooms back out to the lowered laptop
-    // (stage stays shrunk for the scenes after it); it turns over on the next scroll ("flipOver")
+    // Then the screen backdrop and glows fade away and the camera zooms back out to the laptop; then it fades over to the turning laptop
     const zoomOut = timeline()
       .fromTo(this.ref("partC"), { opacity: 1 }, { opacity: 0, duration: 0.4 }, 0)
       .fromTo(s, { screenIn: 1, laptopField: 1 }, { screenIn: 0, laptopField: 0, duration: 0.4 }, 0)
@@ -342,6 +344,8 @@ export class HeroScene {
         { opacity: 1, y: 0, stagger: order },
         0.8,
       )
+      // The hero pans up as the strip comes in, so the strip below the viewport ends up fully visible
+      .fromTo(s, { pan: 0 }, { pan: 1, duration: 0.7 }, 1.1)
       .fromTo(this.ref("powerCallouts"), { opacity: 0 }, { opacity: 1 }, 1.3)
       .fromTo(this.ref("powerStrip"), { opacity: 0, y: 26 }, { opacity: 1, y: 0 }, 1.3);
 
@@ -351,8 +355,7 @@ export class HeroScene {
       agentsFly: [{ timeline: agentsFly }],
       pullBack: [{ frames: true, timeline: pullBack }],
       screenZoom: [{ timeline: screenZoom }, { timeline: screenPanels }],
-      zoomOut: [{ timeline: panelsOut }, { timeline: zoomOut }],
-      flipOver: [{ frames: true }, { timeline: release }],
+      flipOver: [{ timeline: panelsOut }, { timeline: zoomOut }, { frames: true }, { timeline: release }],
       xray: [{ frames: true, timeline: tabsIn }],
       powerFlow: [{ frames: true }, { timeline: powerIn }],
     };
@@ -391,14 +394,15 @@ export class HeroScene {
     this.laptopField.setVisibility(s.laptopField * 0.6);
     this.releaseField.setVisibility(s.releaseField * 0.55);
 
-    // Stage: shrink for the headline, then zoom into the screen; the keyboard below the screen is clipped while zoomed
+    // Stage: zoom into the screen; the keyboard below the screen is clipped while zoomed
     const z = L.zoomTarget;
-    const scale = lerp(lerp(1, L.mobile ? 1 : STAGE_SHRINK, s.shrink), z.scale, s.zoom);
+    const scale = lerp(1, z.scale, s.zoom);
     const transform = `translate(${z.x * s.zoom}px, ${z.y * s.zoom}px) scale(${scale})`;
     const cut = L.height - (L.screen.y + L.screen.height + (34 * L.screen.width) / SCREEN_UI_WIDTH);
     const clipPath = s.zoom > 0.001 ? `inset(-${L.height}px -${L.width}px ${cut * s.zoom}px)` : "none";
     this.stageLayers.forEach((layer) => Object.assign(layer.style, { transform, clipPath }));
     this.ref("screen").style.opacity = String(s.screenIn);
+    this.ref("pan").style.transform = `translateY(${-L.pan * s.pan}px)`;
   }
 
   /** Animate the task bar's CPU / Memory / GPU readings while the app UI is visible */
@@ -410,23 +414,17 @@ export class HeroScene {
   }
 
   /** Map 1600×900 frame pixels to viewport pixels (frames are 3840×2160, same 16:9, so positions are measured
-   *  on a 1600×900 downscale) for a frame drawn full-viewport with `fit` */
-  private fitFrame(width: number, height: number, fit: "cover" | "contain"): (x: number, y: number) => { x: number; y: number } {
+   *  on a 1600×900 downscale) for a frame drawn full-viewport with `fit`, `drop` px below center */
+  private fitFrame(width: number, height: number, fit: "cover" | "contain", drop: number): (x: number, y: number) => { x: number; y: number } {
     const k = (fit === "cover" ? Math.max : Math.min)(width / 1600, height / 900);
-    return (x, y) => ({ x: (width - 1600 * k) / 2 + x * k, y: (height - 900 * k) / 2 + y * k });
+    return (x, y) => ({ x: (width - 1600 * k) / 2 + x * k, y: (height - 900 * k) / 2 + y * k + drop });
   }
 
-  /** Map 1600×900 frame pixels of scene `id` to viewport pixels while the stage is shrunk (desktop) around its
-   *  50% 90% origin; frames use cover on desktop and the scene's mobileFit on phones */
-  private shrunkFrame(id: SceneId, width: number, height: number, mobile: boolean): (x: number, y: number) => { x: number; y: number } {
+  /** Map 1600×900 frame pixels of scene `id` to viewport pixels; frames use cover on desktop and the scene's
+   *  mobileFit on phones */
+  private sceneFrame(id: SceneId, width: number, height: number, mobile: boolean, drop: number): (x: number, y: number) => { x: number; y: number } {
     const scene = SCENES.find((s) => s.id === id)!;
-    const fit = this.fitFrame(width, height, mobile ? scene.mobileFit : "cover");
-    const shrink = mobile ? 1 : STAGE_SHRINK;
-    const origin = { x: width / 2, y: height * 0.9 };
-    return (x, y) => {
-      const p = fit(x, y);
-      return { x: origin.x + (p.x - origin.x) * shrink, y: origin.y + (p.y - origin.y) * shrink };
-    };
+    return this.fitFrame(width, height, mobile ? scene.mobileFit : "cover", drop);
   }
 
   /** Recompute viewport geometry (key position, ripple origin, agent grid) */
@@ -434,19 +432,20 @@ export class HeroScene {
     const width = this.section.clientWidth;
     const height = window.innerHeight;
     const mobile = width <= MOBILE_MAX_WIDTH;
+    const drop = mobile ? 0 : height * LAPTOP_DROP;
+    this.player.setOffsetY(drop);
 
     // Key: plug frames are drawn cover-fit, so map the frame point through the same fit
-    const key = this.fitFrame(width, height, "cover")(KEY_IN_FRAME.x * 1600, KEY_IN_FRAME.y * 900);
+    const key = this.fitFrame(width, height, "cover", drop)(KEY_IN_FRAME.x * 1600, KEY_IN_FRAME.y * 900);
     const keyEl = this.ref("key");
     keyEl.style.left = `${key.x}px`;
     keyEl.style.top = `${key.y}px`;
 
     // Ripple: contain-fit mapping of the laptop frame point
-    const ripple = this.fitFrame(width, height, "contain")(RIPPLE_IN_FRAME.x, RIPPLE_IN_FRAME.y);
+    const ripple = this.fitFrame(width, height, "contain", drop)(RIPPLE_IN_FRAME.x, RIPPLE_IN_FRAME.y);
 
-    // Screen: "pullBack" frames are cover-fit on desktop and use the scene's mobileFit on phones
-    const pullBack = SCENES.find((scene) => scene.id === "pullBack")!;
-    const toScreen = this.fitFrame(width, height, mobile ? pullBack.mobileFit : "cover");
+    // Screen: on the last "pullBack" frame
+    const toScreen = this.sceneFrame("pullBack", width, height, mobile, drop);
     const topLeft = toScreen(SCREEN_IN_FRAME.x, SCREEN_IN_FRAME.y);
     const screenWidth = toScreen(SCREEN_IN_FRAME.x + SCREEN_IN_FRAME.width, 0).x - topLeft.x;
     const uiScale = screenWidth / SCREEN_UI_WIDTH;
@@ -467,9 +466,9 @@ export class HeroScene {
       y: target.y - origin.y - zoomScale * (screen.y + screen.height / 2 - origin.y),
     };
 
-    // From "flipOver" on the laptop sits in the shrunk stage: map frame points through the scene's fit, then the shrink
-    const flippedLaptop = this.shrunkFrame("flipOver", width, height, mobile)(FLIPPED_LAPTOP_IN_FRAME.x, FLIPPED_LAPTOP_IN_FRAME.y);
-    this.power.layout(this.shrunkFrame("powerFlow", width, height, mobile));
+    // From "flipOver" on: map frame points through the scene's fit
+    const flippedLaptop = this.sceneFrame("flipOver", width, height, mobile, drop)(FLIPPED_LAPTOP_IN_FRAME.x, FLIPPED_LAPTOP_IN_FRAME.y);
+    this.power.layout(this.sceneFrame("powerFlow", width, height, mobile, drop));
 
     // Agent grid sits 56px under the second headline (layout box, ignoring its animated offset)
     const title2 = this.ref("title2");
@@ -482,7 +481,10 @@ export class HeroScene {
       chipHeight,
     };
 
-    this.layout = { width, height, mobile, key, ripple, agentGrid, screen, zoomTarget, flippedLaptop };
+    // Pan: the strip sits 16px below the viewport; leave the same gap under it once panned
+    const pan = this.ref("powerStrip").offsetHeight + 32;
+
+    this.layout = { width, height, mobile, drop, key, ripple, agentGrid, screen, zoomTarget, flippedLaptop, pan };
   }
 
   /** Background dots: scrolling luminance texture plus a ripple from the laptop's port */

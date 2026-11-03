@@ -88,10 +88,11 @@ const icon = (item: PowerItem) =>
     ))
   }
 
-  <!-- Bottom strip: 4 cells on desktop, 2×2 on phones -->
+  <!-- Bottom strip: 4 cells on desktop, 2×2 on phones. Sits just below the viewport so it doesn't cover the laptop;
+       HeroScene pans the hero up to show it -->
   <div
     data-ref="powerStrip"
-    class="power-glass absolute bottom-4 left-1/2 w-[calc(100%-32px)] max-w-[1120px] -translate-x-1/2 rounded-3xl opacity-0 md:bottom-2 md:w-[calc(100%-80px)]"
+    class="power-glass absolute top-[calc(100%+16px)] left-1/2 w-[calc(100%-32px)] max-w-[1120px] -translate-x-1/2 rounded-3xl opacity-0 md:w-[calc(100%-80px)]"
   >
     {
       (["with", "without"] as const).map((mode) => (
