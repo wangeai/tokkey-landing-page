@@ -38,11 +38,10 @@ export class SceneStepper {
     ScrollTrigger.create({ start: SceneStepper.TOP_SLACK, end: "max", onLeaveBack: () => this.lock() });
 
     // The browser (and ScrollTrigger) restore the old scroll position on refresh, which would skip the stepper;
-    // always start at the top on scene 0
+    // always start at the top, before scene 0 (the first gesture plays it)
     ScrollTrigger.clearScrollMemory("manual");
     ScrollEngine.instance.scrollTo(0, true);
     this.lock();
-    this.goTo(0, 1);
   }
 
   private step(direction: 1 | -1): void {

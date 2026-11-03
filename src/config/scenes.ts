@@ -1,7 +1,7 @@
 // The hero's scene list, in play order. One scroll gesture plays one scene's frames like a video.
 import type { SequenceName } from "./frames";
 
-export type SceneId = "logoReveal" | "plugIn" | "agentsFly" | "pullBack" | "screenZoom" | "flipOver" | "xray" | "powerFlow";
+export type SceneId = "logoReveal" | "plugIn" | "agentsFly" | "pullBack" | "screenZoom" | "zoomOut" | "flipOver" | "xray" | "powerFlow";
 
 export interface SceneConfig {
   id: SceneId;
@@ -23,7 +23,9 @@ export const SCENES: SceneConfig[] = [
   { id: "pullBack", sequence: "003", mobileFit: "contain" }, // camera pulls back to the laptop's front view
   // No frames of its own: holds pullBack's last frame while the camera zooms into the screen on its own scroll gesture
   { id: "screenZoom", sequence: "003", mobileFit: "contain" },
-  { id: "flipOver", sequence: "004", mobileFit: "contain" }, // zoom back out of the screen, then the laptop rotates to show its underside
+  // No frames of its own: holds pullBack's last frame while the app panels leave and the camera zooms back out of the screen
+  { id: "zoomOut", sequence: "003", mobileFit: "contain" },
+  { id: "flipOver", sequence: "004", mobileFit: "contain" }, // the laptop rotates to show its underside
   { id: "xray", sequence: "005", mobileFit: "contain" }, // lightning reveals the internals
   { id: "powerFlow", sequence: "006", mobileFit: "contain", loopFrom: 178 }, // blue energy flows through the internals
 ];

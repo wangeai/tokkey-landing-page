@@ -155,8 +155,9 @@ export class HeroScene {
     new SceneStepper(SCENES.length, (index, direction) => this.playScene(index, direction));
   }
 
-  /** Dot field fade-in on page load. Frames aren't faded here: scene a plays during this window and must stay visible */
+  /** On page load: scene 0's first frame fades in (the first scroll plays it), and so does the dot field */
   private playIntro(): void {
+    this.player.show(SCENES[0], 0);
     gsap.to(this.state, { introDots: 1, duration: 1.6, delay: 0.2, ease: "none", onUpdate: () => this.render() });
   }
 
@@ -287,7 +288,7 @@ export class HeroScene {
       .fromTo(s, { screenIn: 0 }, { screenIn: 1, duration: 0.4 }, 1.2);
     // Then the panels pop in one by one
     const screenPanels = timeline().fromTo(screenItems, { opacity: 0, y: 26 }, { opacity: 1, y: 0, stagger: 0.14 }, 0);
-    // Scene "flipOver" starts with the panels leaving the way screenPanels rewinds: last one first, sinking as they fade
+    // Scene "zoomOut" starts with the panels leaving the way screenPanels rewinds: last one first, sinking as they fade
     const panelsOut = timeline().fromTo(
       screenItems,
       { opacity: 1, y: 0 },
@@ -296,7 +297,7 @@ export class HeroScene {
     );
 
     // Then the screen backdrop and glows fade away and the camera zooms back out to the lowered laptop
-    // (stage stays shrunk for the scenes after it), then the laptop turns over
+    // (stage stays shrunk for the scenes after it); it turns over on the next scroll ("flipOver")
     const zoomOut = timeline()
       .fromTo(this.ref("partC"), { opacity: 1 }, { opacity: 0, duration: 0.4 }, 0)
       .fromTo(s, { screenIn: 1, laptopField: 1 }, { screenIn: 0, laptopField: 0, duration: 0.4 }, 0)
@@ -346,7 +347,8 @@ export class HeroScene {
       agentsFly: [{ timeline: agentsFly }],
       pullBack: [{ frames: true, timeline: pullBack }],
       screenZoom: [{ timeline: screenZoom }, { timeline: screenPanels }],
-      flipOver: [{ timeline: panelsOut }, { timeline: zoomOut }, { frames: true }, { timeline: release }],
+      zoomOut: [{ timeline: panelsOut }, { timeline: zoomOut }],
+      flipOver: [{ frames: true }, { timeline: release }],
       xray: [{ frames: true, timeline: tabsIn }],
       powerFlow: [{ frames: true }, { timeline: powerIn }],
     };

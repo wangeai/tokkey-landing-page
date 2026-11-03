@@ -82,9 +82,9 @@ export class ScenePlayer {
     return this.current?.scene.sequence === scene.sequence;
   }
 
-  /** Show `scene` at `progress` on the back canvas, bring it on top and fade it in over the front one, which stays
-   *  opaque underneath until the fade ends (fading both at once lets the page show through mid-fade, a visible flash
-   *  between scenes whose frames match). Returns the running fade. The scene's frames must be loaded */
+  /** Show `scene` at `progress` on the back canvas, bring it on top and hide the front one. The first scene fades in;
+   *  later ones cut straight over (a fade would show the outgoing frame through the transparent WebP background).
+   *  Returns the running fade. The scene's frames must be loaded */
   private crossfadeTo(scene: SceneConfig, progress: number): gsap.core.Timeline {
     // Leaving a looping scene (e.g. toggling to "Without Tokkey") ends its loop
     this.stopLoop();
@@ -92,6 +92,8 @@ export class ScenePlayer {
     this.front = 1 - this.front;
     const incoming = this.players[this.front].canvas;
     incoming.style.filter = scene.filter ?? "";
+    // Only the very first scene fades in; later ones cut, since transparent WebP frames would show the old scene through
+    const duration = this.current ? 0 : SCENE_CROSSFADE;
 
     this.current = { scene, progress };
     this.draw();
@@ -102,7 +104,7 @@ export class ScenePlayer {
     gsap.set(outgoing, { zIndex: 0 });
     this.fade = gsap
       .timeline()
-      .to(incoming, { opacity: 1, duration: SCENE_CROSSFADE })
+      .to(incoming, { opacity: 1, duration })
       .set(outgoing, { opacity: 0 });
     return this.fade;
   }
