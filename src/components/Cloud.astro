@@ -1,0 +1,313 @@
+---
+// "Local power. Cloud by choice." section (Figma: Why Local AI / Scene 03 · Cloud approved): the local Mac, the user's
+// approval step and the optional cloud model, joined left to right with a return path underneath. Sits below Personal.
+// Sizes are Figma px via --fx (src/styles/global.css). The diagram is one row from 1200px, stacked cards below.
+// Reveal animation: ScrollReveal.section. Content: src/config/cloud.ts.
+import { CLOUD_CONTEXT_ITEMS, CLOUD_PRINCIPLES } from "../config/cloud";
+
+// Shared Figma px text sizes (desktop only; mobile keeps the token scale)
+const body = "md:text-[calc(16*var(--fx))]/[calc(24*var(--fx))]";
+const lead = "md:text-[calc(24*var(--fx))]/[calc(32*var(--fx))]";
+const h3 = "text-h3 font-semibold md:text-[calc(32*var(--fx))]/[calc(40*var(--fx))]";
+---
+
+<section
+  id="cloud"
+  data-cloud
+  class="relative overflow-hidden bg-black px-gutter-sm py-20 text-white md:px-[calc(128*var(--fx))] md:pt-[calc(128*var(--fx))] md:pb-[calc(48*var(--fx))]"
+>
+  <div class="mx-auto max-w-[calc(1664*var(--fx))]">
+    <!-- Headline with the lead to its right (the lead starts 785 Figma px in and 56 px lower) -->
+    <div class="flex flex-col gap-6 lg:flex-row lg:gap-0">
+      <h2 data-reveal class="text-h2-sm font-bold text-fog md:text-[calc(64*var(--fx))]/[calc(72*var(--fx))] lg:w-[calc(785*var(--fx))] lg:shrink-0">
+        Local power.<br /><span class="text-chrome">Cloud by choice</span><span class="period">.</span>
+      </h2>
+      <p data-reveal class={`text-lead text-ash lg:mt-[calc(56*var(--fx))] lg:max-w-[calc(672*var(--fx))] ${lead}`}>
+        Tokkey brings larger local models to your Mac.<br class="max-lg:hidden" /> When a task needs more, bring in the
+        cloud—<br class="max-lg:hidden" />with the context you choose to share.
+      </p>
+    </div>
+
+    <!-- Diagram: local Mac → user approval → cloud model, with the result returning to the Mac -->
+    <div data-reveal class="diagram mt-12 md:mt-[calc(64*var(--fx))]">
+      <!-- Local domain / inference on the Mac -->
+      <div class="local-card">
+        <div class="local-caption">
+          <p class={`text-lead text-fog ${lead}`}>Local models. On your same Mac.</p>
+          <p class={`text-body text-[#8e8e93] ${body}`}>Your Mac does the processing. Tokkey makes more possible.</p>
+        </div>
+        <img src="/assets/images/cloud/mac-frame.svg" width="638" height="296" alt="" aria-hidden="true" class="mac-frame" />
+        <ul class="context-items">
+          {
+            CLOUD_CONTEXT_ITEMS.map((item) => (
+              <li class="context-item">
+                <b class="font-semibold text-fog">{item.title}</b>
+                <span class="text-ash">{item.status}</span>
+              </li>
+            ))
+          }
+        </ul>
+        <img
+          src="/assets/images/cloud/tokkey-hardware.svg"
+          width="181.787"
+          height="135.226"
+          alt="Tokkey plugged into the Mac"
+          class="hardware"
+        />
+      </div>
+
+      <img src="/assets/images/cloud/local-path.svg" width="146" height="24" alt="" aria-hidden="true" class="connector local-path" />
+
+      <!-- Permission / user controls the boundary -->
+      <div class="decide">
+        <p class={`label-chrome ${h3}`}><span class="text-chrome">You Decide</span></p>
+        <div class="permission-card">
+          <p class={`${h3} text-fog`}>Cloud Approved.</p>
+          <p class={`mt-[calc(29*var(--fx))] text-body text-ash ${body}`}>Sent: selected summary<br />Original files remain local</p>
+          <!-- Illustrative dialog buttons, not interactive -->
+          <div class="mt-[calc(34*var(--fx))] flex gap-[calc(16*var(--fx))]">
+            <span class="action bg-fog text-ink">Review</span>
+            <span class="action action-ghost text-fog">Local-only</span>
+          </div>
+        </div>
+        <p class={`returns text-body text-[#8e8e93] ${body}`}>Cloud result returns to your Mac</p>
+      </div>
+
+      <img src="/assets/images/cloud/outbound-path.svg" width="112" height="24" alt="" aria-hidden="true" class="connector outbound-path" />
+
+      <!-- Cloud domain / optional capability -->
+      <div class="cloud">
+        <p class={`label-chrome ${h3}`}><span class="text-chrome">Cloud Capability</span></p>
+        <img
+          src="/assets/images/cloud/cloud-layers.svg"
+          width="368"
+          height="257.6"
+          alt=""
+          aria-hidden="true"
+          class="cloud-layers"
+        />
+        <p class={`text-lead text-fog ${lead}`}>More capability, on demand.</p>
+        <p class={`text-body text-ash ${body}`}>Only the context you approve.</p>
+      </div>
+
+      <!-- Result returning from the cloud to the Mac; only drawn where the diagram is one row -->
+      <img src="/assets/images/cloud/return-path.svg" width="1171.36" height="91" alt="" aria-hidden="true" class="return-path" />
+    </div>
+
+    <!-- Three principles -->
+    <ul class="mt-14 grid gap-8 md:mt-[calc(37*var(--fx))] md:grid-cols-3 lg:grid-cols-[calc(528*var(--fx))_calc(528*var(--fx))_1fr] md:gap-x-[calc(120*var(--fx))]">
+      {
+        CLOUD_PRINCIPLES.map((principle) => (
+          <li data-reveal class={`flex flex-col gap-2 text-body md:min-h-[calc(88*var(--fx))] md:gap-[calc(8*var(--fx))] ${body}`}>
+            <b class="font-semibold text-fog">{principle.title}</b>
+            <span class="text-[#8e8e93]">{principle.text}</span>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<script>
+  import { ScrollReveal } from "../scripts/ScrollReveal";
+  const section = document.querySelector<HTMLElement>("[data-cloud]");
+  if (section) ScrollReveal.section(section);
+</script>
+
+<style>
+  /* Below 1200px the diagram stacks its three cards; connectors and the return path are hidden */
+  .diagram {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 48px;
+  }
+  .connector,
+  .return-path {
+    display: none;
+  }
+
+  /* Local Mac card: a fixed 640×480 Figma composition. On phones it scales to the column width instead of the viewport */
+  .local-card {
+    position: relative;
+    flex-shrink: 0;
+    width: calc(640 * var(--fx));
+    height: calc(480 * var(--fx));
+    overflow: hidden;
+    border: 1px solid rgb(255 255 255 / 40%);
+    border-radius: calc(48 * var(--fx));
+    background: linear-gradient(150.64deg, rgb(255 255 255 / 13%) 0%, rgb(255 255 255 / 4%) 71.429%);
+  }
+  @media (width < 768px) {
+    .local-card {
+      --fx: min(1px, (100vw - 2 * var(--spacing-gutter-sm)) / 640);
+    }
+    /* The card's text follows its own scale on phones too */
+    .local-card :is(p, .context-item) {
+      font-size: calc(16 * var(--fx));
+      line-height: calc(24 * var(--fx));
+    }
+    .local-card .local-caption p:first-child {
+      font-size: calc(24 * var(--fx));
+      line-height: calc(32 * var(--fx));
+    }
+  }
+  .local-caption {
+    position: absolute;
+    top: calc(47 * var(--fx));
+    left: calc(47 * var(--fx));
+  }
+  .mac-frame {
+    position: absolute;
+    top: calc(133 * var(--fx));
+    left: 0;
+    width: calc(638 * var(--fx));
+    height: calc(296 * var(--fx));
+  }
+  .context-items {
+    position: absolute;
+    top: calc(119 * var(--fx));
+    left: calc(47 * var(--fx));
+    display: flex;
+    gap: calc(17 * var(--fx));
+  }
+  /* Context item (Figma: Tokkey / Routing / Context item), same glass as the comment cards */
+  .context-item {
+    display: flex;
+    flex-direction: column;
+    width: calc(240 * var(--fx));
+    height: calc(72 * var(--fx));
+    padding: calc(12 * var(--fx)) calc(16 * var(--fx));
+    border: 1px solid rgb(255 255 255 / 20%);
+    border-radius: calc(16 * var(--fx));
+    background: linear-gradient(167.32deg, rgb(255 255 255 / 13%) 0%, rgb(255 255 255 / 4%) 71.429%);
+    /* Unprefixed only: the minifier adds -webkit- itself */
+    backdrop-filter: blur(calc(17.787 * var(--fx)));
+    filter: drop-shadow(0 calc(35.573 * var(--fx)) calc(44.466 * var(--fx)) rgb(0 0 0 / 45%));
+    font-size: calc(16 * var(--fx));
+    line-height: calc(24 * var(--fx));
+  }
+  .hardware {
+    position: absolute;
+    top: calc(295 * var(--fx));
+    left: calc(255 * var(--fx));
+    width: calc(181.787 * var(--fx));
+    height: calc(135.226 * var(--fx));
+  }
+
+  .decide,
+  .cloud {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  /* Permission card: darker, opaque glass like the featured comment card */
+  .permission-card {
+    width: calc(328 * var(--fx));
+    min-height: calc(281 * var(--fx));
+    margin-top: 24px;
+    padding: calc(49 * var(--fx)) calc(31 * var(--fx)) calc(39 * var(--fx));
+    border: 1px solid rgb(255 255 255 / 45%);
+    border-radius: calc(24 * var(--fx));
+    background: linear-gradient(147.28deg, rgb(70 70 82 / 92%) 0%, rgb(24 24 30 / 94%) 71.429%);
+    text-align: left;
+  }
+  .action {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: calc(112 * var(--fx));
+    height: calc(40 * var(--fx));
+    border-radius: calc(16 * var(--fx));
+    font-size: calc(16 * var(--fx));
+    font-weight: 600;
+    line-height: calc(24 * var(--fx));
+  }
+  .action-ghost {
+    border: 1px solid rgb(255 255 255 / 20%);
+    background: rgb(255 255 255 / 4%);
+  }
+  .returns {
+    margin-top: 24px;
+  }
+
+  .cloud-layers {
+    width: calc(368 * var(--fx));
+    max-width: 100%;
+    height: auto;
+    margin-block: 24px 0;
+  }
+
+  /* From 1200px: one row with Figma's exact offsets (x/y relative to the diagram's top-left) */
+  @media (width >= 1200px) {
+    .diagram {
+      position: relative;
+      flex-direction: row;
+      align-items: flex-start;
+      gap: 0;
+      height: calc(563 * var(--fx));
+    }
+    .connector {
+      display: block;
+      flex-shrink: 0;
+      height: calc(24 * var(--fx));
+      margin-top: calc(228 * var(--fx));
+    }
+    /* Starts on the card's 1px border so the line touches it */
+    .local-path {
+      width: calc(146 * var(--fx));
+      margin-left: -1px;
+    }
+    .outbound-path {
+      width: calc(112 * var(--fx));
+    }
+
+    .decide,
+    .cloud {
+      align-items: flex-start;
+      flex-shrink: 0;
+      padding-top: calc(32.5 * var(--fx));
+      text-align: left;
+    }
+    .decide {
+      width: calc(328 * var(--fx));
+    }
+    .decide .label-chrome {
+      margin-left: calc(15 * var(--fx));
+    }
+    .permission-card {
+      margin-top: calc(54.5 * var(--fx));
+    }
+    /* Centred on Figma's 352px box at x 761 */
+    .returns {
+      width: calc(352 * var(--fx));
+      margin: calc(54 * var(--fx)) 0 0 calc(-24 * var(--fx));
+      text-align: center;
+    }
+
+    .cloud {
+      width: calc(384 * var(--fx));
+      margin-left: calc(55 * var(--fx));
+    }
+    .cloud .label-chrome {
+      margin-left: calc(16 * var(--fx));
+    }
+    .cloud-layers {
+      margin-block: calc(38.7 * var(--fx)) calc(-0.8 * var(--fx));
+    }
+    .cloud > p:not(.label-chrome) {
+      padding-left: calc(16 * var(--fx));
+    }
+
+    .return-path {
+      display: block;
+      position: absolute;
+      top: calc(472 * var(--fx));
+      left: calc(302.6 * var(--fx));
+      width: calc(1171.36 * var(--fx));
+      height: calc(91 * var(--fx));
+    }
+  }
+</style>
