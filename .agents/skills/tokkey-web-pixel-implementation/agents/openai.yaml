@@ -1,0 +1,4 @@
+interface:
+  display_name: "Tokkey Web Pixel Implementation"
+  short_description: "Match Tokkey Figma designs in Astro + Tailwind."
+  default_prompt: "Use $tokkey-web-pixel-implementation to implement this Figma node as a Tokkey landing-page section with Astro, Tailwind v4 brand tokens, GSAP scroll motion, responsive states, and inspected browser evidence."

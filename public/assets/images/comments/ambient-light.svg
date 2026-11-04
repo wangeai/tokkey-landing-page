@@ -1,0 +1,9 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="1200" height="640" viewBox="0 0 1200 640" fill="none" xmlns="http://www.w3.org/2000/svg">
+<ellipse id="Ambient light &#194;&#183; behind glass" cx="600" cy="320" rx="600" ry="320" fill="url(#paint0_radial_0_46)"/>
+<defs>
+<radialGradient id="paint0_radial_0_46" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(600 320) scale(600 320)">
+<stop stop-color="#8FA6D1" stop-opacity="0.1"/>
+<stop offset="1" stop-opacity="0"/>
+</radialGradient>
+</defs>
+</svg>

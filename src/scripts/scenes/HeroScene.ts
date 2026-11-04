@@ -28,6 +28,8 @@ const SCREEN_UI_WIDTH = 1000;
 const LAPTOP_DROP = 0.15;
 /** Seconds scene 0's first frame holds on page load before the scene plays */
 const INTRO_HOLD = 0;
+/** Interactive elements inside the hero; clicking them doesn't release the scroll lock */
+const HERO_CONTROLS = "a, button, [data-power-card]";
 /** Space kept free above (nav) and below the zoomed-in screen (px) */
 const ZOOM_MARGIN = { top: 90, bottom: 20 };
 /** Live readings in the app's task bar: value = base + amp * sin(time * speed) */
@@ -163,6 +165,10 @@ export class HeroScene {
       .add(`(max-width: ${MOBILE_MAX_WIDTH}px)`, () => this.player.setProfile(2, true));
 
     this.stepper = new SceneStepper(SCENES.length, (index, direction) => this.playScene(index, direction));
+    // Clicking the hero (outside its own controls) lets the next scroll leave it without stepping through every scene
+    section.addEventListener("click", (event) => {
+      if (!(event.target as Element).closest(HERO_CONTROLS)) this.stepper.release();
+    });
   }
 
   /** On page load: scene 0's first frame fades in and holds for INTRO_HOLD seconds, then scene 0 plays on its own;

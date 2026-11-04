@@ -1,0 +1,14 @@
+---
+// Statement section ("You've been renting intelligence. What if you could own it?"): a full-viewport black band with a
+// two-line centered headline, between the features and the user comments.
+---
+
+<section id="statement" class="flex min-h-svh items-center justify-center bg-black px-gutter-sm py-40 text-center md:px-gutter">
+  <h2 class="w-full max-w-[1392px] text-h2-sm font-bold md:text-h2">
+    <span class="block text-[#d9d9d9]">You've been renting intelligence<span class="period">.</span></span>
+    <!-- Block-level so the chrome gradient spans the full headline width, as in Figma; the wrapper carries the gap
+         because .text-chrome uses its own margins to compensate for its padding. No inline-end padding: the box
+         must stay exactly the headline width so the text centers -->
+    <span class="mt-6 block"><span class="text-chrome block pe-0 me-0">What if you could own it?</span></span>
+  </h2>
+</section>

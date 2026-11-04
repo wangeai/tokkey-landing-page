@@ -1,6 +1,6 @@
 // Turns scroll gestures into scene steps: while the page sits at the very top, page scrolling is locked and
-// each wheel/swipe gesture moves one scene forward or back. Past the last scene the page scrolls normally;
-// scrolling back to the top hands control to the stepper again.
+// each wheel/swipe gesture moves one scene forward or back. Past the last scene (or after release()) the page scrolls
+// normally; scrolling back to the top hands control to the stepper again.
 import { Observer, ScrollTrigger } from "./gsap";
 import { ScrollEngine } from "./ScrollEngine";
 
@@ -47,6 +47,11 @@ export class SceneStepper {
   /** Play scene 0 without a gesture; does nothing once a gesture has already moved off the start */
   autoplay(): void {
     if (this.index === -1) this.goTo(0, 1);
+  }
+
+  /** Skip the remaining scenes: the page scrolls normally until it returns to the top */
+  release(): void {
+    this.unlock();
   }
 
   private step(direction: 1 | -1): void {
