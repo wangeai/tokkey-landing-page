@@ -4,4 +4,4 @@ dist/
 .astro/
 .wrangler/
 .dev.vars
-scripts/
+/scripts/

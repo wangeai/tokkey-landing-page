@@ -7,6 +7,7 @@ import Statement from "../components/Statement.astro";
 import Comments from "../components/Comments.astro";
 import Personal from "../components/Personal.astro";
 import Cloud from "../components/Cloud.astro";
+import Faq from "../components/Faq.astro";
 ---
 
 <BaseLayout>
@@ -16,14 +17,5 @@ import Cloud from "../components/Cloud.astro";
   <Statement />
   <Personal />
   <Cloud />
-
-  <!-- Placeholder until the remaining sections are ported -->
-  <section class="mx-auto max-w-page px-gutter-sm py-24 md:px-gutter md:py-32">
-    <p class="label text-graphite">Migration</p>
-    <h2 class="mt-4 text-h2-sm font-bold md:text-h2">Porting in progress<span class="period">.</span></h2>
-    <p class="mt-6 max-w-[60ch] text-body">
-      Sections are being moved from the legacy page one at a time. Compare against the original at
-      <a class="underline" href="/legacy.html">/legacy.html</a>.
-    </p>
-  </section>
+  <Faq />
 </BaseLayout>

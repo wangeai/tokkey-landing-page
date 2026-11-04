@@ -26,6 +26,15 @@ export interface AsciiFieldOptions {
   baseAlpha?: number;
   stepAlpha?: number;
   maxAlpha?: number;
+  /** Optional cell and glyph size (CSS px) for a canvas `width`; defaults to 11×17 cells with 12px glyphs (9×14 / 10px
+   *  below 700px) */
+  grid?: (width: number) => AsciiGrid;
+}
+
+export interface AsciiGrid {
+  cellWidth: number;
+  cellHeight: number;
+  fontSize: number;
 }
 
 export class AsciiField {
@@ -58,13 +67,11 @@ export class AsciiField {
     this.cleared = false;
 
     const { width, height } = this.resize();
-    const { sample, mask, bounds, color = "#dbe9ff", baseAlpha = 0.16, stepAlpha = 0.1, maxAlpha = 0.9 } = this.options;
-    const small = width < 700;
-    const cellW = small ? 9 : 11;
-    const cellH = small ? 14 : 17;
+    const { sample, mask, bounds, grid, color = "#dbe9ff", baseAlpha = 0.16, stepAlpha = 0.1, maxAlpha = 0.9 } = this.options;
+    const { cellWidth: cellW, cellHeight: cellH, fontSize } = grid?.(width) ?? AsciiField.defaultGrid(width);
     const ctx = this.ctx;
     ctx.clearRect(0, 0, width, height);
-    ctx.font = `${small ? 10 : 12}px "Commit Mono", ui-monospace, monospace`;
+    ctx.font = `${fontSize}px "Commit Mono", ui-monospace, monospace`;
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     ctx.fillStyle = color;
@@ -85,6 +92,12 @@ export class AsciiField {
       }
     }
     ctx.globalAlpha = 1;
+  }
+
+  /** Grid used when a field doesn't pass its own: smaller cells on narrow canvases */
+  private static defaultGrid(width: number): AsciiGrid {
+    const small = width < 700;
+    return { cellWidth: small ? 9 : 11, cellHeight: small ? 14 : 17, fontSize: small ? 10 : 12 };
   }
 
   /** Match the backing store to CSS size (DPR capped at 2); returns CSS-pixel size */

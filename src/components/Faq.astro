@@ -1,0 +1,104 @@
+---
+// FAQ section (Figma: FAQ · keyframe 1920 (small type)): headline and an accordion of native <details>, so it opens
+// and closes without script and stays keyboard accessible. Sizes are Figma px via --fx (src/styles/global.css).
+// Reveal animation: ScrollReveal.section. Content: src/config/faq.ts.
+import { FAQ_ITEMS } from "../config/faq";
+---
+
+<section
+  id="faq"
+  data-faq
+  class="bg-black px-gutter-sm pt-20 pb-16 text-white md:px-[calc(86*var(--fx))] md:pt-[calc(152*var(--fx))] md:pb-[calc(96*var(--fx))]"
+>
+  <div class="md:pl-[calc(2*var(--fx))]">
+    <p data-reveal class="font-mono text-[10px]/4 tracking-[0.08em] text-white/60 md:text-[calc(10*var(--fx))]/[calc(16*var(--fx))]">
+      FAQ
+    </p>
+    <h2 data-reveal class="mt-2 text-h2-sm font-bold md:mt-[calc(8*var(--fx))] md:text-[calc(72*var(--fx))]/[calc(88*var(--fx))] md:tracking-[-0.04em]">
+      Questions<span class="period">.</span>
+    </h2>
+  </div>
+
+  <div data-reveal class="mt-10 border-t border-white/14 md:mt-[calc(53*var(--fx))]">
+    {
+      FAQ_ITEMS.map((item, i) => (
+        <details class="faq-item" open={i === 0}>
+          <summary>
+            {item.question}
+            <span class="icon" aria-hidden="true">+</span>
+          </summary>
+          <p class="answer">{item.answer}</p>
+        </details>
+      ))
+    }
+  </div>
+</section>
+
+<script>
+  import { ScrollReveal } from "../scripts/ScrollReveal";
+  const section = document.querySelector<HTMLElement>("[data-faq]");
+  if (section) ScrollReveal.section(section);
+</script>
+
+<style>
+  /* One row: 1px divider below, question padded 23 Figma px above and below */
+  .faq-item {
+    border-bottom: 1px solid rgb(255 255 255 / 14%);
+  }
+  summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: calc(23 * var(--fx)) calc(12 * var(--fx)) calc(23 * var(--fx)) calc(5 * var(--fx));
+    font-size: calc(18 * var(--fx));
+    line-height: calc(24 * var(--fx));
+    cursor: pointer;
+    list-style: none;
+  }
+  summary::-webkit-details-marker {
+    display: none;
+  }
+  summary:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: -2px;
+  }
+
+  /* "+" turns into the accent "×" when the row is open */
+  .icon {
+    flex-shrink: 0;
+    color: rgb(255 255 255 / 60%);
+    transition:
+      transform 0.3s,
+      color 0.3s;
+  }
+  .faq-item[open] .icon {
+    transform: rotate(45deg);
+    color: var(--color-accent);
+  }
+  @media (hover: hover) {
+    summary:hover .icon {
+      color: var(--color-white);
+    }
+    .faq-item[open] summary:hover .icon {
+      color: var(--color-accent);
+    }
+  }
+
+  .answer {
+    margin-top: calc(-1 * var(--fx));
+    padding: 0 calc(60 * var(--fx)) calc(31 * var(--fx)) calc(5 * var(--fx));
+    color: rgb(255 255 255 / 55%);
+    font-size: calc(15 * var(--fx));
+    line-height: calc(24 * var(--fx));
+  }
+  /* Phones keep real px and let long answers use the full row width */
+  @media (width < 768px) {
+    summary {
+      padding-block: 20px;
+    }
+    .answer {
+      padding-right: 12px;
+    }
+  }
+</style>
