@@ -5,18 +5,18 @@
 import { COLUMN_OFFSETS, COMMENT_COLUMNS } from "../config/comments";
 ---
 
-<section id="comments" data-comments class="relative overflow-hidden bg-black px-gutter-sm pt-20 pb-14 text-white md:px-gutter">
-  <div class="mx-auto max-w-[1392px] text-center">
-    <p data-reveal class="text-body font-semibold text-[#a1a1a6]">User Comments</p>
-    <h2 data-reveal class="mt-9 text-h2-sm font-bold md:text-h2">
+<section id="comments" data-comments class="relative overflow-hidden bg-black px-gutter-sm pt-20 pb-14 text-white md:px-[calc(40*var(--fx))] md:pt-[calc(80*var(--fx))] md:pb-[calc(56*var(--fx))]">
+  <div class="mx-auto max-w-[calc(1392*var(--fx))] text-center">
+    <p data-reveal class="text-body font-semibold text-[#a1a1a6] md:text-[calc(16*var(--fx))]/[calc(24*var(--fx))]">User Comments</p>
+    <h2 data-reveal class="mt-9 text-h2-sm font-bold md:mt-[calc(36*var(--fx))] md:text-[calc(64*var(--fx))]/[calc(72*var(--fx))]">
       <span class="text-chrome">Real people. Local AI</span><span class="period">.</span>
     </h2>
-    <p data-reveal class="mx-auto mt-7 max-w-[1000px] text-lead text-[#a1a1a6]">
+    <p data-reveal class="mx-auto mt-7 max-w-[calc(1000*var(--fx))] text-lead text-[#a1a1a6] md:mt-[calc(28*var(--fx))] md:text-[calc(24*var(--fx))]/[calc(32*var(--fx))]">
       A little key. A different way to work.<br class="max-md:hidden" /> For those who want their AI to stay theirs.
     </p>
   </div>
 
-  <div class="relative mx-auto mt-12 max-w-[1392px]">
+  <div class="relative mx-auto mt-12 max-w-[calc(1392*var(--fx))] md:mt-[calc(48*var(--fx))]">
     <!-- Soft blue glow behind the glass; it gives the cards' backdrop blur something to pick up -->
     <img
       src="/assets/images/comments/ambient-light.svg"
@@ -24,18 +24,18 @@ import { COLUMN_OFFSETS, COMMENT_COLUMNS } from "../config/comments";
       height="640"
       alt=""
       aria-hidden="true"
-      class="pointer-events-none absolute -top-6 left-1/2 max-w-none -translate-x-1/2"
+      class="pointer-events-none absolute top-[calc(-24*var(--fx))] left-1/2 w-[calc(1200*var(--fx))] max-w-none -translate-x-1/2"
     />
 
-    <div class="relative grid gap-6 md:grid-cols-2 lg:flex lg:min-h-[592px] lg:justify-center">
+    <div class="relative grid gap-6 md:grid-cols-2 md:gap-[calc(24*var(--fx))] lg:flex lg:min-h-[calc(592*var(--fx))] lg:justify-center">
       {
         COMMENT_COLUMNS.map((column, i) => (
-          <div class="comment-column contents lg:flex lg:max-w-[448px] lg:flex-1 lg:flex-col lg:gap-6" style={`--offset:${COLUMN_OFFSETS[i]}px`}>
+          <div class="comment-column contents lg:flex lg:max-w-[calc(448*var(--fx))] lg:flex-1 lg:flex-col lg:gap-[calc(24*var(--fx))]" style={`--offset:calc(${COLUMN_OFFSETS[i]} * var(--fx))`}>
             {column.map((comment) => (
               <figure data-comment class:list={["comment-card", { featured: comment.featured }]}>
-                <figcaption class="flex items-center gap-4">
+                <figcaption class="flex items-center gap-[calc(16*var(--fx))]">
                   <span class="avatar">{comment.initials}</span>
-                  <span class="text-body">
+                  <span class="text-body md:text-[calc(16*var(--fx))]/[calc(24*var(--fx))]">
                     <b class="block font-semibold text-white">{comment.role}</b>
                     <span class="block text-[#a1a1a6]">Example profile</span>
                   </span>
@@ -49,7 +49,7 @@ import { COLUMN_OFFSETS, COMMENT_COLUMNS } from "../config/comments";
     </div>
   </div>
 
-  <p class="mt-14 text-center text-body text-[#8e8e93]">Concept layout · Quotes and profiles are illustrative.</p>
+  <p class="mt-14 text-center text-body text-[#8e8e93] md:mt-[calc(56*var(--fx))] md:text-[calc(16*var(--fx))]/[calc(24*var(--fx))]">Concept layout · Quotes and profiles are illustrative.</p>
 </section>
 
 <script>
@@ -71,23 +71,23 @@ import { COLUMN_OFFSETS, COMMENT_COLUMNS } from "../config/comments";
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    gap: 32px;
-    min-height: 248px;
-    padding: 32px;
+    gap: calc(32 * var(--fx));
+    min-height: calc(248 * var(--fx));
+    padding: calc(32 * var(--fx));
     border: 1px solid rgb(255 255 255 / 20%);
-    border-radius: 29.644px;
+    border-radius: calc(29.644 * var(--fx));
     background: linear-gradient(157.45deg, rgb(255 255 255 / 13%) 0%, rgb(255 255 255 / 4%) 71.429%);
     /* Unprefixed only: the minifier adds -webkit- itself, and drops the unprefixed one if both are written */
-    backdrop-filter: blur(17.787px);
-    filter: drop-shadow(0 35.573px 44.466px rgb(0 0 0 / 45%));
+    backdrop-filter: blur(calc(17.787 * var(--fx)));
+    filter: drop-shadow(0 calc(35.573 * var(--fx)) calc(44.466 * var(--fx)) rgb(0 0 0 / 45%));
   }
   /* Featured card: taller, darker and opaque (no backdrop blur), brighter edge and a bigger quote */
   .comment-card.featured {
-    min-height: 288px;
+    min-height: calc(288 * var(--fx));
     border-color: rgb(255 255 255 / 45%);
     background: linear-gradient(154.26deg, rgb(70 70 82 / 92%) 0%, rgb(24 24 30 / 94%) 71.429%);
     backdrop-filter: none;
-    filter: drop-shadow(0 30px 30px rgb(0 0 0 / 45%));
+    filter: drop-shadow(0 calc(30 * var(--fx)) calc(30 * var(--fx)) rgb(0 0 0 / 45%));
   }
 
   .avatar {
@@ -95,28 +95,29 @@ import { COLUMN_OFFSETS, COMMENT_COLUMNS } from "../config/comments";
     flex-shrink: 0;
     align-items: center;
     justify-content: center;
-    width: 48px;
-    height: 48px;
+    width: calc(48 * var(--fx));
+    height: calc(48 * var(--fx));
     border: 1px solid rgb(255 255 255 / 10%);
-    border-radius: 16px;
+    border-radius: calc(16 * var(--fx));
     background: linear-gradient(143.13deg, rgb(255 255 255 / 20%) 0%, rgb(255 255 255 / 7%) 71.429%);
     color: #e5e5ea;
-    font-size: 16px;
+    font-size: calc(16 * var(--fx));
     font-weight: 600;
-    line-height: 24px;
+    line-height: calc(24 * var(--fx));
   }
 
   .quote {
     color: #f5f5f7;
-    font-size: 24px;
-    line-height: 32px;
+    font-size: calc(24 * var(--fx));
+    line-height: calc(32 * var(--fx));
   }
   .featured .quote {
-    font-size: 32px;
-    line-height: 40px;
+    font-size: calc(32 * var(--fx));
+    line-height: calc(40 * var(--fx));
   }
-  /* Keep the designed line breaks only once the cards reach their designed 448px width (1392px wall + gutters) */
-  @media (width >= 1472px) {
+  /* Keep the designed line breaks once the three-column wall shows: cards scale with --fx, so from here up
+     they always keep their designed width relative to the text */
+  @media (width >= 1200px) {
     .quote {
       white-space: pre-line;
     }

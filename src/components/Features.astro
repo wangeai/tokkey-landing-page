@@ -15,7 +15,7 @@ const arrows = { prev: "M26 17l-6 6 6 6", next: "M20 17l6 6-6 6" };
   data-features
   aria-roledescription="carousel"
   aria-label="Tokkey features"
-  class="relative flex flex-col overflow-hidden bg-black features pt-24 pb-10 text-white [--edge:max(16px,4.5vw)] md:min-h-svh md:pt-[calc(112*var(--fx))] md:pb-[calc(44*var(--fx))]"
+  class="relative flex flex-col overflow-hidden bg-black pt-24 pb-10 text-white [--edge:max(16px,4.5vw)] md:min-h-svh md:pt-[calc(112*var(--fx))] md:pb-[calc(44*var(--fx))]"
 >
   <div data-ref="carousel" class="track relative">
     <!-- 1. Run large AI models: memory footprint per model; clicking a row highlights it -->
@@ -136,17 +136,7 @@ const arrows = { prev: "M26 17l-6 6 6 6", next: "M20 17l6 6-6 6" };
 </script>
 
 <style>
-  /* --fx = one Figma pixel. The Figma frame is 1920 wide, so on desktop every size is scaled by viewport width / 1920
-     (e.g. a 664px card is 494px tall on a 1430px screen); floored at 0.6 so tablets stay readable. Mobile keeps real px. */
-  .features {
-    --fx: 1px;
-  }
-  @media (width >= 768px) {
-    .features {
-      --fx: max(100vw / 1920, 0.6px);
-    }
-  }
-
+  /* Sizes are in Figma pixels via --fx (src/styles/global.css) */
   /* ---------- Track: native horizontal scroll, cards snap to the left edge ---------- */
   .track {
     display: flex;

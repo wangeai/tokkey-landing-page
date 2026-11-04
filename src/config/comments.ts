@@ -27,5 +27,5 @@ export const COMMENT_COLUMNS: Comment[][] = [
   ],
 ];
 
-/** Top offset of each desktop column (px), staggering the wall */
+/** Top offset of each desktop column (Figma px, scaled by --fx), staggering the wall */
 export const COLUMN_OFFSETS = [40, 0, 64];
