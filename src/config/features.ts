@@ -1,59 +1,40 @@
-// Content of the features section (src/components/Features.astro): the tab list on the left and the data in each panel.
+// Content of the features carousel (src/components/Features.astro): the caption under each card and the data inside them.
 
-export interface Feature {
-  title: string;
+/** Caption under a card: `lead` is shown in white, `text` follows in grey */
+export interface SlideCaption {
+  lead: string;
   text: string;
-  /** Headline shown at the top of the panel */
-  caption: string;
-  /** Show the PRO badge after the title */
-  pro?: boolean;
 }
 
-/** Tabs in display order; tab i shows panel i */
-export const FEATURES: Feature[] = [
+/** Captions in card order: models, game demo, light ring, lid closed, private memory */
+export const SLIDE_CAPTIONS: SlideCaption[] = [
   {
-    title: "Run large AI models",
-    text: "Large models need only a fraction of your Mac's memory with Tokkey.",
-    caption: "Large models. A fraction of the memory.",
+    lead: "Large models, a fraction of the memory.",
+    text: "Qwen3.6 35B needs about 5 GB with Tokkey instead of 23 GB, so bigger models fit the Mac you already have.",
   },
-  {
-    title: "Light guidance",
-    text: "The key's light shows what your agent is doing, without opening a window.",
-    caption: "The light tells you what is happening.",
-  },
-  {
-    title: "Lid closed",
-    text: "Close the Mac. A compatible local task keeps working in the background.",
-    caption: "Close the lid. It keeps going.",
-  },
-  {
-    title: "Private memory",
-    text: "Memory that belongs to you, kept on the key and never uploaded.",
-    caption: "Memory that stays on the key.",
-    pro: true,
-  },
+  { lead: "Build with Tokkey.", text: "Games like 3D Open World run on a local model, with no tokens leaving your Mac." },
+  { lead: "The light shows what is happening.", text: "See what your agent is doing from the key itself, without opening a window." },
+  { lead: "Close the lid.", text: "A compatible local task keeps working in the background." },
+  { lead: "Memory that stays on the key.", text: "Kept on the key and never uploaded." },
 ];
 
-/** Panel 1, first slide: memory a model needs with and without Tokkey */
+/** Card 1: memory a model needs with and without Tokkey */
 export interface ModelFootprint {
   params: string;
   name: string;
+  /** 24px icon tile in public/assets/icons/models */
+  icon: string;
   withTokkey: string;
   without: string;
+  /** Top color of the figure's vertical gradient (fades to white) */
+  tint: string;
 }
 
 export const MODEL_FOOTPRINTS: ModelFootprint[] = [
-  { params: "35B parameters", name: "Qwen3.6 35B-A3B", withTokkey: "~5 GB", without: "~23 GB" },
-  { params: "70B parameters", name: "Llama 3.3 70B", withTokkey: "~10 GB", without: "~46 GB" },
-  { params: "120B parameters", name: "gpt-oss 120B", withTokkey: "~17 GB", without: "~79 GB" },
+  { params: "35B parameters", name: "Qwen3.6 35B-A3B", icon: "qwen", withTokkey: "~5 GB", without: "~23 GB", tint: "#8fb8ff" },
+  { params: "70B parameters", name: "Llama 3.3 70B", icon: "llama", withTokkey: "~10 GB", without: "~46 GB", tint: "#9db4d6" },
+  { params: "120B parameters", name: "gpt-oss 120B", icon: "gpt-oss", withTokkey: "~17 GB", without: "~79 GB", tint: "#9aa6c4" },
 ];
 
-/** Panel 1, second slide: caption above the game demo */
-export const GAME_DEMO_CAPTION = "Game demo: Build with Tokkey.";
-
-/** Panel 4: what the private memory holds */
-export const MEMORY_ROWS: { label: string; value: string }[] = [
-  { label: "Projects", value: "38 notes" },
-  { label: "Preferences", value: "Writing style" },
-  { label: "People", value: "24 contacts" },
-];
+/** Card 2: how many games get a thumbnail (the first N of GAMES in src/config/games.ts) */
+export const DEMO_GAME_COUNT = 4;
