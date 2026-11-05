@@ -1,13 +1,8 @@
-// Footer background: a faint ASCII field (luminance texture plus a drifting ripple, as on the legacy footer),
-// drawn only while the footer is on screen. Markup: src/components/Footer.astro.
+// Footer background: an ASCII field ported from the footer on main (assets/js/main.js `ftdots`): brightness-ramped
+// glyphs over the scrolling luminance texture plus a drifting ripple, drawn only while the footer is on screen.
+// Markup and fade-in mask: src/components/Footer.astro.
 import { AsciiField } from "../AsciiField";
 import { LuminanceMap } from "../LuminanceMap";
-import { MOBILE_MAX_WIDTH } from "../../config/frames";
-
-/** Figma grid: 13px mono glyphs on 7.8 × 16 px cells, at the 1920 design width */
-const FIGMA_GRID = { cellWidth: 7.8, cellHeight: 16, fontSize: 13 };
-/** Figma glyph color: white at 14% */
-const GLYPH_ALPHA = 0.14;
 
 export class FooterScene {
   private readonly field: AsciiField;
@@ -17,12 +12,10 @@ export class FooterScene {
     // Reduced motion: freeze the field at its first frame
     const still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
+    // Glyph alpha = min(0.85, 0.14 + level * 0.1), as on main; color and grid are AsciiField's defaults (same as main)
     this.field = new AsciiField(footer.querySelector<HTMLCanvasElement>("[data-ref=field]")!, {
-      color: "#ffffff",
-      baseAlpha: GLYPH_ALPHA,
-      stepAlpha: 0,
-      maxAlpha: GLYPH_ALPHA,
-      grid: (width) => FooterScene.grid(width),
+      baseAlpha: 0.14,
+      maxAlpha: 0.85,
       sample: ({ x, y, width, height, time }) => {
         const t = still ? 0 : time;
         const hx = width * (0.5 + 0.28 * Math.sin(t * 0.25));
@@ -33,15 +26,5 @@ export class FooterScene {
     });
 
     new IntersectionObserver(([entry]) => this.field.setVisibility(entry.isIntersecting ? 1 : 0)).observe(footer);
-  }
-
-  /** Figma grid scaled like --fx: by viewport width / 1920 (floored at 0.6) on desktop, real px on mobile */
-  private static grid(width: number) {
-    const fx = width > MOBILE_MAX_WIDTH ? Math.max(width / 1920, 0.6) : 1;
-    return {
-      cellWidth: FIGMA_GRID.cellWidth * fx,
-      cellHeight: FIGMA_GRID.cellHeight * fx,
-      fontSize: FIGMA_GRID.fontSize * fx,
-    };
   }
 }

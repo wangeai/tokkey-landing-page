@@ -1,0 +1,232 @@
+---
+// Illustrative Tokkey app window (Figma: Tokkey app window, 1152×576) shown in the Software hero: sidebar nav, status
+// pills, the "Tokkey is connected" card and the Local Models list. Sizes are Figma px times --u, which the parent sets
+// so the window always keeps its designed proportions (see SoftwareHero.astro). Content: src/config/software.ts.
+import { APP_MODELS, APP_NAV } from "../config/software";
+---
+
+<div class="window" role="img" aria-label="Tokkey app: local models on this Mac, Qwen3.5 4B running">
+  <aside class="sidebar">
+    <span class="flex gap-[calc(9.6*var(--u))]">
+      <i class="light bg-[#ff5f57]"></i><i class="light bg-[#febc2e]"></i><i class="light bg-[#28c840]"></i>
+    </span>
+    <span class="mt-[calc(25.6*var(--u))] flex items-center gap-[calc(12.8*var(--u))]">
+      <img src="/assets/icons/software/app-symbol.svg" width="32" height="32" alt="" class="size-[calc(32*var(--u))]" />
+      <b class="app-title">Tokkey</b>
+    </span>
+
+    {
+      APP_NAV.map((group, g) => (
+        <div class:list={["nav-group", g === 0 ? "mt-[calc(25.6*var(--u))]" : "mt-[calc(24*var(--u))]"]}>
+          <span class="mono text-[#6b6f6a] uppercase">{group.label}</span>
+          {group.items.map((item, i) => (
+            <span class:list={["nav-item", { active: g === 0 && i === 0 }]}>{item}</span>
+          ))}
+        </div>
+      ))
+    }
+  </aside>
+
+  <div class="main">
+    <div class="flex justify-end gap-[calc(12.8*var(--u))]">
+      <span class="pill bg-white/85 font-medium text-[#222]">‹&nbsp;&nbsp;›</span>
+      <span class="pill mono gap-[calc(6.4*var(--u))] bg-[#121312] text-white"><i class="status-dot"></i>Tokkey connected</span>
+    </div>
+
+    <b class="page-title">Tokkey</b>
+    <span class="mt-[calc(6.4*var(--u))] block text-[#4d514c]">Manage your local models and inference engine.</span>
+
+    <!-- Connection card -->
+    <div class="card mt-[calc(25.6*var(--u))] flex items-center gap-[calc(19.2*var(--u))] bg-white/50 p-[calc(18.4*var(--u))]">
+      <span class="thumb size-[calc(44.8*var(--u))]"><i></i></span>
+      <span class="flex-1">
+        <b class="block font-semibold">Tokkey is connected</b>
+        <span class="mt-[calc(3.2*var(--u))] block text-[#5c605b]">Connected via USB-C · local runtime available to supported clients</span>
+      </span>
+      <span class="pill mono bg-[#121312] text-white">Connected</span>
+    </div>
+
+    <!-- Local Models card -->
+    <div class="card mt-[calc(19.2*var(--u))] bg-white/42 pb-[calc(11.6*var(--u))]">
+      <div class="flex h-[calc(76*var(--u))] items-start justify-between px-[calc(21.6*var(--u))] pt-[calc(15.2*var(--u))]">
+        <span>
+          <b class="card-title">Local Models</b>
+          <span class="mt-[calc(3.2*var(--u))] block text-[#5c605b]">Download, start, and manage models stored on this Mac.</span>
+        </span>
+        <span class="mt-[calc(3.2*var(--u))] flex gap-[calc(9.6*var(--u))]">
+          <span class="pill bg-white/92 font-semibold">Import</span>
+          <span class="pill bg-white/92 font-semibold">Add model</span>
+        </span>
+      </div>
+      {
+        APP_MODELS.map((model) => (
+          <div class:list={["model", { "bg-white/25": model.running }]}>
+            <span class="thumb size-[calc(38.4*var(--u))]">
+              <i />
+            </span>
+            <span class="flex-1">
+              <span class="flex items-center gap-[calc(9.6*var(--u))]">
+                <b class="font-semibold">{model.name}</b>
+                {model.running && <span class="tag">Running</span>}
+              </span>
+              <span class="mt-[calc(3.2*var(--u))] block text-[#5c605b]">{model.detail}</span>
+            </span>
+            <span class:list={["pill action font-semibold", model.running ? "bg-[#d9cdfa]" : "bg-white/95"]}>
+              {model.running ? "Stop" : "Start"}
+            </span>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</div>
+
+<style>
+  /* Frosted window: 1152×576, sidebar 224 + main */
+  .window {
+    display: flex;
+    width: calc(1152 * var(--u));
+    height: calc(576 * var(--u));
+    overflow: hidden;
+    border: calc(0.8 * var(--u)) solid rgb(255 255 255 / 70%);
+    border-radius: calc(19.2 * var(--u));
+    background: rgb(246 247 242 / 88%);
+    backdrop-filter: blur(calc(12 * var(--u)));
+    box-shadow: 0 calc(32 * var(--u)) calc(72 * var(--u)) calc(-24 * var(--u)) rgb(13 20 15 / 45%);
+    color: #111110;
+    font-size: calc(12.8 * var(--u));
+    line-height: calc(19.2 * var(--u));
+    white-space: nowrap;
+  }
+
+  .mono {
+    font-family: var(--font-mono);
+    letter-spacing: 0.075em;
+  }
+
+  .sidebar {
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    width: calc(224 * var(--u));
+    padding: calc(21.6 * var(--u)) calc(12 * var(--u)) 0;
+    border-right: calc(0.8 * var(--u)) solid rgb(255 255 255 / 70%);
+    background: rgb(255 255 255 / 40%);
+  }
+  .sidebar > span {
+    padding-left: calc(12.8 * var(--u));
+  }
+  .light {
+    width: calc(9.6 * var(--u));
+    height: calc(9.6 * var(--u));
+    border-radius: 50%;
+  }
+  .app-title {
+    font-size: calc(19.2 * var(--u));
+    line-height: calc(25.6 * var(--u));
+    font-weight: 600;
+  }
+
+  /* Nav group: mono label, then 38.4-tall items 6.4 apart */
+  .nav-group {
+    display: flex;
+    flex-direction: column;
+    gap: calc(6.4 * var(--u));
+  }
+  .nav-group > .mono {
+    padding-left: calc(12.8 * var(--u));
+  }
+  .nav-item {
+    padding: calc(9.6 * var(--u)) calc(12.8 * var(--u));
+    border-radius: calc(12.8 * var(--u));
+    color: #2a2d2a;
+  }
+  .nav-item.active {
+    background: rgb(255 255 255 / 85%);
+    color: #111110;
+    font-weight: 500;
+  }
+
+  .main {
+    flex: 1;
+    padding: calc(18.4 * var(--u)) calc(37.6 * var(--u)) 0;
+  }
+  .page-title {
+    display: block;
+    margin-top: calc(19.2 * var(--u));
+    font-size: calc(25.6 * var(--u));
+    line-height: calc(32 * var(--u));
+    font-weight: 600;
+    letter-spacing: -0.022em;
+  }
+
+  /* 32-tall pill used for buttons and status */
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: calc(32 * var(--u));
+    padding-inline: calc(17.6 * var(--u));
+    border-radius: calc(16 * var(--u));
+  }
+  .pill.mono {
+    padding-inline: calc(12.8 * var(--u));
+  }
+  .pill.action {
+    width: calc(76.8 * var(--u));
+    padding-inline: 0;
+  }
+  .status-dot {
+    width: calc(6.4 * var(--u));
+    height: calc(6.4 * var(--u));
+    border-radius: 50%;
+    background: #fff;
+  }
+
+  .card {
+    overflow: hidden;
+    border: calc(0.8 * var(--u)) solid rgb(255 255 255 / 70%);
+    border-radius: calc(12.8 * var(--u));
+  }
+  .card-title {
+    display: block;
+    font-size: calc(19.2 * var(--u));
+    line-height: calc(25.6 * var(--u));
+    font-weight: 600;
+  }
+
+  /* Model placeholder icon: white rounded tile with a small outlined square */
+  .thumb {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    border: calc(0.8 * var(--u)) solid rgb(0 0 0 / 6%);
+    border-radius: calc(12.8 * var(--u));
+    background: rgb(255 255 255 / 82%);
+  }
+  .thumb i {
+    width: calc(11.2 * var(--u));
+    height: calc(11.2 * var(--u));
+    border: calc(0.8 * var(--u)) solid #666;
+    border-radius: calc(3.2 * var(--u));
+  }
+
+  /* Model row: 63.2 tall, hairline above */
+  .model {
+    display: flex;
+    align-items: center;
+    gap: calc(12.8 * var(--u));
+    height: calc(64 * var(--u));
+    padding-inline: calc(21.6 * var(--u));
+    border-top: calc(0.8 * var(--u)) solid rgb(255 255 255 / 70%);
+  }
+  .tag {
+    padding-inline: calc(9.6 * var(--u));
+    border-radius: calc(11.2 * var(--u));
+    background: #121312;
+    color: #fff;
+    font-weight: 600;
+    line-height: calc(22.4 * var(--u));
+  }
+</style>

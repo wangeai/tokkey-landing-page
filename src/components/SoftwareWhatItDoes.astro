@@ -1,0 +1,368 @@
+---
+// Software page "What it does" section (Figma: S2 What it does): headline, then "Run larger models locally." beside a
+// dark glow panel holding the inference-engine card (model memory bars). Sizes are Figma px via --fx
+// (src/styles/global.css). Text and panel sit side by side from 1200px, stacked below; on mobile the card flows in px
+// and the icon tiles are hidden. Content: src/config/software.ts.
+import { ENGINE_MEMORY_GB, ENGINE_MODELS, ENGINE_TILES, FEATURES } from "../config/software";
+---
+
+<section
+  id="what-it-does"
+  data-what-it-does
+  class="relative overflow-hidden bg-white px-gutter-sm py-24 text-[#16191a] md:px-[calc(120*var(--fx))] md:pt-[calc(120*var(--fx))] md:pb-[calc(80*var(--fx))]"
+>
+  <!-- ASCII halftone behind the headline -->
+  <img
+    src="/assets/images/software/halftone.png"
+    width="1504"
+    height="474"
+    alt=""
+    aria-hidden="true"
+    loading="lazy"
+    class="pointer-events-none absolute top-0 left-[calc(-243.43*var(--fx))] h-[calc(702*var(--fx))] w-[calc(2406.86*var(--fx))] max-w-none object-cover opacity-40 max-md:left-1/2 max-md:h-[702px] max-md:w-[2407px] max-md:-translate-x-1/2"
+  />
+
+  <div class="relative">
+    <p data-reveal class="label text-[#6b6f69] md:text-[calc(16*var(--fx))]/[calc(24*var(--fx))]">What it does</p>
+    <h2 data-reveal class="mt-2 text-h2-sm font-bold md:mt-[calc(8*var(--fx))] md:text-[calc(64*var(--fx))]/[calc(72*var(--fx))]">
+      Bigger models first<span class="period">.</span> Everything else follows<span class="period">.</span>
+    </h2>
+
+    <div class="mt-16 flex flex-col gap-12 md:mt-[calc(130*var(--fx))] md:gap-[calc(64*var(--fx))] lg:flex-row lg:justify-between lg:gap-0">
+      <div class="lg:w-[calc(720*var(--fx))]">
+        <h3 data-reveal class="text-[32px]/[40px] font-semibold tracking-[-0.033em] md:text-[calc(48*var(--fx))]/[calc(56*var(--fx))]">
+          Run larger models locally.
+        </h3>
+        <p data-reveal class="mt-6 max-w-[calc(640*var(--fx))] text-lead text-[#6b6f69] max-md:max-w-none md:mt-[calc(32*var(--fx))] md:text-[calc(24*var(--fx))]/[calc(32*var(--fx))]">
+          Bigger models on your current Mac. No new machine, no whole-device upgrade. Pick a model, start it, connect your tools.
+        </p>
+      </div>
+
+      <!-- Engine glow panel: teal glow and rings behind a stacked white card, icon tiles around it -->
+      <div data-reveal class="panel">
+        <img src="/assets/images/software/teal-glow.svg" width="1000" height="760" alt="" aria-hidden="true" class="deco glow" />
+        <img src="/assets/images/software/ring-1.svg" width="800" height="800" alt="" aria-hidden="true" class="deco ring-1" />
+        <img src="/assets/images/software/ring-2.svg" width="1080" height="1080" alt="" aria-hidden="true" class="deco ring-2" />
+        <img src="/assets/images/software/ring-3.svg" width="1360" height="1360" alt="" aria-hidden="true" class="deco ring-3" />
+
+        {
+          ENGINE_TILES.map((tile) => (
+            <span class="tile" style={`--x:${tile.left};--y:${tile.top}`} aria-hidden="true">
+              <img src={`/assets/icons/software/${tile.icon}.svg`} width="28" height="28" alt="" />
+            </span>
+          ))
+        }
+
+        <div class="card-stack">
+          <figure class="card" aria-label="Tokkey inference engine: local model memory">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <span class="pill">The Tokkey inference engine</span>
+              <span class="pill gap-[calc(8*var(--fx))]"><i class="dot"></i>Local</span>
+            </div>
+
+            <ul class="mt-[calc(40*var(--fx))]">
+              {
+                ENGINE_MODELS.map((model) => (
+                  <li class="model">
+                    <p class="flex justify-between gap-4">
+                      <b class="font-semibold">{model.name}</b>
+                      <span class="text-[#6b6f69]">
+                        {model.usedGb} GB / {ENGINE_MEMORY_GB} GB
+                      </span>
+                    </p>
+                    <span class="track">
+                      <span class="bar" style={`width:${(model.usedGb / ENGINE_MEMORY_GB) * 100}%`} />
+                    </span>
+                  </li>
+                ))
+              }
+            </ul>
+
+            <p class="note">ⓘ&nbsp; Only one local model runs at a time. Switch from the app.</p>
+          </figure>
+        </div>
+      </div>
+    </div>
+
+    <!-- Feature grid (Figma: Feature grid, 3 × 544 cards): one column on mobile, two on tablet, three from 1200px -->
+    <ul class="mt-16 grid gap-4 md:mt-[calc(88*var(--fx))] md:grid-cols-2 md:gap-[calc(24*var(--fx))] lg:grid-cols-3">
+      {
+        FEATURES.map((feature, i) => (
+          <li data-reveal class="feature">
+            <div class="flex items-center justify-between">
+              <span class="feature-tile">
+                <img src={`/assets/icons/software/${feature.icon}.svg`} width="24" height="24" alt="" aria-hidden="true" />
+              </span>
+              <span class="feature-index">{String(i + 2).padStart(2, "0")}</span>
+            </div>
+            <h4 class="feature-title">{feature.title}</h4>
+            <p class="feature-text">{feature.text}</p>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<script>
+  import { ScrollReveal } from "../scripts/ScrollReveal";
+  const section = document.querySelector<HTMLElement>("[data-what-it-does]");
+  if (section) ScrollReveal.section(section);
+</script>
+
+<style>
+  /* Feature card (Figma: Feature card, 544×272): icon tile + index, title 20 below, text 16 below the title */
+  .feature {
+    padding: 27px 31px 31px;
+    border: 1px solid #e3e5db;
+    border-radius: 24px;
+    background: #fff;
+    box-shadow: 0 12px 32px rgb(26 31 26 / 6%);
+  }
+  .feature-tile {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    background: #16191a;
+    box-shadow: 0 4px 16px rgb(74 191 23 / 28%);
+  }
+  .feature-tile img {
+    width: 24px;
+    height: 24px;
+  }
+  .feature-index {
+    color: #6b6f69;
+    font-family: var(--font-mono);
+    font-size: 16px;
+    line-height: 24px;
+    letter-spacing: 0.0875em;
+  }
+  .feature-title {
+    margin-top: 20px;
+    font-size: 24px;
+    line-height: 32px;
+    font-weight: 600;
+    letter-spacing: -0.2px;
+  }
+  .feature-text {
+    margin-top: 16px;
+    color: #6b6f69;
+    font-size: 16px;
+    line-height: 24px;
+  }
+  @media (width >= 768px) {
+    .feature {
+      height: calc(272 * var(--fx));
+      padding: calc(27 * var(--fx)) calc(31 * var(--fx));
+      border-radius: calc(24 * var(--fx));
+      box-shadow: 0 calc(12 * var(--fx)) calc(32 * var(--fx)) rgb(26 31 26 / 6%);
+    }
+    .feature-tile {
+      width: calc(40 * var(--fx));
+      height: calc(40 * var(--fx));
+      border-radius: calc(12 * var(--fx));
+      box-shadow: 0 calc(4 * var(--fx)) calc(16 * var(--fx)) rgb(74 191 23 / 28%);
+    }
+    .feature-tile img {
+      width: calc(24 * var(--fx));
+      height: calc(24 * var(--fx));
+    }
+    .feature-index,
+    .feature-text {
+      font-size: calc(16 * var(--fx));
+      line-height: calc(24 * var(--fx));
+    }
+    .feature-title {
+      margin-top: calc(20 * var(--fx));
+      font-size: calc(24 * var(--fx));
+      line-height: calc(32 * var(--fx));
+      letter-spacing: calc(-0.2 * var(--fx));
+    }
+    .feature-text {
+      margin-top: calc(16 * var(--fx));
+    }
+  }
+
+  /* Dark panel (Figma: engine glow panel, 921×760). Mobile: padded box the card flows in */
+  .panel {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 64px 16px 48px;
+    overflow: hidden;
+    border: 1px solid rgb(255 255 255 / 14%);
+    border-radius: 24px;
+    background: #080909;
+  }
+
+  /* Glow and rings: centered on mobile, at their Figma offsets inside the panel from 768px */
+  .deco {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    max-width: none;
+    translate: -50% -50%;
+    pointer-events: none;
+  }
+
+  /* Glowing icon tile (56 square, 28 icon); desktop/tablet only */
+  .tile {
+    display: none;
+  }
+
+  /* Card with two faint layers stacked behind it */
+  .card-stack {
+    position: relative;
+    width: 100%;
+  }
+  .card-stack::before,
+  .card-stack::after {
+    content: "";
+    position: absolute;
+    inset-block: 0;
+    border: 1px solid rgb(22 25 26 / 8%);
+    border-radius: calc(24 * var(--fx));
+    background: rgb(22 25 26 / 3%);
+  }
+  .card-stack::before {
+    inset-inline: calc(48 * var(--fx));
+    translate: 0 calc(-33 * var(--fx));
+  }
+  .card-stack::after {
+    inset-inline: calc(24 * var(--fx));
+    translate: 0 calc(-17 * var(--fx));
+  }
+
+  /* Inference engine card (Figma: 720×472, 40px sides, 32px top) */
+  .card {
+    position: relative;
+    z-index: 1;
+    padding: 24px 20px;
+    border: 1px solid #e3e5db;
+    border-radius: 24px;
+    background: #fff;
+    box-shadow: 0 12px 32px rgb(26 31 26 / 6%);
+    color: #16191a;
+    font-size: 16px;
+    line-height: 24px;
+  }
+
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    height: calc(32 * var(--fx));
+    padding-inline: calc(16 * var(--fx));
+    border-radius: calc(16 * var(--fx));
+    background: rgb(22 25 26 / 5%);
+    font-weight: 500;
+    white-space: nowrap;
+  }
+  .dot {
+    width: calc(8 * var(--fx));
+    height: calc(8 * var(--fx));
+    border-radius: calc(4 * var(--fx));
+    background: #16191a;
+  }
+
+  /* Model row: name + usage, bar 16 below; hairline 20 under the bar, next row 31 after it */
+  .model + .model {
+    margin-top: calc(20 * var(--fx));
+    padding-top: calc(31 * var(--fx));
+    border-top: 1px solid rgb(22 25 26 / 5%);
+  }
+  .track {
+    display: block;
+    height: calc(12 * var(--fx));
+    margin-top: calc(16 * var(--fx));
+    border-radius: calc(6 * var(--fx));
+    background: rgb(22 25 26 / 5%);
+  }
+  .bar {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: #16191a;
+  }
+
+  .note {
+    margin-top: calc(20 * var(--fx));
+    padding: calc(12 * var(--fx)) calc(20 * var(--fx));
+    border-radius: calc(16 * var(--fx));
+    background: rgb(22 25 26 / 5%);
+    color: #6b6f69;
+  }
+
+  @media (width >= 768px) {
+    .panel {
+      flex-shrink: 0;
+      width: calc(921 * var(--fx));
+      height: calc(760 * var(--fx));
+      padding: 0;
+      border-radius: calc(24 * var(--fx));
+    }
+
+    .deco {
+      translate: none;
+    }
+    .glow {
+      top: calc(-1 * var(--fx));
+      left: calc(-93 * var(--fx));
+      width: calc(1000 * var(--fx));
+      height: calc(760 * var(--fx));
+    }
+    .ring-1 {
+      top: 50%;
+      left: calc(50% + 0.5 * var(--fx));
+      width: calc(800 * var(--fx));
+      height: calc(800 * var(--fx));
+      translate: -50% -50%;
+    }
+    .ring-2 {
+      top: calc(-161 * var(--fx));
+      left: calc(-133 * var(--fx));
+      width: calc(1080 * var(--fx));
+      height: calc(1080 * var(--fx));
+    }
+    .ring-3 {
+      top: calc(-301 * var(--fx));
+      left: calc(-273 * var(--fx));
+      width: calc(1360 * var(--fx));
+      height: calc(1360 * var(--fx));
+    }
+
+    .tile {
+      position: absolute;
+      top: calc(var(--y) * var(--fx));
+      left: calc(var(--x) * var(--fx));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: calc(56 * var(--fx));
+      height: calc(56 * var(--fx));
+      border: 1px solid rgb(255 255 255 / 18%);
+      border-radius: calc(16 * var(--fx));
+      background: rgb(255 255 255 / 8%);
+      box-shadow: 0 0 calc(24 * var(--fx)) rgb(102 229 204 / 25%);
+    }
+    .tile img {
+      width: calc(28 * var(--fx));
+      height: calc(28 * var(--fx));
+    }
+
+    .card-stack {
+      width: calc(720 * var(--fx));
+    }
+    .card {
+      height: calc(472 * var(--fx));
+      padding: calc(31 * var(--fx)) calc(39 * var(--fx));
+      border-radius: calc(24 * var(--fx));
+      box-shadow: 0 calc(12 * var(--fx)) calc(32 * var(--fx)) rgb(26 31 26 / 6%);
+      font-size: calc(16 * var(--fx));
+      line-height: calc(24 * var(--fx));
+    }
+  }
+</style>

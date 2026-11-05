@@ -1,0 +1,141 @@
+---
+// Software page hero (Figma: S1 Hero (dark, ripple)): eyebrow, "Own your AI." and two CTAs over the aurora backdrop,
+// fading into the light section below, with the app window and its glass chips on the right. Sizes are Figma px via
+// --fx (src/styles/global.css); mobile keeps real px. Content: src/config/software.ts.
+import { HERO_CHIPS } from "../config/software";
+import SoftwareAppWindow from "./SoftwareAppWindow.astro";
+---
+
+<section
+  id="software-hero"
+  data-software-hero
+  class="relative flex min-h-svh flex-col overflow-hidden bg-black px-gutter-sm pt-36 pb-48 text-white md:min-h-[calc(1080*var(--fx))] md:px-[calc(120*var(--fx))] md:pt-[calc(236*var(--fx))] md:pb-[calc(260*var(--fx))]"
+>
+  <img
+    src="/assets/images/software/hero-aurora.jpg"
+    width="1920"
+    height="1080"
+    alt=""
+    aria-hidden="true"
+    fetchpriority="high"
+    class="pointer-events-none absolute inset-0 size-full object-cover"
+  />
+  <!-- Bottom fade into the light "What it does" section -->
+  <div class="fade pointer-events-none absolute inset-x-0 bottom-0 h-48 md:h-[calc(260*var(--fx))]"></div>
+
+  <div class="relative">
+    <p data-reveal class="label text-[#a1a1a6] md:text-[calc(16*var(--fx))]/[calc(24*var(--fx))]">The Tokkey app · Built for Mac</p>
+    <h1 data-reveal class="mt-2 text-hero-sm font-bold md:mt-[calc(8*var(--fx))] md:text-[calc(96*var(--fx))]/[calc(104*var(--fx))]">
+      <span class="text-chrome block">Own your<br />AI<span class="period">.</span></span>
+    </h1>
+    <p data-reveal class="mt-8 max-w-[520px] text-lead text-[#a1a1a6] md:mt-[calc(32*var(--fx))] md:max-w-[calc(520*var(--fx))] md:text-[calc(24*var(--fx))]/[calc(32*var(--fx))]">
+      Run larger models on the Mac you already own. Keep private and routine work off your cloud API bill.
+    </p>
+    <div data-reveal class="mt-12 flex flex-wrap gap-4 md:mt-[calc(56*var(--fx))] md:gap-[calc(16*var(--fx))]">
+      <a href="#early" class="cta bg-[#edebe3] font-semibold text-[#111] md:w-[calc(256*var(--fx))]">Get early access →</a>
+      <a href="#compatibility" class="cta border border-white/30 font-medium md:w-[calc(224*var(--fx))]">Can my Mac run it?</a>
+    </div>
+  </div>
+
+  <!-- App window with glass chips around it: beside the text at Figma's spot (704, 204) from 1200px, below it under 1200 -->
+  <div data-reveal class="app-stage">
+    <SoftwareAppWindow />
+    {
+      HERO_CHIPS.map((chip) => (
+        <span class="chip" style={`--x:${chip.left};--y:${chip.top}`} aria-hidden="true">
+          <img src={`/assets/icons/software/${chip.icon}.svg`} width="32" height="32" alt="" />
+          {chip.label}
+        </span>
+      ))
+    }
+  </div>
+</section>
+
+<script>
+  import { ScrollReveal } from "../scripts/ScrollReveal";
+  const section = document.querySelector<HTMLElement>("[data-software-hero]");
+  if (section) ScrollReveal.section(section);
+</script>
+
+<style>
+  /* Window + chips stage. --u is one Figma px of the 1152-wide window: below 1200 the stage fills the column (with room
+     for the Memory chip under the window); from 1200 it sits at Figma's spot and --u equals --fx */
+  .app-stage {
+    container-type: inline-size;
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1152 / 675;
+    margin-top: 64px;
+  }
+  .app-stage > :global(*) {
+    --u: calc(100cqw / 1152);
+  }
+  @media (width >= 1200px) {
+    .app-stage {
+      position: absolute;
+      top: calc(204 * var(--fx));
+      left: calc(704 * var(--fx));
+      width: calc(1152 * var(--fx));
+      margin-top: 0;
+    }
+  }
+
+  /* Glass chip (Figma: chip / Router, 64 tall) */
+  .chip {
+    position: absolute;
+    top: calc(var(--y) * var(--u));
+    left: calc(var(--x) * var(--u));
+    display: flex;
+    align-items: center;
+    gap: calc(12 * var(--u));
+    height: calc(64 * var(--u));
+    padding: 0 calc(24 * var(--u)) 0 calc(20 * var(--u));
+    border: calc(1 * var(--u)) solid rgb(255 255 255 / 30%);
+    border-radius: calc(16 * var(--u));
+    background: rgb(184 189 184 / 38%);
+    backdrop-filter: blur(calc(12 * var(--u)));
+    box-shadow: 0 calc(16 * var(--u)) calc(32 * var(--u)) rgb(0 0 0 / 35%);
+    font-size: calc(24 * var(--u));
+    line-height: calc(32 * var(--u));
+    /* Shrink-to-fit would stop at the stage's right edge (Agent Hub sticks out past the window) */
+    width: max-content;
+    white-space: nowrap;
+  }
+  .chip img {
+    width: calc(32 * var(--u));
+    height: calc(32 * var(--u));
+  }
+
+  .fade {
+    background: linear-gradient(to bottom, rgb(244 244 242 / 0%), #f4f4f2);
+  }
+
+  /* Pill CTA (Figma: CTA primary / CTA ghost), 56 tall */
+  .cta {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 56px;
+    padding-inline: 32px;
+    border-radius: 28px;
+    font-size: 16px;
+    line-height: 24px;
+    transition: opacity 0.2s;
+  }
+  .cta:hover {
+    opacity: 0.88;
+  }
+  .cta:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+  @media (width >= 768px) {
+    .cta {
+      height: calc(56 * var(--fx));
+      padding-inline: 0;
+      border-radius: calc(28 * var(--fx));
+      font-size: calc(16 * var(--fx));
+      line-height: calc(24 * var(--fx));
+    }
+  }
+</style>

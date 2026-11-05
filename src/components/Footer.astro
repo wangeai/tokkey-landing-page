@@ -14,7 +14,7 @@ const label = "font-mono text-[12px]/4 uppercase tracking-[0.08em] text-[#8e8e93
   data-footer
   class="relative overflow-hidden bg-black px-gutter-sm pt-24 pb-8 text-white md:px-[calc(40*var(--fx))] md:pt-[calc(170*var(--fx))] md:pb-[calc(41*var(--fx))]"
 >
-  <canvas data-ref="field" aria-hidden="true" class="pointer-events-none absolute inset-0 size-full"></canvas>
+  <canvas data-ref="field" aria-hidden="true" class="field pointer-events-none absolute inset-0 size-full"></canvas>
 
   <div class="relative mx-auto max-w-[calc(1280*var(--fx))]">
     <div class="grid grid-cols-2 gap-x-6 gap-y-12 md:grid-cols-3 lg:grid-cols-[calc(444*var(--fx))_calc(292*var(--fx))_calc(292*var(--fx))_1fr] lg:gap-0">
@@ -74,6 +74,18 @@ const label = "font-mono text-[12px]/4 uppercase tracking-[0.08em] text-[#8e8e93
 </script>
 
 <style>
+  /* ASCII field fades in from the top and thins toward the bottom (mask from #ftc on main) */
+  .field {
+    mask-image: linear-gradient(
+      180deg,
+      transparent 0,
+      #000 25%,
+      rgb(0 0 0 / 90%) 52%,
+      rgb(0 0 0 / 22%) 78%,
+      rgb(0 0 0 / 14%) 100%
+    );
+  }
+
   /* Round glass button around each social icon */
   .social {
     display: flex;
