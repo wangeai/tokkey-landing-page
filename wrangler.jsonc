@@ -3,5 +3,7 @@
 {
   "name": "tokkey-landing-page",
   "compatibility_date": "2026-11-01",
+  // Build dist/ before deploy, so CI works even without a separate build step.
+  "build": { "command": "npm run build" },
   "assets": { "directory": "./dist", "not_found_handling": "404-page" }
 }
