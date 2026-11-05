@@ -1,0 +1,174 @@
+---
+// Software page "Local AI agent use cases" section (Figma: S5 Use cases): centred headline over the ASCII halftone and
+// the one-path pills, then the use-case list beside the glass app window, then three use-case cards. Sizes are Figma px
+// via --fx (src/styles/global.css). List and window sit side by side from 1200px, stacked below; cards go three across
+// from 1200px. Content: src/config/software.ts.
+import SoftwareAppWindow from "./SoftwareAppWindow.astro";
+import { USE_CASE_APP_NAV, USE_CASE_CARDS, USE_CASE_PATH, USE_CASES } from "../config/software";
+---
+
+<section
+  id="use-cases"
+  data-use-cases
+  class="relative overflow-hidden bg-white px-gutter-sm py-24 text-[#16191a] md:px-[calc(120*var(--fx))] md:pt-[calc(120*var(--fx))] md:pb-[calc(120*var(--fx))]"
+>
+  <!-- ASCII halftone behind the headline (Figma: Texture, 1920×560) -->
+  <img
+    src="/assets/images/software/halftone.png"
+    width="1504"
+    height="474"
+    alt=""
+    aria-hidden="true"
+    loading="lazy"
+    class="pointer-events-none absolute inset-x-0 top-0 h-[calc(560*var(--fx))] w-full max-w-none object-cover max-md:left-1/2 max-md:w-[1920px] max-md:-translate-x-1/2"
+  />
+
+  <div class="relative flex flex-col items-center text-center">
+    <p data-reveal class="label text-[#6b6f69] md:text-[calc(16*var(--fx))]/[calc(24*var(--fx))]">Local AI agent use cases</p>
+    <h2 data-reveal class="mt-2 text-h2-sm font-bold md:mt-[calc(8*var(--fx))] md:text-[calc(64*var(--fx))]/[calc(72*var(--fx))]">
+      Local models,<br />where you already work<span class="period">.</span>
+    </h2>
+    <p data-reveal class="mt-6 text-lead text-[#6b6f69] md:mt-[calc(32*var(--fx))] md:text-[calc(24*var(--fx))]/[calc(32*var(--fx))]">
+      Every use case follows one path.
+    </p>
+    <ol data-reveal class="mt-8 flex flex-wrap items-center justify-center gap-3 md:mt-[calc(48*var(--fx))] md:gap-[calc(16*var(--fx))]">
+      {
+        USE_CASE_PATH.map((step, i) => (
+          <>
+            {i > 0 && (
+              <li aria-hidden="true" class="text-[#6b6f69] max-md:hidden md:text-[calc(16*var(--fx))]">
+                →
+              </li>
+            )}
+            <li class="step">{step}</li>
+          </>
+        ))
+      }
+    </ol>
+  </div>
+
+  <div class="relative mt-16 flex flex-col gap-10 md:mt-[calc(88*var(--fx))] lg:flex-row lg:gap-[calc(48*var(--fx))]">
+    <!-- Use-case list: the first item is boxed until another is hovered -->
+    <ul class="cases flex flex-col gap-4 lg:w-[calc(480*var(--fx))] lg:shrink-0 lg:gap-[calc(24*var(--fx))]">
+      {
+        USE_CASES.map((useCase, i) => (
+          <li data-reveal class:list={["case", { active: i === 0 }]}>
+            <h3 class="case-title">{useCase.title}</h3>
+            <p class="case-text">{useCase.text}</p>
+          </li>
+        ))
+      }
+    </ul>
+
+    <!-- Blurred backdrop with the glass app window centred on it (Figma: 1152×744) -->
+    <div data-reveal class="stage">
+      <img src="/assets/images/software/usecase-backdrop.jpg" width="1376" height="768" alt="" aria-hidden="true" loading="lazy" class="backdrop" />
+      <SoftwareAppWindow variant="glass" nav={USE_CASE_APP_NAV} />
+    </div>
+  </div>
+
+  <ul class="relative mt-6 grid gap-4 md:mt-[calc(72*var(--fx))] md:gap-[calc(24*var(--fx))] lg:grid-cols-3">
+    {
+      USE_CASE_CARDS.map((card) => (
+        <li data-reveal class="card">
+          <p class="label text-[#6b6f69] md:text-[calc(16*var(--fx))]/[calc(24*var(--fx))]">{card.label}</p>
+          <h3 class="case-title mt-[calc(60*var(--fx))]">{card.title}</h3>
+          <p class="case-text">{card.text}</p>
+        </li>
+      ))
+    }
+  </ul>
+</section>
+
+<script>
+  import { ScrollReveal } from "../scripts/ScrollReveal";
+  const section = document.querySelector<HTMLElement>("[data-use-cases]");
+  if (section) ScrollReveal.section(section);
+</script>
+
+<style>
+  /* One-path pill (Figma: span, 48 tall) */
+  .step {
+    display: flex;
+    align-items: center;
+    height: calc(48 * var(--fx));
+    padding-inline: calc(24 * var(--fx));
+    border: 1px solid #e3e5dc;
+    border-radius: calc(24 * var(--fx));
+    background: #fff;
+    font-size: calc(16 * var(--fx));
+    line-height: calc(24 * var(--fx));
+    font-weight: 500;
+  }
+
+  /* Use-case item (Figma: uk, 480×232, 2px border on the highlighted one) */
+  .case {
+    min-height: calc(232 * var(--fx));
+    padding: calc(30 * var(--fx));
+    border: 2px solid transparent;
+    border-radius: calc(24 * var(--fx));
+    background: #fff;
+    transition: border-color 0.25s;
+  }
+  .case.active,
+  .case:hover {
+    border-color: #e3e5dc;
+  }
+  .cases:has(.case:hover) .case.active:not(:hover) {
+    border-color: transparent;
+  }
+  .case-title {
+    font-size: calc(24 * var(--fx));
+    line-height: calc(32 * var(--fx));
+    font-weight: 600;
+    letter-spacing: -0.69px;
+  }
+  .case-text {
+    margin-top: calc(16 * var(--fx));
+    color: #6b6f69;
+    font-size: calc(16 * var(--fx));
+    line-height: calc(24 * var(--fx));
+  }
+
+  /* Window stage: --u is one Figma px of the 1152-wide stage, so the window keeps its spot at every width */
+  .stage {
+    container-type: inline-size;
+    position: relative;
+    display: flex;
+    flex: 1;
+    align-items: center;
+    justify-content: center;
+    aspect-ratio: 1152 / 744;
+    overflow: hidden;
+    border-radius: calc(24 * var(--fx));
+  }
+  .stage > :global(*) {
+    --u: calc(100cqw / 1152);
+  }
+  .backdrop {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.7;
+    filter: blur(calc(7.442 * var(--u)));
+  }
+
+  /* Use-case card (Figma: uk, 544×240) */
+  .card {
+    padding: calc(31 * var(--fx));
+    border: 1px solid #e3e5dc;
+    border-radius: calc(24 * var(--fx));
+    background: #fff;
+  }
+  .card .case-text {
+    margin-top: calc(12 * var(--fx));
+  }
+
+  @media (width >= 768px) {
+    .card {
+      min-height: calc(240 * var(--fx));
+    }
+  }
+</style>

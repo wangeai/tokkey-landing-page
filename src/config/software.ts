@@ -1,4 +1,4 @@
-// Content of the Software page sections (src/components/SoftwareHero.astro, src/components/SoftwareWhatItDoes.astro).
+// Content of the Software page sections (src/components/Software*.astro).
 
 /** Memory available to local models in the inference-engine card (GB) */
 export const ENGINE_MEMORY_GB = 24;
@@ -65,4 +65,79 @@ export const FEATURES = [
     title: "Local models, where you already work.",
     text: "Use Tokkey inside Codex, Claude Code and other agents. Same workflow, local model.",
   },
+];
+
+/** Spec pills above the compatibility table (Figma: S4 Compatibility check); `width` is the pill width in Figma px,
+ *  `signal` adds the green dot at the pill's right end */
+export const COMPAT_SPECS = [
+  { label: "Cores", value: "10", width: 200 },
+  { label: "Memory", value: "24 GB", width: 240 },
+  { label: "Bandwidth", value: "~120 GB/s", width: 336 },
+  { label: "Tokkey", value: "Attached", width: 264, signal: true },
+];
+
+/** Compatibility table rows. `alone` is the speed on the Mac by itself (null = the model doesn't fit in memory),
+ *  `grade` "S" renders the dark pill, `boost` is the speed-up shown after the grade (omitted when there is none) */
+export const COMPAT_MODELS: {
+  name: string;
+  size: string;
+  memory: string;
+  alone: string | null;
+  withTokkey: string;
+  grade: "S" | "B";
+  boost?: string;
+}[] = [
+  { name: "Qwen3 8B", size: "8B", memory: "4.6 GB", alone: "~20 tok/s", withTokkey: "~51 tok/s", grade: "S", boost: "×2.5" },
+  { name: "Qwen2.5 Coder 7B", size: "7B", memory: "4.1 GB", alone: "~22 tok/s", withTokkey: "~58 tok/s", grade: "S", boost: "×2.6" },
+  { name: "GPT-OSS 20B", size: "21B", memory: "11.3 GB", alone: "~8 tok/s", withTokkey: "~21 tok/s", grade: "B", boost: "×2.6" },
+  { name: "Gemma 3 27B", size: "27B", memory: "15.6 GB", alone: null, withTokkey: "~15 tok/s", grade: "B" },
+];
+
+/** Rows shown before "Show all models" expands the table */
+export const COMPAT_VISIBLE_ROWS = 4;
+
+/** The one path every use case follows (pills under the use-cases headline) */
+export const USE_CASE_PATH = ["Read local files", "Run multi-step work", "Save a result you can check"];
+
+/** Use cases listed beside the app window; the first one is highlighted until another is hovered */
+export const USE_CASES = [
+  {
+    title: "Run your code workflows locally.",
+    text: "Reads the codebase, finds the error, edits the files and runs your existing tests. Saves a change log and the test results.",
+  },
+  {
+    title: "Automate recurring work locally.",
+    text: "Reads a chosen folder on a schedule and writes the weekly report, summary or status update. No cloud credits used.",
+  },
+  {
+    title: "A 100% local agent for private work.",
+    text: "Reads contracts, financials or research documents. Pulls out what matters and returns results with sources.",
+  },
+];
+
+/** Use-case cards under the app window */
+export const USE_CASE_CARDS = [
+  { label: "Research", title: "Ask your files.", text: "Searches local PDFs, notes and project files. Writes a research brief with citations." },
+  {
+    label: "Meetings & recordings",
+    title: "Turn recordings into action.",
+    text: "Transcribes locally. Extracts decisions, to-dos and owners. Saves a Summary, Transcript and Action list.",
+  },
+  { label: "Files", title: "Bring order to your files.", text: "Identifies, renames and sorts local files. Shows the change list first, then acts." },
+];
+
+/** Sidebar of the glass app window in the use-cases section (adds Router to the hero's nav) */
+export const USE_CASE_APP_NAV = [
+  { label: "Core", items: ["Tokkey", "Router", "Agent Hub", "Memory"] },
+  { label: "Workspace", items: ["Chat"] },
+  { label: "System", items: ["Dashboard", "Settings"] },
+];
+
+/** Early-access steps beside the form; the first step is the current one */
+export const EARLY_ACCESS_STEPS = [
+  { title: "Apply", text: "Tell us your email and Mac." },
+  { title: "Review", text: "We check your Mac setup. The first wave is small." },
+  { title: "Invite", text: "Download, install steps, a feedback link and a $30 Router credit." },
+  { title: "Test", text: "Use it on real work. We follow up." },
+  { title: "Improve", text: "Your feedback shapes the launch build." },
 ];

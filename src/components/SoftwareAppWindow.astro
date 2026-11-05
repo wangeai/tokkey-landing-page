@@ -2,21 +2,44 @@
 // Illustrative Tokkey app window (Figma: Tokkey app window, 1152×576) shown in the Software hero: sidebar nav, status
 // pills, the "Tokkey is connected" card and the Local Models list. Sizes are Figma px times --u, which the parent sets
 // so the window always keeps its designed proportions (see SoftwareHero.astro). Content: src/config/software.ts.
+// variant "glass" is the frosted 894.6×580.9 window of the use-cases section (Figma: Window (glass)): same markup,
+// its own metrics in the `.glass` rules below, the traffic-light and logo assets of that frame, and a custom nav.
 import { APP_MODELS, APP_NAV } from "../config/software";
+
+interface Props {
+  variant?: "hero" | "glass";
+  nav?: typeof APP_NAV;
+}
+const { variant = "hero", nav = APP_NAV } = Astro.props;
+const glass = variant === "glass";
 ---
 
-<div class="window" role="img" aria-label="Tokkey app: local models on this Mac, Qwen3.5 4B running">
+<div class:list={["window", { glass }]} role="img" aria-label="Tokkey app: local models on this Mac, Qwen3.5 4B running">
   <aside class="sidebar">
-    <span class="flex gap-[calc(9.6*var(--u))]">
-      <i class="light bg-[#ff5f57]"></i><i class="light bg-[#febc2e]"></i><i class="light bg-[#28c840]"></i>
-    </span>
-    <span class="mt-[calc(25.6*var(--u))] flex items-center gap-[calc(12.8*var(--u))]">
-      <img src="/assets/icons/software/app-symbol.svg" width="32" height="32" alt="" class="size-[calc(32*var(--u))]" />
+    {
+      glass ? (
+        <img src="/assets/icons/software/traffic-lights.svg" width="48.2172" height="11.0377" alt="" class="lights" />
+      ) : (
+        <span class="flex gap-[calc(9.6*var(--u))]">
+          <i class="light bg-[#ff5f57]" />
+          <i class="light bg-[#febc2e]" />
+          <i class="light bg-[#28c840]" />
+        </span>
+      )
+    }
+    <span class="brand mt-[calc(25.6*var(--u))] flex items-center gap-[calc(12.8*var(--u))]">
+      {
+        glass ? (
+          <img src="/assets/icons/software/logo-mark.svg" width="32.6841" height="32.6841" alt="" class="logo" />
+        ) : (
+          <img src="/assets/icons/software/app-symbol.svg" width="32" height="32" alt="" class="logo" />
+        )
+      }
       <b class="app-title">Tokkey</b>
     </span>
 
     {
-      APP_NAV.map((group, g) => (
+      nav.map((group, g) => (
         <div class:list={["nav-group", g === 0 ? "mt-[calc(25.6*var(--u))]" : "mt-[calc(24*var(--u))]"]}>
           <span class="mono text-[#6b6f6a] uppercase">{group.label}</span>
           {group.items.map((item, i) => (
@@ -28,32 +51,32 @@ import { APP_MODELS, APP_NAV } from "../config/software";
   </aside>
 
   <div class="main">
-    <div class="flex justify-end gap-[calc(12.8*var(--u))]">
+    <div class="top flex justify-end gap-[calc(12.8*var(--u))]">
       <span class="pill bg-white/85 font-medium text-[#222]">‹&nbsp;&nbsp;›</span>
       <span class="pill mono gap-[calc(6.4*var(--u))] bg-[#121312] text-white"><i class="status-dot"></i>Tokkey connected</span>
     </div>
 
     <b class="page-title">Tokkey</b>
-    <span class="mt-[calc(6.4*var(--u))] block text-[#4d514c]">Manage your local models and inference engine.</span>
+    <span class="page-sub mt-[calc(6.4*var(--u))] block text-[#4d514c]">Manage your local models and inference engine.</span>
 
     <!-- Connection card -->
-    <div class="card mt-[calc(25.6*var(--u))] flex items-center gap-[calc(19.2*var(--u))] bg-white/50 p-[calc(18.4*var(--u))]">
+    <div class="card conn mt-[calc(25.6*var(--u))] flex items-center gap-[calc(19.2*var(--u))] bg-white/50 p-[calc(18.4*var(--u))]">
       <span class="thumb size-[calc(44.8*var(--u))]"><i></i></span>
       <span class="flex-1">
-        <b class="block font-semibold">Tokkey is connected</b>
-        <span class="mt-[calc(3.2*var(--u))] block text-[#5c605b]">Connected via USB-C · local runtime available to supported clients</span>
+        <b class="row-title block font-semibold">Tokkey is connected</b>
+        <span class="row-sub mt-[calc(3.2*var(--u))] block text-[#5c605b]">Connected via USB-C · local runtime available to supported clients</span>
       </span>
       <span class="pill mono bg-[#121312] text-white">Connected</span>
     </div>
 
     <!-- Local Models card -->
-    <div class="card mt-[calc(19.2*var(--u))] bg-white/42 pb-[calc(11.6*var(--u))]">
-      <div class="flex h-[calc(76*var(--u))] items-start justify-between px-[calc(21.6*var(--u))] pt-[calc(15.2*var(--u))]">
+    <div class="card models mt-[calc(19.2*var(--u))] bg-white/42 pb-[calc(11.6*var(--u))]">
+      <div class="card-head flex h-[calc(76*var(--u))] items-start justify-between px-[calc(21.6*var(--u))] pt-[calc(15.2*var(--u))]">
         <span>
           <b class="card-title">Local Models</b>
-          <span class="mt-[calc(3.2*var(--u))] block text-[#5c605b]">Download, start, and manage models stored on this Mac.</span>
+          <span class="row-sub mt-[calc(3.2*var(--u))] block text-[#5c605b]">Download, start, and manage models stored on this Mac.</span>
         </span>
-        <span class="mt-[calc(3.2*var(--u))] flex gap-[calc(9.6*var(--u))]">
+        <span class="head-pills mt-[calc(3.2*var(--u))] flex gap-[calc(9.6*var(--u))]">
           <span class="pill bg-white/92 font-semibold">Import</span>
           <span class="pill bg-white/92 font-semibold">Add model</span>
         </span>
@@ -65,13 +88,13 @@ import { APP_MODELS, APP_NAV } from "../config/software";
               <i />
             </span>
             <span class="flex-1">
-              <span class="flex items-center gap-[calc(9.6*var(--u))]">
-                <b class="font-semibold">{model.name}</b>
+              <span class="title-row flex items-center gap-[calc(9.6*var(--u))]">
+                <b class="row-title font-semibold">{model.name}</b>
                 {model.running && <span class="tag">Running</span>}
               </span>
-              <span class="mt-[calc(3.2*var(--u))] block text-[#5c605b]">{model.detail}</span>
+              <span class="row-sub mt-[calc(3.2*var(--u))] block text-[#5c605b]">{model.detail}</span>
             </span>
-            <span class:list={["pill action font-semibold", model.running ? "bg-[#d9cdfa]" : "bg-white/95"]}>
+            <span class:list={["pill action font-semibold", model.running ? "stop bg-[#d9cdfa]" : "bg-white/95"]}>
               {model.running ? "Stop" : "Start"}
             </span>
           </div>
@@ -120,6 +143,10 @@ import { APP_MODELS, APP_NAV } from "../config/software";
     width: calc(9.6 * var(--u));
     height: calc(9.6 * var(--u));
     border-radius: 50%;
+  }
+  .logo {
+    width: calc(32 * var(--u));
+    height: calc(32 * var(--u));
   }
   .app-title {
     font-size: calc(19.2 * var(--u));
@@ -228,5 +255,211 @@ import { APP_MODELS, APP_NAV } from "../config/software";
     color: #fff;
     font-weight: 600;
     line-height: calc(22.4 * var(--u));
+  }
+  /* ---- Glass variant (Figma: Window (glass), 894.632×580.93). Unlayered, so these beat the utility classes above ---- */
+  .glass {
+    width: calc(894.632 * var(--u));
+    height: calc(580.93 * var(--u));
+    border-width: calc(1.162 * var(--u));
+    border-radius: calc(34.856 * var(--u));
+    background: linear-gradient(143.77deg, rgb(255 255 255 / 80%) 26%, rgb(255 255 255 / 60%) 83.46%);
+    backdrop-filter: blur(calc(17.428 * var(--u)));
+    box-shadow: 0 calc(23.237 * var(--u)) calc(58.093 * var(--u)) rgb(26 56 31 / 30%);
+    color: #16191a;
+    font-size: calc(13.942 * var(--u));
+    line-height: normal;
+  }
+  .glass .mono {
+    font-family: var(--font-mono);
+    letter-spacing: normal;
+  }
+
+  /* Sidebar 196.35 wide: lights and brand 22.65 in, nav 15.69 in */
+  .glass .sidebar {
+    width: calc(196.354 * var(--u));
+    padding: calc(18 * var(--u)) calc(15.69 * var(--u)) 0;
+    border-right-width: calc(0.581 * var(--u));
+    border-right-color: rgb(255 255 255 / 50%);
+    background: rgb(255 255 255 / 22%);
+  }
+  .glass .lights {
+    width: calc(48.217 * var(--u));
+    height: calc(11.038 * var(--u));
+    margin-left: calc(6.96 * var(--u));
+  }
+  .glass .brand {
+    margin-top: calc(25 * var(--u));
+    padding-left: calc(6.96 * var(--u));
+    gap: calc(9.295 * var(--u));
+  }
+  .glass .logo {
+    width: calc(32.684 * var(--u));
+    height: calc(32.684 * var(--u));
+  }
+  .glass .app-title {
+    font-size: calc(19.752 * var(--u));
+    line-height: normal;
+    font-weight: 500;
+  }
+  .glass .nav-group {
+    gap: calc(3.486 * var(--u));
+    margin-top: calc(15.104 * var(--u));
+  }
+  .glass .brand + .nav-group {
+    margin-top: calc(19.6 * var(--u));
+  }
+  .glass .nav-group > .mono {
+    padding-left: 0;
+    color: rgb(22 25 26 / 50%);
+    font-family: var(--font-sans);
+    font-size: calc(8.714 * var(--u));
+    font-weight: 600;
+    letter-spacing: calc(1.22 * var(--u));
+  }
+  .glass .nav-item {
+    display: flex;
+    align-items: center;
+    height: calc(33.694 * var(--u));
+    padding: 0 calc(13.942 * var(--u));
+    border-radius: calc(9.295 * var(--u));
+    color: rgb(22 25 26 / 85%);
+  }
+  .glass .nav-item.active {
+    background: rgb(255 255 255 / 65%);
+    color: rgb(22 25 26 / 85%);
+    font-weight: 400;
+  }
+
+  /* Main column: 633 wide content 28.5 right of the sidebar */
+  .glass .main {
+    padding: calc(17.43 * var(--u)) calc(32.3 * var(--u)) 0 calc(28.5 * var(--u));
+  }
+  .glass .top {
+    gap: calc(9.295 * var(--u));
+    padding-bottom: calc(15.104 * var(--u));
+  }
+  .glass .top .pill {
+    height: calc(32.532 * var(--u));
+    padding-inline: calc(12.78 * var(--u));
+    border-radius: calc(57.512 * var(--u));
+    background: rgb(255 255 255 / 75%);
+    color: #16191a;
+    font-family: var(--font-mono);
+    font-size: calc(12.78 * var(--u));
+    font-weight: 400;
+  }
+  .glass .top .pill + .pill {
+    padding-inline: calc(16.266 * var(--u));
+    background: rgb(0 0 0 / 78%);
+    color: #fff;
+  }
+  .glass .status-dot {
+    width: calc(7 * var(--u));
+    height: calc(7 * var(--u));
+  }
+  .glass .page-title {
+    margin-top: 0;
+    font-size: calc(33.694 * var(--u));
+    line-height: normal;
+    letter-spacing: calc(-0.674 * var(--u));
+  }
+  .glass .page-sub {
+    margin-top: calc(1.162 * var(--u));
+    color: rgb(22 25 26 / 60%);
+  }
+
+  /* Cards: 19.75 radius, rows 17.43 / 16.27 padding, 38.34 icon tile */
+  .glass .card {
+    border-width: calc(0.871 * var(--u));
+    border-radius: calc(19.752 * var(--u));
+    background: rgb(255 255 255 / 42%);
+  }
+  .glass .conn,
+  .glass .models {
+    margin-top: calc(19.752 * var(--u));
+  }
+  .glass .conn,
+  .glass .model {
+    gap: calc(13.942 * var(--u));
+    height: auto;
+    padding: calc(16.266 * var(--u)) calc(17.428 * var(--u));
+  }
+  .glass .models {
+    padding-bottom: 0;
+  }
+  .glass .model {
+    border-top-width: calc(0.871 * var(--u));
+    border-top-color: rgb(255 255 255 / 60%);
+    background: none;
+  }
+  .glass .card-head {
+    align-items: center;
+    gap: calc(9.295 * var(--u));
+    height: auto;
+    padding: calc(17.428 * var(--u));
+  }
+  .glass .card-title {
+    font-size: calc(19.171 * var(--u));
+    line-height: normal;
+  }
+  .glass .head-pills {
+    margin-top: 0;
+    gap: calc(9.295 * var(--u));
+  }
+  .glass .thumb {
+    width: calc(38.341 * var(--u));
+    height: calc(38.341 * var(--u));
+    border: 0;
+    border-radius: calc(10.457 * var(--u));
+    background: rgb(255 255 255 / 70%);
+  }
+  .glass .thumb i {
+    width: calc(15.104 * var(--u));
+    height: calc(15.104 * var(--u));
+    border: calc(1.394 * var(--u)) solid rgb(22 25 26 / 60%);
+    border-radius: calc(4.067 * var(--u));
+  }
+  .glass .title-row {
+    gap: calc(8.133 * var(--u));
+  }
+  .glass .row-title {
+    font-size: calc(16.847 * var(--u));
+  }
+  .glass .row-sub {
+    margin-top: calc(3.486 * var(--u));
+    color: rgb(22 25 26 / 55%);
+    font-size: calc(12.2 * var(--u));
+  }
+  .glass .card .pill {
+    height: calc(31.37 * var(--u));
+    padding-inline: calc(17.428 * var(--u));
+    border-radius: calc(57.512 * var(--u));
+    background: rgb(255 255 255 / 75%);
+    font-size: calc(12.78 * var(--u));
+  }
+  .glass .pill.action {
+    width: auto;
+  }
+  .glass .pill.stop {
+    background: #d2c1fe;
+    color: #5130a7;
+  }
+  .glass .conn .pill {
+    height: calc(26.723 * var(--u));
+    padding-inline: calc(13.942 * var(--u));
+    background: rgb(0 0 0 / 80%);
+    font-size: calc(11.619 * var(--u));
+  }
+  .glass .tag {
+    display: inline-flex;
+    align-items: center;
+    height: calc(19.752 * var(--u));
+    padding-inline: calc(9.295 * var(--u));
+    border-radius: calc(57.512 * var(--u));
+    background: rgb(0 0 0 / 80%);
+    font-family: var(--font-mono);
+    font-size: calc(9.876 * var(--u));
+    font-weight: 400;
+    line-height: normal;
   }
 </style>

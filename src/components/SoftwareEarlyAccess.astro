@@ -1,0 +1,241 @@
+---
+// Software page "Early access" section (Figma: S6 Early access): a frosted panel over a static ASCII field, holding the
+// five steps from request to running and the glass application form. Sizes are Figma px via --fx
+// (src/styles/global.css); steps and form sit side by side from 1200px, stacked below. Content: src/config/software.ts.
+import { EARLY_ACCESS_STEPS } from "../config/software";
+---
+
+<section
+  id="early"
+  data-early-access
+  class="relative overflow-hidden bg-black px-gutter-sm py-24 text-white md:p-[calc(120*var(--fx))]"
+>
+  <!-- Static ASCII field (Figma: ascii bg, white glyphs at 20%) -->
+  <img
+    src="/assets/images/software/early-ascii.png"
+    width="1783"
+    height="992"
+    alt=""
+    aria-hidden="true"
+    loading="lazy"
+    class="pointer-events-none absolute top-[calc(44*var(--fx))] left-[calc(77*var(--fx))] w-[calc(1783*var(--fx))] max-w-none max-md:top-0 max-md:left-1/2 max-md:h-full max-md:w-auto max-md:-translate-x-1/2"
+  />
+
+  <div class="panel">
+    <div>
+      <p data-reveal class="label text-white/70 md:text-[calc(16*var(--fx))]/[calc(24*var(--fx))]">Early access</p>
+      <h2 data-reveal class="mt-2 text-h2-sm font-bold md:mt-[calc(8*var(--fx))] md:text-[calc(64*var(--fx))]/[calc(72*var(--fx))]">
+        From request<br />to running<span class="period">.</span>
+      </h2>
+
+      <ol class="mt-8 flex flex-col gap-6 md:mt-[calc(28*var(--fx))] md:gap-[calc(24*var(--fx))]">
+        {
+          EARLY_ACCESS_STEPS.map((step, i) => (
+            <li data-reveal class="flex gap-[calc(24*var(--fx))]" aria-current={i === 0 ? "step" : undefined}>
+              <span class:list={["num", { current: i === 0 }]}>
+                {i === 0 ? (
+                  <img src="/assets/icons/software/step-active.svg" width="80" height="80" alt="" aria-hidden="true" class="step-ring step-glow" />
+                ) : (
+                  <img src="/assets/icons/software/step.svg" width="48" height="48" alt="" aria-hidden="true" class="step-ring" />
+                )}
+                <span class="relative">{String(i + 1).padStart(2, "0")}</span>
+              </span>
+              <span>
+                <b class="step-title">{step.title}</b>
+                <span class="step-text">{step.text}</span>
+              </span>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+
+    <!-- Application form (Figma: fm, 634×620 glass card) -->
+    <form data-reveal class="form" aria-labelledby="early-title">
+      <h3 id="early-title" class="form-title">Get early access</h3>
+      <p class="form-lead">Try on-device tasks on your Mac and share feedback. Selected users receive $30 in free Router credits.</p>
+
+      <label class="field-label mt-[calc(36*var(--fx))]" for="early-email">Email</label>
+      <input id="early-email" name="email" type="email" autocomplete="email" required class="field" />
+
+      <label class="field-label mt-[calc(24*var(--fx))]" for="early-mac">Mac model, chip, and memory</label>
+      <input id="early-mac" name="mac" type="text" required class="field" />
+
+      <button type="submit" class="submit">Apply for access</button>
+      <p class="form-note">We'll review your device details and email you if you're selected.</p>
+    </form>
+  </div>
+</section>
+
+<script>
+  import { ScrollReveal } from "../scripts/ScrollReveal";
+  const section = document.querySelector<HTMLElement>("[data-early-access]");
+  if (section) ScrollReveal.section(section);
+</script>
+
+<style>
+  /* Frosted panel (Figma: access panel, 1680×840): steps 96 in from the top-left, form 102 in from the right */
+  .panel {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 48px;
+    padding: 32px 20px;
+    border: 1px solid rgb(255 255 255 / 14%);
+    border-radius: calc(24 * var(--fx));
+    background: rgb(255 255 255 / 10%);
+  }
+  @media (width >= 768px) {
+    .panel {
+      padding: calc(95 * var(--fx));
+    }
+  }
+  @media (width >= 1200px) {
+    .panel {
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: flex-start;
+      min-height: calc(840 * var(--fx));
+      padding-right: calc(101 * var(--fx));
+    }
+  }
+
+  /* Step number in a 48 circle; the current step's white circle carries a green glow (80 asset, 16 bleed) */
+  .num {
+    position: relative;
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    width: calc(48 * var(--fx));
+    height: calc(48 * var(--fx));
+    margin-top: calc(4 * var(--fx));
+    color: rgb(255 255 255 / 90%);
+    font-family: var(--font-mono);
+    font-size: calc(16 * var(--fx));
+    line-height: calc(24 * var(--fx));
+    letter-spacing: 1.4px;
+  }
+  .num.current {
+    color: #16191a;
+  }
+  .step-ring {
+    position: absolute;
+    max-width: none;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+  .step-glow {
+    inset: calc(-16 * var(--fx));
+    width: calc(80 * var(--fx));
+    height: calc(80 * var(--fx));
+  }
+  .step-title {
+    display: block;
+    font-size: calc(24 * var(--fx));
+    line-height: calc(32 * var(--fx));
+    font-weight: 600;
+    letter-spacing: -0.5px;
+  }
+  .step-text {
+    display: block;
+    color: rgb(255 255 255 / 65%);
+    font-size: calc(16 * var(--fx));
+    line-height: calc(24 * var(--fx));
+  }
+
+  /* Glass form card: 53 padding, inputs and button 61.4 tall */
+  .form {
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    padding: 32px 20px;
+    border: calc(1.181 * var(--fx)) solid rgb(255 255 255 / 50%);
+    border-radius: calc(33.079 * var(--fx));
+    /* Node fill is 40% → 20% white, but Figma renders the card at ~#d1d1d1 → #c5c5c5 on the panel; match the render */
+    background: linear-gradient(150.54deg, rgb(255 255 255 / 80%) 13.4%, rgb(255 255 255 / 75%) 86.6%);
+    backdrop-filter: blur(calc(17.721 * var(--fx)));
+    box-shadow: 0 calc(1.181 * var(--fx)) 0 rgb(255 255 255 / 70%);
+    color: #16191a;
+  }
+  @media (width >= 768px) {
+    .form {
+      width: calc(634.163 * var(--fx));
+      min-height: calc(620.341 * var(--fx));
+      padding: calc(52 * var(--fx));
+    }
+  }
+  .form-title {
+    font-size: calc(42.53 * var(--fx));
+    line-height: normal;
+    font-weight: 600;
+    letter-spacing: calc(-1.4885 * var(--fx));
+  }
+  .form-lead {
+    max-width: calc(486 * var(--fx));
+    margin-top: calc(19 * var(--fx));
+    color: rgb(22 25 26 / 72%);
+    font-size: calc(18.902 * var(--fx));
+    line-height: calc(29.298 * var(--fx));
+  }
+  .field-label {
+    font-size: calc(16.539 * var(--fx));
+    line-height: normal;
+    font-weight: 500;
+  }
+  .field {
+    height: calc(61.432 * var(--fx));
+    margin-top: calc(12 * var(--fx));
+    padding-inline: calc(20 * var(--fx));
+    border: calc(1.181 * var(--fx)) solid rgb(255 255 255 / 70%);
+    border-radius: calc(16.539 * var(--fx));
+    background: rgb(255 255 255 / 55%);
+    font-size: calc(16.539 * var(--fx));
+    outline: none;
+    transition:
+      border-color 0.2s,
+      background-color 0.2s;
+  }
+  .field:focus-visible {
+    border-color: var(--color-accent);
+    background: rgb(255 255 255 / 75%);
+  }
+  .submit {
+    height: calc(61.432 * var(--fx));
+    margin-top: calc(33 * var(--fx));
+    border-radius: calc(16.539 * var(--fx));
+    background: #111110;
+    box-shadow: 0 calc(9.451 * var(--fx)) calc(28.353 * var(--fx)) rgb(10 20 10 / 30%);
+    color: #fff;
+    font-size: calc(18.902 * var(--fx));
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+  .submit:hover {
+    opacity: 0.88;
+  }
+  .submit:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+  .form-note {
+    margin-top: calc(20 * var(--fx));
+    color: rgb(22 25 26 / 55%);
+    font-size: calc(15.358 * var(--fx));
+    line-height: calc(23.037 * var(--fx));
+  }
+
+  /* Mobile: Figma px would crowd a phone, so the form type steps down */
+  @media (width < 768px) {
+    .form-title {
+      font-size: 32px;
+      letter-spacing: -1px;
+    }
+    .form-lead {
+      font-size: 16px;
+      line-height: 24px;
+    }
+  }
+</style>
