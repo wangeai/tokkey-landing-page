@@ -67,35 +67,6 @@ export const FEATURES = [
   },
 ];
 
-/** Spec pills above the compatibility table (Figma: S4 Compatibility check); `width` is the pill width in Figma px,
- *  `signal` adds the green dot at the pill's right end */
-export const COMPAT_SPECS = [
-  { label: "Cores", value: "10", width: 200 },
-  { label: "Memory", value: "24 GB", width: 240 },
-  { label: "Bandwidth", value: "~120 GB/s", width: 336 },
-  { label: "Tokkey", value: "Attached", width: 264, signal: true },
-];
-
-/** Compatibility table rows. `alone` is the speed on the Mac by itself (null = the model doesn't fit in memory),
- *  `grade` "S" renders the dark pill, `boost` is the speed-up shown after the grade (omitted when there is none) */
-export const COMPAT_MODELS: {
-  name: string;
-  size: string;
-  memory: string;
-  alone: string | null;
-  withTokkey: string;
-  grade: "S" | "B";
-  boost?: string;
-}[] = [
-  { name: "Qwen3 8B", size: "8B", memory: "4.6 GB", alone: "~20 tok/s", withTokkey: "~51 tok/s", grade: "S", boost: "×2.5" },
-  { name: "Qwen2.5 Coder 7B", size: "7B", memory: "4.1 GB", alone: "~22 tok/s", withTokkey: "~58 tok/s", grade: "S", boost: "×2.6" },
-  { name: "GPT-OSS 20B", size: "21B", memory: "11.3 GB", alone: "~8 tok/s", withTokkey: "~21 tok/s", grade: "B", boost: "×2.6" },
-  { name: "Gemma 3 27B", size: "27B", memory: "15.6 GB", alone: null, withTokkey: "~15 tok/s", grade: "B" },
-];
-
-/** Rows shown before "Show all models" expands the table */
-export const COMPAT_VISIBLE_ROWS = 4;
-
 /** The one path every use case follows (pills under the use-cases headline) */
 export const USE_CASE_PATH = ["Read local files", "Run multi-step work", "Save a result you can check"];
 
