@@ -6,6 +6,12 @@
 import Logo from "./Logo.astro";
 import { FOOTER_COLUMNS, SOCIAL_LINKS } from "../config/footer";
 
+interface Props {
+  /** Blue aurora photo behind the ASCII field instead of plain black (Figma: S7 Footer (aurora)) */
+  aurora?: boolean;
+}
+const { aurora = false } = Astro.props;
+
 // Mono label used for "Social media" and the column titles
 const label = "font-mono text-[12px]/4 uppercase tracking-[0.08em] text-[#8e8e93] md:text-[calc(12*var(--fx))]/[calc(16*var(--fx))]";
 ---
@@ -14,6 +20,20 @@ const label = "font-mono text-[12px]/4 uppercase tracking-[0.08em] text-[#8e8e93
   data-footer
   class="relative overflow-hidden bg-black px-gutter-sm pt-24 pb-8 text-white md:px-[calc(40*var(--fx))] md:pt-[calc(170*var(--fx))] md:pb-[calc(41*var(--fx))]"
 >
+  {
+    aurora && (
+      // Figma: footer bg (aurora), 1920×1080 starting 560 above the footer's top and stretched to its bottom so its lower half shows
+      <img
+        src="/assets/images/software/hero-aurora.jpg"
+        width="1920"
+        height="1080"
+        alt=""
+        aria-hidden="true"
+        loading="lazy"
+        class="pointer-events-none absolute inset-x-0 top-[-560px] h-[calc(100%+560px)] w-full max-w-none object-cover object-top max-md:left-1/2 max-md:w-[1920px] max-md:-translate-x-1/2 md:top-[calc(-560*var(--fx))] md:h-[calc(100%+560*var(--fx))]"
+      />
+    )
+  }
   <canvas data-ref="field" aria-hidden="true" class="field pointer-events-none absolute inset-0 size-full"></canvas>
 
   <div class="relative mx-auto max-w-[calc(1280*var(--fx))]">

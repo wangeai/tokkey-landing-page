@@ -10,16 +10,17 @@ import { EARLY_ACCESS_STEPS } from "../config/software";
   data-early-access
   class="relative overflow-hidden bg-black px-gutter-sm py-24 text-white md:p-[calc(120*var(--fx))]"
 >
-  <!-- Static ASCII field (Figma: ascii bg, white glyphs at 20%) -->
+  <!-- Hero backdrop with a sweeping luminous ASCII ripple (src/scripts/RippleField.ts) -->
   <img
-    src="/assets/images/software/early-ascii.png"
-    width="1783"
-    height="992"
+    src="/assets/images/software/hero-bg.jpg"
+    width="1920"
+    height="1080"
     alt=""
     aria-hidden="true"
     loading="lazy"
-    class="pointer-events-none absolute top-[calc(44*var(--fx))] left-[calc(77*var(--fx))] w-[calc(1783*var(--fx))] max-w-none max-md:top-0 max-md:left-1/2 max-md:h-full max-md:w-auto max-md:-translate-x-1/2"
+    class="pointer-events-none absolute inset-0 size-full object-cover"
   />
+  <canvas data-ref="ripple" aria-hidden="true" class="pointer-events-none absolute inset-0 size-full"></canvas>
 
   <div class="panel">
     <div>
@@ -70,7 +71,17 @@ import { EARLY_ACCESS_STEPS } from "../config/software";
 <script>
   import { ScrollReveal } from "../scripts/ScrollReveal";
   const section = document.querySelector<HTMLElement>("[data-early-access]");
-  if (section) ScrollReveal.section(section);
+  import { RippleField } from "../scripts/RippleField";
+  if (section) {
+    ScrollReveal.section(section);
+    new RippleField(section.querySelector<HTMLCanvasElement>("[data-ref=ripple]")!, {
+      sweep: true,
+      y: 0.62,
+      textureWeight: 1,
+      rippleWeight: 0.7,
+      decay: 1100,
+    });
+  }
 </script>
 
 <style>

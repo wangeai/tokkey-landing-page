@@ -7,10 +7,13 @@ import Footer from "../components/Footer.astro";
 interface Props {
   title?: string;
   description?: string;
+  /** Put the footer on the blue aurora backdrop (software page) */
+  footerAurora?: boolean;
 }
 const {
   title = "Tokkey — Own your intelligence",
   description = "Tokkey is a USB-C local-AI key for Mac. 0 tokens, runs on-device.",
+  footerAurora = false,
 } = Astro.props;
 ---
 
@@ -33,7 +36,7 @@ const {
     <main>
       <slot />
     </main>
-    <Footer />
+    <Footer aurora={footerAurora} />
     <script>
       // Start Lenis + GSAP ScrollTrigger once for the whole page
       import { ScrollEngine } from "../scripts/ScrollEngine";

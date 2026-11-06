@@ -12,16 +12,12 @@ import { USE_CASE_APP_NAV, USE_CASE_CARDS, USE_CASE_PATH, USE_CASES } from "../c
   data-use-cases
   class="relative overflow-hidden bg-white px-gutter-sm py-24 text-[#16191a] md:px-[calc(120*var(--fx))] md:pt-[calc(120*var(--fx))] md:pb-[calc(120*var(--fx))]"
 >
-  <!-- ASCII halftone behind the headline (Figma: Texture, 1920×560) -->
-  <img
-    src="/assets/images/software/halftone.png"
-    width="1504"
-    height="474"
-    alt=""
+  <!-- Luminous ASCII ripple behind the headline (src/scripts/RippleField.ts) -->
+  <canvas
+    data-ref="ripple"
     aria-hidden="true"
-    loading="lazy"
-    class="pointer-events-none absolute inset-x-0 top-0 h-[calc(560*var(--fx))] w-full max-w-none object-cover max-md:left-1/2 max-md:w-[1920px] max-md:-translate-x-1/2"
-  />
+    class="ripple-light pointer-events-none absolute inset-x-0 top-0 h-[640px] w-full md:h-[calc(640*var(--fx))]"
+  ></canvas>
 
   <div class="relative flex flex-col items-center text-center">
     <p data-reveal class="label text-[#6b6f69] md:text-[calc(16*var(--fx))]/[calc(24*var(--fx))]">Local AI agent use cases</p>
@@ -83,10 +79,18 @@ import { USE_CASE_APP_NAV, USE_CASE_CARDS, USE_CASE_PATH, USE_CASES } from "../c
 <script>
   import { ScrollReveal } from "../scripts/ScrollReveal";
   const section = document.querySelector<HTMLElement>("[data-use-cases]");
-  if (section) ScrollReveal.section(section);
+  import { RippleField } from "../scripts/RippleField";
+  if (section) {
+    ScrollReveal.section(section);
+    RippleField.light(section.querySelector<HTMLCanvasElement>("[data-ref=ripple]")!);
+  }
 </script>
 
 <style>
+  /* Light ripple thins out toward the bottom of its band */
+  .ripple-light {
+    mask-image: linear-gradient(#000 40%, transparent);
+  }
   /* One-path pill (Figma: span, 48 tall) */
   .step {
     display: flex;

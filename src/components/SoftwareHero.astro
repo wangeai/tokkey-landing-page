@@ -12,7 +12,7 @@ import SoftwareAppWindow from "./SoftwareAppWindow.astro";
   class="relative flex min-h-svh flex-col overflow-hidden bg-black px-gutter-sm pt-36 pb-48 text-white md:min-h-[calc(1080*var(--fx))] md:px-[calc(120*var(--fx))] md:pt-[calc(236*var(--fx))] md:pb-[calc(260*var(--fx))]"
 >
   <img
-    src="/assets/images/software/hero-aurora.jpg"
+    src="/assets/images/software/hero-bg.jpg"
     width="1920"
     height="1080"
     alt=""
@@ -20,6 +20,8 @@ import SoftwareAppWindow from "./SoftwareAppWindow.astro";
     fetchpriority="high"
     class="pointer-events-none absolute inset-0 size-full object-cover"
   />
+  <!-- Luminous ASCII ripple over the aurora (src/scripts/RippleField.ts) -->
+  <canvas data-ref="ripple" aria-hidden="true" class="pointer-events-none absolute inset-0 size-full"></canvas>
   <!-- Bottom fade into the light "What it does" section -->
   <div class="fade pointer-events-none absolute inset-x-0 bottom-0 h-48 md:h-[calc(260*var(--fx))]"></div>
 
@@ -52,8 +54,18 @@ import SoftwareAppWindow from "./SoftwareAppWindow.astro";
 
 <script>
   import { ScrollReveal } from "../scripts/ScrollReveal";
+  import { RippleField } from "../scripts/RippleField";
   const section = document.querySelector<HTMLElement>("[data-software-hero]");
-  if (section) ScrollReveal.section(section);
+  if (section) {
+    ScrollReveal.section(section);
+    new RippleField(section.querySelector<HTMLCanvasElement>("[data-ref=ripple]")!, {
+      x: 0.56,
+      y: 0.8,
+      textureWeight: 1.1,
+      rippleWeight: 0.7,
+      decay: 900,
+    });
+  }
 </script>
 
 <style>
