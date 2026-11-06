@@ -25,8 +25,8 @@ export const SCENES: SceneConfig[] = [
   { id: "pullBack", sequence: "003", mobileFit: "contain" }, // camera pulls back to the laptop's front view
   // No frames of its own: holds pullBack's last frame while the camera zooms into the screen on its own scroll gesture
   { id: "screenZoom", sequence: "003", mobileFit: "contain" },
-  // The app panels leave and the camera zooms back out of the screen, then the laptop fades out and rotates in to show its underside
-  { id: "flipOver", sequence: "004", mobileFit: "contain", fps: 45, fadeIn: true },
+  // The app panels leave and the camera zooms back out of the screen, then the laptop rotates to show its underside
+  { id: "flipOver", sequence: "004", mobileFit: "contain", fps: 45 },
   { id: "xray", sequence: "005", mobileFit: "contain" }, // lightning reveals the internals
   { id: "powerFlow", sequence: "006", mobileFit: "contain", fps: 45 }, // blue energy flows through the internals
 ];
