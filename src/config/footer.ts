@@ -39,7 +39,6 @@ export const FOOTER_COLUMNS: { title: string; links: FooterLink[] }[] = [
 
 /** Social accounts; icons live in public/assets/icons/social */
 export const SOCIAL_LINKS: (FooterLink & { icon: string })[] = [
-  { label: "X", href: "#", icon: "/assets/icons/social/x.svg" },
-  { label: "Discord", href: "#", icon: "/assets/icons/social/discord.svg" },
-  { label: "GitHub", href: "#", icon: "/assets/icons/social/github.svg" },
+  { label: "X", href: "https://x.com/tokkeyai?s=11", icon: "/assets/icons/social/x.svg" },
+  { label: "Discord", href: "https://discord.gg/cBNX8hmtAw", icon: "/assets/icons/social/discord.svg" },
 ];
