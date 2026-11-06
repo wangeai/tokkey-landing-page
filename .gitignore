@@ -5,3 +5,5 @@ dist/
 .wrangler/
 .dev.vars
 /scripts/
+assets-src/frames
+public/assets/frames

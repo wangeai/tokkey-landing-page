@@ -19,7 +19,7 @@ import PowerPanel from "./PowerPanel.astro";
 
     <!-- Stage: two layers HeroScene zooms together around 50% 90%.
          Frames: two stacked canvases so ScenePlayer can crossfade between scenes. Frames are drawn unblended so the
-         laptop stays opaque (WebP frames have a transparent background).
+         laptop stays opaque (the videos carry a transparent background as packed alpha).
          App UI: sits on the laptop screen and moves with the frames -->
     <div data-stage class="absolute inset-0 origin-[50%_90%]">
       <canvas data-frames class="absolute inset-0 size-full"></canvas>

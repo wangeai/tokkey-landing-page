@@ -156,13 +156,13 @@ export class HeroScene {
     // App UI panels wait hidden until the zoom into the screen finishes
     gsap.set("[data-screen-item]", { opacity: 0 });
     this.steps = this.createSteps();
-    this.playIntro();
-
-    // Mobile loads half the frames and fits each scene per its mobileFit; agent layout adapts inside measure()
+    // Mobile loads the smaller videos and fits each scene per its mobileFit; agent layout adapts inside measure().
+    // Set before the intro so a phone never downloads the desktop video
     gsap
       .matchMedia()
-      .add(`(min-width: ${MOBILE_MAX_WIDTH + 1}px)`, () => this.player.setProfile(1, false))
-      .add(`(max-width: ${MOBILE_MAX_WIDTH}px)`, () => this.player.setProfile(2, true));
+      .add(`(min-width: ${MOBILE_MAX_WIDTH + 1}px)`, () => this.player.setProfile(false))
+      .add(`(max-width: ${MOBILE_MAX_WIDTH}px)`, () => this.player.setProfile(true));
+    this.playIntro();
 
     this.stepper = new SceneStepper(SCENES.length, (index, direction) => this.playScene(index, direction));
     // Clicking the hero (outside its own controls) lets the next scroll leave it without stepping through every scene
