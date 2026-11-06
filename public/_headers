@@ -1,0 +1,8 @@
+# Browser cache rules for Cloudflare Workers static assets (copied to dist/ by Astro).
+# Hero videos: cached for a day. Their URLs carry ?v=VIDEO_VERSION (src/config/frames.ts); bump it after re-encoding.
+/assets/videos/*
+  Cache-Control: public, max-age=86400, immutable
+
+# Astro's bundled JS/CSS: file names contain a content hash, so they never change in place
+/_astro/*
+  Cache-Control: public, max-age=31536000, immutable

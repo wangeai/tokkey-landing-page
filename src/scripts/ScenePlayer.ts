@@ -35,9 +35,10 @@ export class ScenePlayer {
     this.players.forEach((player) => player.setOffsetY(y));
   }
 
-  /** Start downloading a scene's frames ahead of time */
-  preload(scene: SceneConfig): void {
-    this.sequence(scene).load();
+  /** Download every scene's video ahead of time, one after another in play order, so each arrives as soon as possible
+   *  instead of all of them sharing the bandwidth. Scenes that share a video only download it once */
+  async preloadAll(scenes: SceneConfig[]): Promise<void> {
+    for (const scene of scenes) await this.sequence(scene).ready();
   }
 
   /** Crossfade to `scene` and play its frames forward; resolves when the last frame is shown.

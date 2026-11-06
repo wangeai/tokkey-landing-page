@@ -174,7 +174,11 @@ export class HeroScene {
   /** On page load: scene 0's first frame fades in and holds for INTRO_HOLD seconds, then scene 0 plays on its own;
    *  the dot field fades in alongside */
   private playIntro(): void {
-    this.player.show(SCENES[0], 0).then(() => gsap.delayedCall(INTRO_HOLD, () => this.stepper.autoplay()));
+    this.player.show(SCENES[0], 0).then(() => {
+      gsap.delayedCall(INTRO_HOLD, () => this.stepper.autoplay());
+      // Scene 0 is on screen: fetch the rest of the videos in the background, next scene first
+      this.player.preloadAll(SCENES.slice(1));
+    });
     gsap.to(this.state, { introDots: 1, duration: 1.6, delay: 0.2, ease: "none", onUpdate: () => this.render() });
   }
 
@@ -192,8 +196,6 @@ export class HeroScene {
     // Forward plays scene `index`; backward rewinds the scene after it
     const scene = direction > 0 ? SCENES[index] : SCENES[index + 1];
     const steps = this.steps[scene.id];
-    const next = SCENES[index + 1];
-    if (direction > 0 && next && frames) this.player.preload(next);
     const running = this.transition;
     const transition = {
       scene,

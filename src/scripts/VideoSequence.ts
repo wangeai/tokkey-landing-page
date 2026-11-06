@@ -1,6 +1,6 @@
 // Loads one frame sequence's packed-alpha video (see src/config/frames.ts) fully into memory and seeks it to a frame
 // on request; shared via a cache.
-import { FRAME_SEQUENCES, VIDEO_FPS, type SequenceName } from "../config/frames";
+import { FRAME_SEQUENCES, VIDEO_FPS, videoUrl, type SequenceName } from "../config/frames";
 
 export class VideoSequence {
   private static readonly cache = new Map<string, VideoSequence>();
@@ -58,7 +58,7 @@ export class VideoSequence {
 
   /** Download the whole file before playing, so seeks never wait on the network */
   private async fetchVideo(): Promise<void> {
-    const response = await fetch(`/assets/videos/${this.name}${this.mobile ? "-mobile" : ""}.mp4`);
+    const response = await fetch(videoUrl(this.name, this.mobile));
     this.video.src = URL.createObjectURL(await response.blob());
     await new Promise((resolve) => this.video.addEventListener("loadeddata", resolve, { once: true }));
     // A paused video that has never seeked can hand WebGL no frame (the canvas then keeps its old picture), so land

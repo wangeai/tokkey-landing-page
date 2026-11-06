@@ -8,9 +8,19 @@ import Comments from "../components/Comments.astro";
 import Personal from "../components/Personal.astro";
 import Cloud from "../components/Cloud.astro";
 import Faq from "../components/Faq.astro";
+import { MOBILE_MAX_WIDTH, videoUrl } from "../config/frames";
+import { SCENES } from "../config/scenes";
+
+// The first hero video starts downloading with the HTML instead of waiting for the hero script; `media` picks the
+// desktop or mobile encode. crossorigin matches the fetch() in VideoSequence so the browser reuses this download
+const firstSequence = SCENES[0].sequence;
 ---
 
 <BaseLayout>
+  <Fragment slot="head">
+    <link rel="preload" as="fetch" crossorigin="anonymous" href={videoUrl(firstSequence, false)} media={`(min-width: ${MOBILE_MAX_WIDTH + 1}px)`} />
+    <link rel="preload" as="fetch" crossorigin="anonymous" href={videoUrl(firstSequence, true)} media={`(max-width: ${MOBILE_MAX_WIDTH}px)`} />
+  </Fragment>
   <Hero />
   <Features />
   <Comments />
