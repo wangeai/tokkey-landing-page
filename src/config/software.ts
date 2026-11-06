@@ -108,7 +108,7 @@ export const USE_CASE_APP_NAV = [
 export const EARLY_ACCESS_STEPS = [
   { title: "Apply", text: "Tell us your email and Mac." },
   { title: "Review", text: "We check your Mac setup. The first wave is small." },
-  { title: "Invite", text: "Download, install steps, a feedback link and a $30 Router credit." },
+  { title: "Invite", text: "Download, install steps, a feedback link and a $20 Router credit." },
   { title: "Test", text: "Use it on real work. We follow up." },
   { title: "Improve", text: "Your feedback shapes the launch build." },
 ];
