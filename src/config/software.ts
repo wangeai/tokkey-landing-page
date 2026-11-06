@@ -121,7 +121,7 @@ export const MAC_CHIPS = [
   "Not sure",
 ].filter((chip) => !["Apple M4 Ultra", "Apple M5 Ultra"].includes(chip));
 export const MAC_MEMORY = [
-  ...[16, 24, 32, 48, 64, 96, 128, 192, 256].map((gb) => `${gb}GB`),
+  ...[16, 32, 48, 64, 96, 128, 192, 256].map((gb) => `${gb}GB`),
   "Not sure",
 ];
 
