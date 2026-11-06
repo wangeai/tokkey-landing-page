@@ -112,3 +112,15 @@ export const EARLY_ACCESS_STEPS = [
   { title: "Test", text: "Use it on real work. We follow up." },
   { title: "Improve", text: "Your feedback shapes the launch build." },
 ];
+
+// Early access form dropdown options (Figma: S6 form "Your Mac"); the empty-value first option is the placeholder
+export const MAC_MODELS = ["MacBook Air", "MacBook Pro", "Mac mini", "iMac", "Mac Studio", "Mac Pro", "Other", "Not sure"];
+export const MAC_CHIPS = [
+  ...["M1", "M2", "M3", "M4", "M5"].flatMap((gen) => ["", " Pro", " Max", " Ultra"].map((tier) => `Apple ${gen}${tier}`)),
+  "Intel",
+  "Not sure",
+].filter((chip) => !["Apple M4 Ultra", "Apple M5 Ultra"].includes(chip));
+export const MAC_MEMORY = [
+  ...[16, 18, 24, 32, 36, 48, 64, 96, 128, 192, 256].map((gb) => `${gb}GB`),
+  "Not sure",
+];

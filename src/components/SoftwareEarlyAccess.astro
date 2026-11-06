@@ -2,7 +2,7 @@
 // Software page "Early access" section (Figma: S6 Early access): a frosted panel over a static ASCII field, holding the
 // five steps from request to running and the glass application form. Sizes are Figma px via --fx
 // (src/styles/global.css); steps and form sit side by side from 1200px, stacked below. Content: src/config/software.ts.
-import { EARLY_ACCESS_STEPS } from "../config/software";
+import { EARLY_ACCESS_STEPS, MAC_CHIPS, MAC_MEMORY, MAC_MODELS } from "../config/software";
 ---
 
 <section
@@ -51,16 +51,47 @@ import { EARLY_ACCESS_STEPS } from "../config/software";
       </ol>
     </div>
 
-    <!-- Application form (Figma: fm, 634×620 glass card) -->
+    <!-- Application form (Figma: fm, 640×800 glass card) -->
     <form data-reveal class="form" aria-labelledby="early-title">
       <h3 id="early-title" class="form-title">Get early access</h3>
       <p class="form-lead">Try on-device tasks on your Mac and share feedback. Selected users receive $30 in free Router credits.</p>
 
-      <label class="field-label mt-[calc(36*var(--fx))]" for="early-email">Email</label>
-      <input id="early-email" name="email" type="email" autocomplete="email" required class="field" />
+      <label class="field-label mt-[calc(32*var(--fx))]" for="early-email">Email</label>
+      <input id="early-email" name="email" type="email" autocomplete="email" placeholder="you@example.com" required class="field" />
 
-      <label class="field-label mt-[calc(24*var(--fx))]" for="early-mac">Mac model, chip, and memory</label>
-      <input id="early-mac" name="mac" type="text" required class="field" />
+      <!-- "Your Mac": native selects so the OS draws the dropdown; the empty first option is the placeholder -->
+      <fieldset class="mt-[calc(40*var(--fx))]">
+        <legend class="section-title">Your Mac</legend>
+
+        <label class="field-label mt-[calc(24*var(--fx))]" for="early-model">Mac model</label>
+        <select id="early-model" name="model" required class="field select">
+          <option value="">Select your Mac</option>
+          {MAC_MODELS.map((model) => <option>{model}</option>)}
+        </select>
+
+        <div class="mt-[calc(24*var(--fx))] grid grid-cols-2 gap-[calc(24*var(--fx))]">
+          <div class="flex min-w-0 flex-col">
+            <label class="field-label" for="early-chip">Chip</label>
+            <select id="early-chip" name="chip" required class="field select">
+              <option value="">Select chip</option>
+              {MAC_CHIPS.map((chip) => <option>{chip}</option>)}
+            </select>
+          </div>
+          <div class="flex min-w-0 flex-col">
+            <label class="field-label" for="early-memory">Memory</label>
+            <select id="early-memory" name="memory" required class="field select">
+              <option value="">Select memory</option>
+              {MAC_MEMORY.map((memory) => <option>{memory}</option>)}
+            </select>
+          </div>
+        </div>
+
+        <p class="form-hint">
+          Find these details in Apple menu
+          <img src="/assets/icons/software/hint-apple.svg" width="14" height="14" alt="Apple" class="hint-apple" />
+          → About This Mac.
+        </p>
+      </fieldset>
 
       <button type="submit" class="submit">Apply for access</button>
       <p class="form-note">We'll review your device details and email you if you're selected.</p>
@@ -156,70 +187,109 @@ import { EARLY_ACCESS_STEPS } from "../config/software";
     line-height: calc(24 * var(--fx));
   }
 
-  /* Glass form card: 53 padding, inputs and button 61.4 tall */
+  /* Glass form card (Figma: 640×800, 48 padding, 56-tall fields and button) */
   .form {
     display: flex;
     flex-direction: column;
     flex-shrink: 0;
     padding: 32px 20px;
     border: calc(1.181 * var(--fx)) solid rgb(255 255 255 / 50%);
-    border-radius: calc(33.079 * var(--fx));
+    border-radius: calc(32 * var(--fx));
     /* Node fill is 40% → 20% white, but Figma renders the card at ~#d1d1d1 → #c5c5c5 on the panel; match the render */
-    background: linear-gradient(150.54deg, rgb(255 255 255 / 80%) 13.4%, rgb(255 255 255 / 75%) 86.6%);
+    background: linear-gradient(144.18deg, rgb(255 255 255 / 80%) 13.4%, rgb(255 255 255 / 75%) 86.6%);
     backdrop-filter: blur(calc(17.721 * var(--fx)));
     box-shadow: 0 calc(1.181 * var(--fx)) 0 rgb(255 255 255 / 70%);
     color: #16191a;
   }
   @media (width >= 768px) {
     .form {
-      width: calc(634.163 * var(--fx));
-      min-height: calc(620.341 * var(--fx));
-      padding: calc(52 * var(--fx));
+      width: calc(640 * var(--fx));
+      min-height: calc(800 * var(--fx));
+      padding: calc(48 * var(--fx));
     }
   }
   .form-title {
-    font-size: calc(42.53 * var(--fx));
-    line-height: normal;
-    font-weight: 600;
-    letter-spacing: calc(-1.4885 * var(--fx));
+    font-size: calc(48 * var(--fx));
+    line-height: calc(56 * var(--fx));
+    font-weight: 700;
+    letter-spacing: calc(-0.96 * var(--fx));
   }
   .form-lead {
-    max-width: calc(486 * var(--fx));
-    margin-top: calc(19 * var(--fx));
-    color: rgb(22 25 26 / 72%);
-    font-size: calc(18.902 * var(--fx));
-    line-height: calc(29.298 * var(--fx));
+    max-width: calc(420 * var(--fx));
+    margin-top: calc(16 * var(--fx));
+    color: #6b6f68;
+    font-size: calc(16 * var(--fx));
+    line-height: calc(24 * var(--fx));
+  }
+  .section-title {
+    font-size: calc(24 * var(--fx));
+    line-height: calc(32 * var(--fx));
+    font-weight: 500;
   }
   .field-label {
-    font-size: calc(16.539 * var(--fx));
-    line-height: normal;
+    display: block;
+    font-size: calc(16 * var(--fx));
+    line-height: calc(24 * var(--fx));
     font-weight: 500;
   }
   .field {
-    height: calc(61.432 * var(--fx));
-    margin-top: calc(12 * var(--fx));
-    padding-inline: calc(20 * var(--fx));
-    border: calc(1.181 * var(--fx)) solid rgb(255 255 255 / 70%);
-    border-radius: calc(16.539 * var(--fx));
-    background: rgb(255 255 255 / 55%);
-    font-size: calc(16.539 * var(--fx));
+    width: 100%;
+    height: calc(56 * var(--fx));
+    margin-top: calc(8 * var(--fx));
+    padding-inline: calc(16 * var(--fx));
+    border: 1px solid rgb(22 25 26 / 8%);
+    border-radius: calc(16 * var(--fx));
+    background: rgb(255 255 255 / 70%);
+    color: #16191a;
+    font-size: calc(16 * var(--fx));
     outline: none;
     transition:
       border-color 0.2s,
       background-color 0.2s;
   }
+  .field::placeholder {
+    color: #6b6f68;
+  }
   .field:focus-visible {
     border-color: var(--color-accent);
-    background: rgb(255 255 255 / 75%);
+    background: rgb(255 255 255 / 85%);
+  }
+  /* Select: custom chevron 20 in from the right; the OS draws the open list. Empty (placeholder) value reads grey */
+  .select {
+    appearance: none;
+    padding-right: calc(44 * var(--fx));
+    background: rgb(255 255 255 / 70%) url("/assets/icons/software/select-chevron.svg") no-repeat right calc(20 * var(--fx)) center /
+      calc(12 * var(--fx)) calc(8 * var(--fx));
+    text-overflow: ellipsis;
+    cursor: pointer;
+  }
+  .select:invalid {
+    color: #6b6f68;
+  }
+  .select option {
+    color: #16191a;
+  }
+  .form-hint {
+    margin-top: calc(16 * var(--fx));
+    color: #6b6f68;
+    font-size: calc(14 * var(--fx));
+    line-height: calc(24 * var(--fx));
+  }
+  .hint-apple {
+    display: inline-block;
+    width: calc(14 * var(--fx));
+    height: calc(14 * var(--fx));
+    margin-inline: calc(4 * var(--fx)) calc(2 * var(--fx));
+    vertical-align: calc(-2 * var(--fx));
   }
   .submit {
-    height: calc(61.432 * var(--fx));
-    margin-top: calc(33 * var(--fx));
-    border-radius: calc(16.539 * var(--fx));
+    height: calc(56 * var(--fx));
+    margin-top: calc(24 * var(--fx));
+    border-radius: calc(16 * var(--fx));
     background: #111110;
-    box-shadow: 0 calc(9.451 * var(--fx)) calc(28.353 * var(--fx)) rgb(10 20 10 / 30%);
+    box-shadow: 0 calc(8 * var(--fx)) calc(24 * var(--fx)) rgb(10 20 10 / 30%);
     color: #fff;
-    font-size: calc(18.902 * var(--fx));
+    font-size: calc(16 * var(--fx));
     font-weight: 600;
     cursor: pointer;
     transition: opacity 0.2s;
@@ -232,16 +302,17 @@ import { EARLY_ACCESS_STEPS } from "../config/software";
     outline-offset: 2px;
   }
   .form-note {
-    margin-top: calc(20 * var(--fx));
-    color: rgb(22 25 26 / 55%);
-    font-size: calc(15.358 * var(--fx));
-    line-height: calc(23.037 * var(--fx));
+    margin-top: calc(24 * var(--fx));
+    color: #6b6f68;
+    font-size: calc(16 * var(--fx));
+    line-height: calc(24 * var(--fx));
   }
 
   /* Mobile: Figma px would crowd a phone, so the form type steps down */
   @media (width < 768px) {
     .form-title {
       font-size: 32px;
+      line-height: 40px;
       letter-spacing: -1px;
     }
     .form-lead {
