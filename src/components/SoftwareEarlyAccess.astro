@@ -52,7 +52,7 @@ import { EARLY_ACCESS_STEPS, MAC_CHIPS, MAC_MEMORY, MAC_MODELS } from "../config
     </div>
 
     <!-- Application form (Figma: fm, 640×800 glass card) -->
-    <form data-reveal class="form" aria-labelledby="early-title">
+    <form data-reveal data-ref="early-form" class="form" aria-labelledby="early-title" novalidate>
       <h3 id="early-title" class="form-title">Get early access</h3>
       <p class="form-lead">Try on-device tasks on your Mac and share feedback. Selected users receive $20 in free Router credits.</p>
 
@@ -95,6 +95,8 @@ import { EARLY_ACCESS_STEPS, MAC_CHIPS, MAC_MEMORY, MAC_MODELS } from "../config
 
       <button type="submit" class="submit">Apply for access</button>
       <p class="form-note">We'll review your device details and email you if you're selected.</p>
+      <!-- Submit result, filled by EarlyAccessForm -->
+      <p data-ref="status" class="form-status" role="status" aria-live="polite"></p>
     </form>
   </div>
 </section>
@@ -103,8 +105,10 @@ import { EARLY_ACCESS_STEPS, MAC_CHIPS, MAC_MEMORY, MAC_MODELS } from "../config
   import { ScrollReveal } from "../scripts/ScrollReveal";
   const section = document.querySelector<HTMLElement>("[data-early-access]");
   import { RippleField } from "../scripts/RippleField";
+  import { EarlyAccessForm } from "../scripts/EarlyAccessForm";
   if (section) {
     ScrollReveal.section(section);
+    new EarlyAccessForm(section.querySelector<HTMLFormElement>("[data-ref=early-form]")!);
     new RippleField(section.querySelector<HTMLCanvasElement>("[data-ref=ripple]")!, {
       sweep: true,
       y: 0.62,
@@ -294,7 +298,11 @@ import { EARLY_ACCESS_STEPS, MAC_CHIPS, MAC_MEMORY, MAC_MODELS } from "../config
     cursor: pointer;
     transition: opacity 0.2s;
   }
-  .submit:hover {
+  .submit:disabled {
+    opacity: 0.6;
+    cursor: wait;
+  }
+  .submit:hover:not(:disabled) {
     opacity: 0.88;
   }
   .submit:focus-visible {
@@ -306,6 +314,16 @@ import { EARLY_ACCESS_STEPS, MAC_CHIPS, MAC_MEMORY, MAC_MODELS } from "../config
     color: #6b6f68;
     font-size: calc(16 * var(--fx));
     line-height: calc(24 * var(--fx));
+  }
+  /* Submit result line: empty until a request finishes; red on failure */
+  .form-status {
+    margin-top: calc(8 * var(--fx));
+    font-size: calc(16 * var(--fx));
+    line-height: calc(24 * var(--fx));
+    font-weight: 500;
+  }
+  .form-status.error {
+    color: #c62828;
   }
 
   /* Mobile: Figma px would crowd a phone, so the form type steps down */

@@ -121,6 +121,9 @@ export const MAC_CHIPS = [
   "Not sure",
 ].filter((chip) => !["Apple M4 Ultra", "Apple M5 Ultra"].includes(chip));
 export const MAC_MEMORY = [
-  ...[16, 18, 24, 32, 36, 48, 64, 96, 128, 192, 256].map((gb) => `${gb}GB`),
+  ...[16, 24, 32, 48, 64, 96, 128, 192, 256].map((gb) => `${gb}GB`),
   "Not sure",
 ];
+
+/** Backend endpoint that receives early access applications (POST JSON) */
+export const EARLY_ACCESS_ENDPOINT = "https://amis-wifi-backend-947027167514.us-central1.run.app/api/v1/earlyaccess";
