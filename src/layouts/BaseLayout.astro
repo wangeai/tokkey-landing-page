@@ -9,11 +9,14 @@ interface Props {
   description?: string;
   /** Put the footer on the blue aurora backdrop (software page) */
   footerAurora?: boolean;
+  /** Header shares the hero's background instead of a solid bar */
+  navOverHero?: boolean;
 }
 const {
   title = "Tokkey — Own your intelligence",
   description = "Tokkey is a USB-C local-AI key for Mac. 0 tokens, runs on-device.",
   footerAurora = false,
+  navOverHero = false,
 } = Astro.props;
 ---
 
@@ -32,7 +35,7 @@ const {
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
   </head>
   <body>
-    <Nav />
+    <Nav overHero={navOverHero} />
     <main>
       <slot />
     </main>

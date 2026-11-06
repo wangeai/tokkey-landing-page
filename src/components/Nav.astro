@@ -1,24 +1,54 @@
 ---
-// Fixed site header: wordmark, primary links (hidden ≤ 900px), early-access CTA.
+// Fixed site header (Figma: UI (editable)): wordmark, primary links (hidden ≤ 900px), "Reserve your spot" CTA. With `overHero` it has no background
+// while over the hero and turns solid black past it (src/scripts/NavBackdrop.ts).
 import Logo from "./Logo.astro";
 
-// Primary nav links (same targets as the legacy page)
+interface Props {
+  /** Share the hero's background instead of a solid bar (software page) */
+  overHero?: boolean;
+}
+const { overHero = false } = Astro.props;
+
+// Primary nav links; Technology is the homepage until it has its own page
 const links = [
   { label: "Software", href: "/software" },
-  { label: "Models", href: "/models" },
-  { label: "Pricing", href: "/pricing" },
-  { label: "Dev Doc", href: "/devdoc" },
-  { label: "FAQ", href: "/faq" },
+  { label: "Technology", href: "/" },
 ];
 ---
 
-<nav class="fixed inset-x-0 top-0 z-[60] flex h-header items-center border-b border-[#161618] bg-black px-4 text-white min-[901px]:px-12">
+<nav
+  data-nav
+  data-over-hero={overHero || undefined}
+  class="fixed inset-x-0 top-0 z-[60] flex h-header items-center border-b border-[#161618] bg-black px-4 text-white min-[901px]:px-12"
+>
   <Logo variant="wordmark" class="block h-[30px] w-auto" />
-  <ul class="mr-10 ml-auto hidden gap-9 text-[15px] min-[901px]:flex">
-    {links.map((link) => <li><a href={link.href} class="opacity-72 hover:opacity-100">{link.label}</a></li>)}
+  <ul class="mr-8 ml-auto hidden gap-8 text-[16px]/6 min-[901px]:flex">
+    {links.map((link) => <li><a href={link.href} class="opacity-70 hover:opacity-100">{link.label}</a></li>)}
   </ul>
+  <!-- Figma: 192×52.8 white pill, 16 semibold -->
   <a
-    class="ml-auto inline-flex h-11 items-center rounded-full bg-white px-[22px] text-[14.5px] font-medium text-[#111] min-[901px]:ml-0"
-    href="/software#early">Get early access</a
+    class="ml-auto inline-flex h-[52px] items-center rounded-full bg-white px-5 text-[16px]/6 font-semibold text-[#111] min-[901px]:ml-0"
+    href="/software#early">Reserve your spot</a
   >
 </nav>
+
+<script>
+  import { NavBackdrop } from "../scripts/NavBackdrop";
+  const nav = document.querySelector<HTMLElement>("[data-nav][data-over-hero]");
+  // The hero is the first section of the page
+  const hero = document.querySelector<HTMLElement>("main > section");
+  if (nav && hero) new NavBackdrop(nav, hero);
+</script>
+
+<style>
+  /* No background over the hero; .is-solid brings the black bar back once the hero is past */
+  nav[data-over-hero] {
+    transition:
+      background-color 0.3s,
+      border-color 0.3s;
+  }
+  nav[data-over-hero]:not(.is-solid) {
+    border-color: transparent;
+    background-color: transparent;
+  }
+</style>

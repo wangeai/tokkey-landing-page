@@ -7,7 +7,7 @@ import Logo from "./Logo.astro";
 import { FOOTER_COLUMNS, SOCIAL_LINKS } from "../config/footer";
 
 interface Props {
-  /** Blue aurora photo behind the ASCII field instead of plain black (Figma: S7 Footer (aurora)) */
+  /** Blue backdrop photo behind the ASCII field instead of plain black (Figma: S7 Footer (aurora)) */
   aurora?: boolean;
 }
 const { aurora = false } = Astro.props;
@@ -22,15 +22,15 @@ const label = "font-mono text-[12px]/4 uppercase tracking-[0.08em] text-[#8e8e93
 >
   {
     aurora && (
-      // Figma: footer bg (aurora), 1920×1080 starting 560 above the footer's top and stretched to its bottom so its lower half shows
+      // Software page footer backdrop, covering the whole footer
       <img
-        src="/assets/images/software/hero-aurora.jpg"
+        src="/assets/images/footer_bg.jpg"
         width="1920"
         height="1080"
         alt=""
         aria-hidden="true"
         loading="lazy"
-        class="pointer-events-none absolute inset-x-0 top-[-560px] h-[calc(100%+560px)] w-full max-w-none object-cover object-top max-md:left-1/2 max-md:w-[1920px] max-md:-translate-x-1/2 md:top-[calc(-560*var(--fx))] md:h-[calc(100%+560*var(--fx))]"
+        class="pointer-events-none absolute inset-0 size-full object-cover"
       />
     )
   }
