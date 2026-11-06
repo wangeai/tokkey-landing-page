@@ -1,6 +1,5 @@
-// Frame sequences under public/assets/frames/<name>/<prefix>_NNNNN.<jpg|webp> (numbered from 00000) — update the count
-// when frames are added/removed. The format is detected at load time: jpg if present, otherwise webp.
-// "webp" frames have a transparent background; "jpg" frames have a black one.
+// Frame sequences under public/assets/frames/<name>/<prefix>_NNNNN.webp (numbered from 00000) — update the count
+// when frames are added/removed. Frames have a transparent background.
 export const FRAME_SEQUENCES = {
   "001": { prefix: "001", count: 47 },
   "002": { prefix: "002", count: 70 },

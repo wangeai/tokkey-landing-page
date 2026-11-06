@@ -1,4 +1,4 @@
-// Loads one frame folder (public/assets/frames/<name>/<prefix>_NNNNN.<jpg|webp>) as Image objects; shared via a cache.
+// Loads one frame folder (public/assets/frames/<name>/<prefix>_NNNNN.webp) as Image objects; shared via a cache.
 import { FRAME_SEQUENCES, type SequenceName } from "../config/frames";
 
 export class FrameSequence {
@@ -26,31 +26,16 @@ export class FrameSequence {
     for (let i = 0; i < count; i += this.step) {
       const img = new Image();
       img.decoding = "async";
+      img.src = this.url(i);
       this.frames.push(img);
     }
-    // Probe the first frame as jpg; if it's missing, fall back to webp. The rest follow the detected format.
-    const first = this.frames[0];
-    const loadRest = (ext: string) => this.frames.slice(1).forEach((img, i) => (img.src = this.url((i + 1) * this.step, ext)));
-    // Remove both listeners once either fires, so the webp fallback's own "load" doesn't re-trigger the jpg path
-    const onLoad = () => {
-      first.removeEventListener("error", onError);
-      loadRest("jpg");
-    };
-    const onError = () => {
-      first.removeEventListener("load", onLoad);
-      first.src = this.url(0, "webp");
-      loadRest("webp");
-    };
-    first.addEventListener("load", onLoad, { once: true });
-    first.addEventListener("error", onError, { once: true });
-    first.src = this.url(0, "jpg");
     return this;
   }
 
-  /** URL of the frame with the given source index and extension */
-  private url(index: number, ext: string): string {
+  /** URL of the frame with the given source index */
+  private url(index: number): string {
     const { prefix } = FRAME_SEQUENCES[this.name];
-    return `/assets/frames/${this.name}/${prefix}_${String(index).padStart(5, "0")}.${ext}`;
+    return `/assets/frames/${this.name}/${prefix}_${String(index).padStart(5, "0")}.webp`;
   }
 
   get length(): number {
