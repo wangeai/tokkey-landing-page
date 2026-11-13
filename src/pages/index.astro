@@ -5,5 +5,34 @@ import FrameStage from "../components/FrameStage.astro";
 ---
 
 <BaseLayout navOverHero>
-  <FrameStage />
+  <!-- Fonts for the hero "Intelligence" dance only (approved exception to Inter + Commit Mono, see HeroTitleScene) -->
+  <link
+    slot="head"
+    rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;1,400&family=Cormorant+Garamond:wght@300&family=EB+Garamond:ital,wght@1,400&family=Bodoni+Moda:opsz,wght@6..96,400&family=DM+Serif+Display:ital@1&family=Josefin+Slab:wght@300&family=Space+Grotesk:wght@300&family=Bebas+Neue&family=Courier+Prime&display=swap"
+  />
+  <FrameStage>
+    <!-- Hero headline over the first frames; scrolls away as the stage starts playing (HeroTitleScene).
+         Figma 1157:61: Inter Medium 128px / 0.95 on a 1920 frame (scales with the viewport), top at 31%, 0.12em word gap (two lines on mobile), round accent dot -->
+    <h1
+      data-hero-title
+      aria-label="Own Your Intelligence"
+      class="pointer-events-none absolute inset-x-0 top-[31%] px-gutter-sm text-center text-hero-sm font-medium text-white md:px-gutter md:text-[clamp(48px,6.667vw,128px)] md:leading-[0.95]"
+    >
+      <span data-ref="inner" class="block"
+        ><span class="block whitespace-nowrap tracking-[-0.035em] text-white/55 md:inline">Own Your</span>
+        <span data-ref="dance" class="whitespace-nowrap tracking-[-0.03em] md:ml-[0.12em]">Intelligence</span><span
+          class="ml-[0.06em] inline-block size-[0.15em] rounded-full bg-accent"
+          aria-hidden="true"></span
+        ></span
+      >
+    </h1>
+  </FrameStage>
 </BaseLayout>
+
+<script>
+  import { HeroTitleScene } from "../scripts/scenes/HeroTitleScene";
+  const title = document.querySelector<HTMLElement>("[data-hero-title]");
+  const section = title?.closest<HTMLElement>("[data-frame-stage]");
+  if (title && section) new HeroTitleScene(title, section);
+</script>

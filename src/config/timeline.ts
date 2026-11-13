@@ -23,6 +23,7 @@ export type TimelineSegment =
     };
 
 export const TIMELINE: TimelineSegment[] = [
+  { kind: "effect", id: "heroTitle", length: 20 }, // "Own Your Intelligence." fades out on the first slight scroll (HeroTitleScene)
   { kind: "frames", sequence: "001", mobileFit: "contain", filter: "hue-rotate(28deg) saturate(1.1)" }, // lid lifts, logo glows
   { kind: "frames", sequence: "002", mobileFit: "cover" }, // laptop opens, camera moves in to the plugged-in key
   // Example of an effect between scenes: { kind: "effect", id: "agentsFly", length: 60 },
