@@ -1,6 +1,6 @@
-// Plays the whole TIMELINE as one continuous strip of frames on a canvas. ScrollScrubber sets where the playhead is
-// headed; each tick the playhead eases toward it, capped at a max speed, so a slight scroll plays a few frames and a
-// big flick plays many, in order, like a video. Effect segments report their progress to handlers from onEffect().
+// Plays the whole TIMELINE as one continuous strip of frames on a canvas. ScrollScrubber maps page scroll to the
+// playhead, so frames follow the scroll exactly: a slow scroll plays slowly, a fast flick plays fast. Effect segments
+// report their progress to handlers from onEffect().
 import { gsap } from "./gsap";
 import { FrameCanvas } from "./FrameCanvas";
 import { FrameStore } from "./FrameStore";
@@ -21,10 +21,6 @@ export type EffectHandler = (progress: number) => void;
 export class FrameStage {
   /** Frames are 16:9 */
   private static readonly ASPECT = 16 / 9;
-  /** How quickly the playhead closes the gap to the target (per second; higher = snappier) */
-  private static readonly EASE = 6;
-  /** Fastest the playhead moves, in source frames per second; a big flick plays at this speed instead of skipping */
-  private static readonly MAX_FPS = 90;
 
   private readonly timeline: FrameTimeline;
   private readonly store: FrameStore;
@@ -35,13 +31,13 @@ export class FrameStage {
   /** Where the playhead is (source frames) */
   private position = 0;
   private direction: 1 | -1 = 1;
-  private readonly tick = () => this.update(gsap.ticker.deltaRatio() / 60);
+  private readonly tick = () => this.update();
 
-  constructor(canvas: HTMLCanvasElement, profile: StageProfile) {
+  constructor(section: HTMLElement, canvas: HTMLCanvasElement, profile: StageProfile) {
     this.timeline = new FrameTimeline(TIMELINE, profile.size, profile.step, profile.mobile);
     this.store = new FrameStore(this.timeline.urls, FRAME_SIZES[profile.size].width);
     this.painter = new FrameCanvas(canvas, FrameStage.ASPECT, (width) => this.store.setDecodeWidth(width));
-    this.scrubber = new ScrollScrubber(this.timeline.end, profile, () => Math.abs(this.position - this.timeline.end) < 0.5);
+    this.scrubber = new ScrollScrubber(section, this.timeline.end, profile);
     gsap.ticker.add(this.tick);
   }
 
@@ -59,15 +55,11 @@ export class FrameStage {
     this.store.destroy();
   }
 
-  /** Advance the playhead by `dt` seconds of motion, then draw and report effects */
-  private update(dt: number): void {
+  /** Move the playhead to the scroll position, then draw and report effects */
+  private update(): void {
     const gap = this.scrubber.target - this.position;
-    if (Math.abs(gap) > 0.01) {
-      const eased = gap * (1 - Math.exp(-dt * FrameStage.EASE));
-      const capped = FrameStage.MAX_FPS * dt;
-      this.position += Math.sign(gap) * Math.min(Math.abs(eased), capped);
-      this.direction = gap > 0 ? 1 : -1;
-    }
+    if (gap) this.direction = gap > 0 ? 1 : -1;
+    this.position = this.scrubber.target;
     const point = this.timeline.at(this.position);
     this.store.setFocus(point.frame, this.direction);
     this.painter.setFilter(point.filter);

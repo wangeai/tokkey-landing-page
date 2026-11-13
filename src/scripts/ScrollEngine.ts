@@ -5,7 +5,6 @@ import { gsap, ScrollTrigger } from "./gsap";
 export class ScrollEngine {
   private static singleton: ScrollEngine | null = null;
   private lenis: Lenis | null = null;
-  private locked = false;
 
   /** One engine per page; scenes and layout share it */
   static get instance(): ScrollEngine {
@@ -23,22 +22,9 @@ export class ScrollEngine {
 
     // Lenis smooths wheel input only; touch scrolling stays native on mobile
     this.lenis = new Lenis({ autoRaf: false });
-    if (this.locked) this.lenis.stop();
     this.lenis.on("scroll", ScrollTrigger.update);
     gsap.ticker.add((time) => this.lenis?.raf(time * 1000));
     gsap.ticker.lagSmoothing(0);
-  }
-
-  /** Freeze page scrolling (the hero steps through scenes meanwhile); remembered if Lenis starts later */
-  lock(): void {
-    this.locked = true;
-    this.lenis?.stop();
-  }
-
-  /** Hand scrolling back to the page */
-  unlock(): void {
-    this.locked = false;
-    this.lenis?.start();
   }
 
   /** Smooth-scroll (or jump, with `immediate`) to an element or y position; falls back to native when Lenis is off */
