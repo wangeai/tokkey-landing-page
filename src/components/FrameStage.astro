@@ -1,0 +1,15 @@
+---
+// Hero frame stage: every frame sequence in src/config/timeline.ts plays as one scroll-driven strip on the canvas
+// (src/scripts/scenes/FrameStageScene.ts). Overlays for effect segments go in the slot, above the canvas.
+---
+
+<section class="relative h-svh overflow-hidden bg-black" data-frame-stage>
+  <canvas data-ref="frames" class="absolute inset-0 size-full"></canvas>
+  <slot />
+</section>
+
+<script>
+  import { FrameStageScene } from "../scripts/scenes/FrameStageScene";
+  const section = document.querySelector<HTMLElement>("[data-frame-stage]");
+  if (section) new FrameStageScene(section);
+</script>

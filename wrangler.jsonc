@@ -5,5 +5,13 @@
   "compatibility_date": "2026-11-01",
   // Build dist/ before deploy, so CI works even without a separate build step.
   "build": { "command": "npm run build" },
-  "assets": { "directory": "./dist", "not_found_handling": "404-page" }
+  "assets": { "directory": "./dist", "not_found_handling": "404-page" },
+  "env": {
+    // Staging copy on its own Worker at preview.tokkey.ai: `npx wrangler deploy --env preview`.
+    // Wrangler creates the DNS record and certificate (tokkey.ai must be a zone in the same Cloudflare account).
+    "preview": {
+      "name": "tokkey-landing-page-preview",
+      "routes": [{ "pattern": "preview.tokkey.ai", "custom_domain": true }]
+    }
+  }
 }

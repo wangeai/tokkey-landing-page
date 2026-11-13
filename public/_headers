@@ -1,0 +1,4 @@
+# Cache headers for Cloudflare Workers static assets. Frame files keep their names when re-rendered, so cache them
+# for a week rather than forever.
+/assets/frames/*
+  Cache-Control: public, max-age=604800

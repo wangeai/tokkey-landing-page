@@ -1,6 +1,9 @@
 ---
-// Homepage: cleared for the redesign. New sections go inside BaseLayout.
+// Homepage: being redesigned. Opens with the scroll-driven frame stage; new sections go after it inside BaseLayout.
 import BaseLayout from "../layouts/BaseLayout.astro";
+import FrameStage from "../components/FrameStage.astro";
 ---
 
-<BaseLayout></BaseLayout>
+<BaseLayout navOverHero>
+  <FrameStage />
+</BaseLayout>
