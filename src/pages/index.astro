@@ -2,6 +2,7 @@
 // Homepage: being redesigned. Opens with the scroll-driven frame stage; new sections go after it inside BaseLayout.
 import BaseLayout from "../layouts/BaseLayout.astro";
 import FrameStage from "../components/FrameStage.astro";
+import FeatureCarousel from "../components/FeatureCarousel.astro";
 ---
 
 <BaseLayout navOverHero>
@@ -21,13 +22,12 @@ import FrameStage from "../components/FrameStage.astro";
     >
       <span data-ref="inner" class="block"
         ><span class="block whitespace-nowrap tracking-[-0.035em] text-white/55 md:inline">Own Your</span>
-        <span data-ref="dance" class="whitespace-nowrap tracking-[-0.03em] md:ml-[0.12em]">Intelligence</span><span
-          class="ml-[0.06em] inline-block size-[0.15em] rounded-full bg-accent"
-          aria-hidden="true"></span
+        <span data-ref="dance" class="whitespace-nowrap tracking-[-0.03em] md:ml-[0.12em]">Intelligence</span><span class="dot" aria-hidden="true"></span
         ></span
       >
     </h1>
   </FrameStage>
+  <FeatureCarousel />
 </BaseLayout>
 
 <script>
