@@ -156,13 +156,13 @@ export class HeroScene {
     // App UI panels wait hidden until the zoom into the screen finishes
     gsap.set("[data-screen-item]", { opacity: 0 });
     this.steps = this.createSteps();
-    // Mobile loads the smaller videos and fits each scene per its mobileFit; agent layout adapts inside measure().
-    // Set before the intro so a phone never downloads the desktop video
+    this.playIntro();
+
+    // Mobile loads half the frames and fits each scene per its mobileFit; agent layout adapts inside measure()
     gsap
       .matchMedia()
-      .add(`(min-width: ${MOBILE_MAX_WIDTH + 1}px)`, () => this.player.setProfile(false))
-      .add(`(max-width: ${MOBILE_MAX_WIDTH}px)`, () => this.player.setProfile(true));
-    this.playIntro();
+      .add(`(min-width: ${MOBILE_MAX_WIDTH + 1}px)`, () => this.player.setProfile(1, false))
+      .add(`(max-width: ${MOBILE_MAX_WIDTH}px)`, () => this.player.setProfile(2, true));
 
     this.stepper = new SceneStepper(SCENES.length, (index, direction) => this.playScene(index, direction));
     // Clicking the hero (outside its own controls) lets the next scroll leave it without stepping through every scene
@@ -174,11 +174,7 @@ export class HeroScene {
   /** On page load: scene 0's first frame fades in and holds for INTRO_HOLD seconds, then scene 0 plays on its own;
    *  the dot field fades in alongside */
   private playIntro(): void {
-    this.player.show(SCENES[0], 0).then(() => {
-      gsap.delayedCall(INTRO_HOLD, () => this.stepper.autoplay());
-      // Scene 0 is on screen: fetch the rest of the videos in the background, next scene first
-      this.player.preloadAll(SCENES.slice(1));
-    });
+    this.player.show(SCENES[0], 0).then(() => gsap.delayedCall(INTRO_HOLD, () => this.stepper.autoplay()));
     gsap.to(this.state, { introDots: 1, duration: 1.6, delay: 0.2, ease: "none", onUpdate: () => this.render() });
   }
 
@@ -196,6 +192,8 @@ export class HeroScene {
     // Forward plays scene `index`; backward rewinds the scene after it
     const scene = direction > 0 ? SCENES[index] : SCENES[index + 1];
     const steps = this.steps[scene.id];
+    const next = SCENES[index + 1];
+    if (direction > 0 && next && frames) this.player.preload(next);
     const running = this.transition;
     const transition = {
       scene,
