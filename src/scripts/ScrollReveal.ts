@@ -1,6 +1,6 @@
 // Fade-up reveal shared by the sections below the hero (legacy `.rvv`: rise 26px, 0.9s, staggered).
 import { gsap } from "./gsap";
-import { MOBILE_MAX_WIDTH } from "../config/frames";
+import { MOBILE_MAX_WIDTH } from "../config/breakpoints";
 
 export class ScrollReveal {
   /** Distance (px) each element rises while fading in */
