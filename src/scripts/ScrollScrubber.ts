@@ -1,6 +1,7 @@
 // Maps page scroll to a position on the frame timeline, like Apple's scroll-scrubbed videos: the section pins while
 // the page scrolls through it, and the scroll position inside the pin is the timeline position. Scrolling never locks,
-// so a slow scroll plays slowly and a fast flick plays fast (skipping frames); Lenis smooths the wheel.
+// so a slow scroll plays slowly and a fast flick plays fast; Lenis smooths the wheel and FrameStage eases the
+// playhead toward the target.
 import { ScrollTrigger } from "./gsap";
 
 export interface ScrubberOptions {

@@ -1,5 +1,5 @@
-// Hero frame stage (markup: src/components/FrameStage.astro). Builds a FrameStage per breakpoint: desktop loads the
-// full-size frames (half-size on small or 1x screens), mobile loads every other half-size frame and moves more per px.
+// Hero frame stage (markup: src/components/FrameStage.astro). Builds a FrameStage per breakpoint: desktop plays the
+// full-size videos (half-size on small or 1x screens), mobile plays the half-size videos and moves more per px.
 // Effect segments' progress is re-dispatched on the section as EFFECT_EVENT, so overlays in the slot can follow it.
 import { gsap } from "../gsap";
 import { FrameStage, type StageProfile } from "../FrameStage";
@@ -21,12 +21,12 @@ export class FrameStageScene {
   private static readonly EFFECT_IDS = TIMELINE.flatMap((s) => (s.kind === "effect" ? [s.id] : []));
 
   constructor(section: HTMLElement) {
-    const canvas = section.querySelector<HTMLCanvasElement>("[data-ref=frames]")!;
+    const host = section.querySelector<HTMLElement>("[data-ref=frames]")!;
     gsap
       .matchMedia()
-      .add(`(min-width: ${MOBILE_MAX_WIDTH + 1}px)`, () => this.build(section, canvas, FrameStageScene.desktopProfile()))
+      .add(`(min-width: ${MOBILE_MAX_WIDTH + 1}px)`, () => this.build(section, host, FrameStageScene.desktopProfile()))
       .add(`(max-width: ${MOBILE_MAX_WIDTH}px)`, () =>
-        this.build(section, canvas, { size: "sm", step: 2, mobile: true, framesPerPx: 0.5 }),
+        this.build(section, host, { size: "sm", mobile: true, framesPerPx: 0.5 }),
       );
   }
 
@@ -35,12 +35,12 @@ export class FrameStageScene {
     const screenPx = window.innerWidth * Math.min(window.devicePixelRatio || 1, 2);
     const size = screenPx > FRAME_SIZES.sm.width * 1.25 ? "lg" : "sm";
     // One mouse notch (~100px) ≈ 20 frames
-    return { size, step: 1, mobile: false, framesPerPx: 0.2 };
+    return { size, mobile: false, framesPerPx: 0.2 };
   }
 
   /** Create the stage for one breakpoint; returns its cleanup for matchMedia */
-  private build(section: HTMLElement, canvas: HTMLCanvasElement, profile: StageProfile): () => void {
-    const stage = new FrameStage(section, canvas, profile);
+  private build(section: HTMLElement, host: HTMLElement, profile: StageProfile): () => void {
+    const stage = new FrameStage(section, host, profile);
     for (const id of FrameStageScene.EFFECT_IDS) {
       stage.onEffect(id, (progress) =>
         section.dispatchEvent(new CustomEvent<StageEffect>(FrameStageScene.EFFECT_EVENT, { detail: { id, progress } })),

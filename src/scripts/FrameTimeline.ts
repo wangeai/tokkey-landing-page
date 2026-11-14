@@ -1,6 +1,6 @@
 // Lays TIMELINE segments end to end on one axis measured in source frames, and maps a position on it to the frame to
-// draw (an index into one flat list of every frame URL) plus the progress of each effect segment.
-import { FRAME_SEQUENCES, frameUrl, type FrameSize } from "../config/frames";
+// draw (a sequence and a frame inside it) plus the progress of each effect segment.
+import { FRAME_SEQUENCES, type SequenceName } from "../config/frames";
 import type { FrameFit, TimelineSegment } from "../config/timeline";
 
 type FramesSegment = Extract<TimelineSegment, { kind: "frames" }>;
@@ -13,60 +13,59 @@ interface Span {
   start: number;
   /** Scroll length in source frames */
   length: number;
-  /** Frames: flat index of its first frame. Effects: flat index of the frame held underneath */
-  firstFrame: number;
-  /** Frames: number of frames loaded (fewer than the source count when `step` > 1) */
-  frameCount: number;
+  /** Frames: its own sequence. Effects: the sequence of the frame held underneath */
+  sequence: SequenceName;
+  /** Effects: the frame held underneath (the last one before it, or the first frame if the timeline opens with it) */
+  heldFrame: number;
 }
 
 export interface TimelinePoint {
-  /** Flat index into `urls` */
+  sequence: SequenceName;
+  /** Frame index inside the sequence */
   frame: number;
   fit: FrameFit;
   filter: string;
 }
 
 export class FrameTimeline {
-  /** Every frame URL, in play order */
-  readonly urls: string[] = [];
+  /** Sequences in play order, each once */
+  readonly sequences: SequenceName[];
   /** Last valid position */
   readonly end: number;
   private readonly spans: Span[] = [];
 
   constructor(
     segments: TimelineSegment[],
-    size: FrameSize,
-    /** Load every `step`-th frame (mobile uses 2) */
-    private readonly step: number,
     private readonly mobile: boolean,
   ) {
+    const frameSegments = segments.filter((s): s is FramesSegment => s.kind === "frames");
+    this.sequences = [...new Set(frameSegments.map((s) => s.sequence))];
+
     let start = 0;
     let look: FramesSegment | null = null;
     for (const segment of segments) {
       if (segment.kind === "frames") {
         look = segment;
-        const { count } = FRAME_SEQUENCES[segment.sequence];
-        const firstFrame = this.urls.length;
-        for (let i = 0; i < count; i += step) this.urls.push(frameUrl(segment.sequence, i, size));
-        this.spans.push({ segment, look, start, length: count, firstFrame, frameCount: this.urls.length - firstFrame });
-        start += count;
+        const length = FRAME_SEQUENCES[segment.sequence].count;
+        this.spans.push({ segment, look, start, length, sequence: segment.sequence, heldFrame: 0 });
+        start += length;
       } else {
-        // Holds the last frame before it (or the first frame, if the timeline opens with an effect)
-        this.spans.push({ segment, look, start, length: segment.length, firstFrame: Math.max(0, this.urls.length - 1), frameCount: 0 });
+        const sequence = look?.sequence ?? frameSegments[0].sequence;
+        const heldFrame = look ? FRAME_SEQUENCES[look.sequence].count - 1 : 0;
+        this.spans.push({ segment, look, start, length: segment.length, sequence, heldFrame });
         start += segment.length;
       }
     }
     this.end = Math.max(0, start - 1);
   }
 
-  /** Frame, fit and filter to show at `position` */
+  /** Sequence, frame, fit and filter to show at `position` */
   at(position: number): TimelinePoint {
     const span = this.spanAt(position);
     const frame =
-      span.segment.kind === "frames"
-        ? span.firstFrame + Math.min(span.frameCount - 1, Math.floor((position - span.start) / this.step))
-        : span.firstFrame;
+      span.segment.kind === "frames" ? Math.min(span.length - 1, Math.floor(position - span.start)) : span.heldFrame;
     return {
+      sequence: span.sequence,
       frame,
       fit: this.mobile && span.look ? span.look.mobileFit : "cover",
       filter: span.look?.filter ?? "",
