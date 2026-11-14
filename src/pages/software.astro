@@ -1,9 +1,14 @@
 ---
-// Software page: cleared for the redesign; only the early-access application section is kept.
+// Software page (Figma: Software · D · 01_hero → 06_router): hero, the five-chapter features story, then the
+// early-access application section.
 import BaseLayout from "../layouts/BaseLayout.astro";
+import SoftwareHero from "../components/SoftwareHero.astro";
+import SoftwareFeatures from "../components/SoftwareFeatures.astro";
 import SoftwareEarlyAccess from "../components/SoftwareEarlyAccess.astro";
 ---
 
-<BaseLayout title="Tokkey Software — Own your AI" description="The Tokkey app for Mac: run larger models on the Mac you already own." footerAurora>
+<BaseLayout title="Tokkey Software — Own your AI" description="The Tokkey app for Mac: run larger models on the Mac you already own." navOverHero footerAurora>
+  <SoftwareHero />
+  <SoftwareFeatures />
   <SoftwareEarlyAccess />
 </BaseLayout>

@@ -1,0 +1,1247 @@
+---
+// Software page features story (Figma: Software · D · 02_agent_hub → 06_router, nodes 1163:63–67): five chapters on
+// paper (#fafaf7) over a faint ambient character field. From 1200px the copy scrolls on the left while the matching UI
+// preview stays pinned on the right and cross-fades per chapter, with a chapter bar pinned to the bottom of the
+// viewport; below 1200px each chapter stacks its copy above its preview. Preview sizes are Figma px via --ux (= --fx
+// when pinned, the column width / 960 when stacked). Behaviour: src/scripts/scenes/FeatureStoryScene.ts and
+// src/scripts/FeaturePreview.ts. Content: src/config/software.ts.
+import { FEATURE_CHAPTERS, HUB_AGENTS, WORKFLOW_MODELS } from "../config/software";
+
+const icon = (name: string) => `/assets/icons/software/features/${name}`;
+const [localModel] = WORKFLOW_MODELS;
+---
+
+<section id="features" data-features data-nav-light aria-label="What Tokkey does" class="features">
+  <!-- Ambient field: one viewport tall, sticks while the story scrolls (prototype `fxAmb`) -->
+  <canvas data-ref="ambient" aria-hidden="true" class="ambient"></canvas>
+
+  <div class="story">
+    <!-- Chapters: copy (and, below 1200px, the chapter's preview moved into its slot) -->
+    <div>
+      {
+        FEATURE_CHAPTERS.map((chapter) => (
+          <article id={chapter.id} data-ref="chapter" class="chapter" aria-labelledby={`${chapter.id}-title`}>
+            <div data-ref="copy" class="copy">
+              <p class="eyebrow">{chapter.label}</p>
+              <h2 id={`${chapter.id}-title`} class="title">
+                {chapter.lead}
+                <br />
+                <em>{chapter.emphasis}</em>
+              </h2>
+              <p class="text">{chapter.text}</p>
+              {chapter.note && (
+                <p class="note">
+                  {chapter.noteLock && <img src={icon("lock.svg")} width="15" height="15" alt="" aria-hidden="true" />}
+                  {chapter.note}
+                </p>
+              )}
+            </div>
+            <div data-ref="slot" class="slot"></div>
+          </article>
+        ))
+      }
+    </div>
+
+    <!-- Pinned preview column (from 1200px): the five previews stacked, the active one shown -->
+    <div class="pin">
+      <div data-ref="host" class="host">
+        <!-- 01 Agent Hub -->
+        <div data-ref="stage" class="stage s-hub" style="--h:720" role="group" aria-label="Agent Hub preview: Codex selected and connected to Tokkey, running Qwen3.5 9B on this Mac">
+          <div class="atm" aria-hidden="true"></div>
+          <div class="ui" data-ref="hub">
+            <div class="row hub-hd"><b>Agent Hub</b><span>Choose an agent</span></div>
+            <div class="hub-opts" role="tablist" aria-label="Choose an agent">
+              {
+                HUB_AGENTS.map((agent, i) => (
+                  <button
+                    type="button"
+                    role="tab"
+                    data-ref="agent"
+                    data-agent={agent.name}
+                    aria-selected={i === 0 ? "true" : "false"}
+                    tabindex={i === 0 ? 0 : -1}
+                    class:list={["hub-opt", { "is-on": i === 0 }]}
+                  >
+                    <span class="hub-icon" aria-hidden="true">
+                      {agent.icons.map((layer) => (
+                        <img
+                          src={icon(layer.src)}
+                          width={layer.w}
+                          height={layer.h}
+                          alt=""
+                          style={`left:calc(${layer.x}*var(--ux));top:calc(${layer.y}*var(--ux));width:calc(${layer.w}*var(--ux));height:calc(${layer.h}*var(--ux))`}
+                        />
+                      ))}
+                    </span>
+                    <b>{agent.name}</b>
+                    <span>{agent.text}</span>
+                  </button>
+                ))
+              }
+            </div>
+            <div class="hr"></div>
+            <div class="row hub-sel">
+              <div>
+                <b data-ref="agent-name">{HUB_AGENTS[0].name}</b>
+                <span class="status"><i class="dot"></i>Connected to Tokkey</span>
+              </div>
+              <span class="hub-btn" data-ref="agent-open">Open {HUB_AGENTS[0].name} ↗</span>
+            </div>
+            <div class="hub-model">
+              <div class="grow"><small>LOCAL MODEL</small><b>Qwen3.5 9B</b></div>
+              <span class="loc"><i class="dot"></i>On this Mac</span>
+              <span class="chev" aria-hidden="true">⌄</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 02 Private Chat -->
+        <div data-ref="stage" class="stage s-chat" style="--h:600" role="group" aria-label="Private Chat preview in local-only mode: a question about Client proposal.pdf answered on the Mac">
+          <div class="atm" aria-hidden="true"></div>
+          <div class="ui">
+            <div class="row">
+              <span class="ttl">Private Chat</span>
+              <span class="pill"><img src={icon("lock-pill.svg")} width="14" height="14" alt="" class="pill-icon" />Local-only</span>
+            </div>
+            <div class="chat-q">
+              <span class="doc"><img src={icon("doc.svg")} width="19" height="19" alt="" />Client proposal.pdf</span>
+              <p>What are the key points in this proposal?</p>
+            </div>
+            <div class="chat-a">
+              <b>Here’s the short version.</b>
+              <p>A six-week project, two review rounds, and a final handoff.<br />The next step is to agree on the scope and deliverables.</p>
+            </div>
+            <div class="hr"></div>
+            <div class="row chat-in">
+              <span class="ph">Ask a follow-up…</span>
+              <span class="chat-meta">
+                <span class="lm"><i class="dot dot-6"></i>Local model</span>
+                <span class="send send-32"><img src={icon("send.svg")} width="18" height="18" alt="" /></span>
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 03 No AI Credits -->
+        <div data-ref="stage" class="stage s-zero" style="--h:640" role="group" aria-label="Local activity preview: 0 cloud credits used across three tasks completed locally">
+          <div class="atm" aria-hidden="true"></div>
+          <div class="ui">
+            <div class="row">
+              <span class="ttl">Local activity</span>
+              <span class="pill"><i class="dot dot-6"></i>On this Mac</span>
+            </div>
+            <div class="zero">
+              <span class="n">0</span>
+              <div><b>Cloud credits used</b><span>Across these local tasks.</span></div>
+            </div>
+            <div class="hr"></div>
+            <ol class="acts">
+              {
+                ["Document summarized", "Draft rewritten", "Follow-up answered"].map((task, i) => (
+                  <li class="act">
+                    <i>{String(i + 1).padStart(2, "0")}</i>
+                    <span>{task}</span>
+                    <em>Completed locally</em>
+                  </li>
+                ))
+              }
+            </ol>
+            <div class="hr"></div>
+            <div class="row zero-ft"><span>Ready for your next task.</span><b>No per-token API fee</b></div>
+          </div>
+        </div>
+
+        <!-- 04 Your existing workflow -->
+        <div data-ref="stage" class="stage s-flow" style="--h:640" role="group" aria-label="Codex composer preview with the model menu open: Tokkey local model selected">
+          <div class="atm" aria-hidden="true"></div>
+          <div class="ui comp">
+            <div class="comp-hd"><b>Codex</b><span>/ &nbsp;your-project</span></div>
+            <p class="msg">Review the changes in this project and suggest a fix.</p>
+            <div class="row">
+              <button type="button" class="sel" data-ref="model-toggle" aria-expanded="true" aria-controls="features-model-menu">
+                <span data-ref="model-current">{localModel.name}</span>
+                <img src={icon("chevron.svg")} width="18" height="18" alt="" />
+              </button>
+              <span class="send send-34"><img src={icon("send.svg")} width="18" height="18" alt="" /></span>
+            </div>
+          </div>
+          <div class="ui menu" id="features-model-menu" data-ref="model-menu">
+            <span class="cap">Choose a model</span>
+            {
+              WORKFLOW_MODELS.map((model, i) => (
+                <button
+                  type="button"
+                  data-ref="model"
+                  data-model={model.id}
+                  aria-pressed={i === 0 ? "true" : "false"}
+                  class:list={["opt", { "is-on": i === 0 }]}
+                >
+                  <span class="grow">
+                    <b>{model.name}</b>
+                    <span>{model.text}</span>
+                  </span>
+                  <img src={icon("check.svg")} width="20" height="20" alt="" class="check" />
+                </button>
+              ))
+            }
+          </div>
+          <div class="api" aria-live="polite">
+            <b><i class="dot dot-6"></i><span data-ref="api-name">{localModel.api}</span></b>
+            <span data-ref="api-text">{localModel.apiText}</span>
+            <small data-ref="api-note">{localModel.apiNote}</small>
+          </div>
+        </div>
+
+        <!-- 05 Router -->
+        <div data-ref="stage" class="stage s-route" style="--h:740" role="group" aria-label="Router preview: a task goes either to Local AI on your Mac or to Cloud AI after you review what is shared">
+          <div class="atm" aria-hidden="true"></div>
+          <div class="stem" aria-hidden="true"></div>
+          <img src={icon("fork.svg")} width="504" height="98" alt="" aria-hidden="true" class="fork" />
+          <div class="ui task"><small>YOUR TASK</small><p>Help me refine this launch plan.</p></div>
+          <div class="ui node">
+            <img src={icon("router.svg")} width="24" height="24" alt="" />
+            <div><b>Router</b><span>Matches task to model</span></div>
+          </div>
+          <div class="ui opt-card is-local">
+            <div class="who"><img src={icon("lock-local.svg")} width="20" height="20" alt="" />Local AI</div>
+            <p class="for">For private &amp; everyday work.</p>
+            <div class="box"><small>RUNS ON</small><b>Your Mac</b></div>
+            <p class="nt">Prompts and files processed here.</p>
+            <span class="do">On-device processing</span>
+          </div>
+          <div class="ui opt-card is-cloud">
+            <div class="who"><img src={icon("cloud.svg")} width="20.1381" height="20" alt="" />Cloud AI</div>
+            <p class="for">For more demanding tasks.</p>
+            <div class="box"><small>CONTEXT TO SHARE</small><b>Selected summary</b></div>
+            <p class="nt">Review before anything is sent.</p>
+            <span class="do">Review &amp; continue →</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chapter bar (from 1200px): sticks to the bottom of the viewport while the story is on screen -->
+  <nav data-ref="bar" class="bar" aria-label="Feature chapters">
+    <span class="count"><b data-ref="count">01</b><i>/</i>{String(FEATURE_CHAPTERS.length).padStart(2, "0")}</span>
+    <div class="links">
+      {
+        FEATURE_CHAPTERS.map((chapter, i) => (
+          <a href={`#${chapter.id}`} data-ref="bar-link" class:list={{ "is-on": i === 0 }}>
+            <span class="line"></span>
+            {chapter.nav}
+          </a>
+        ))
+      }
+    </div>
+    <span class="cue">Scroll <i aria-hidden="true">↓</i></span>
+  </nav>
+</section>
+
+<script>
+  import { FeatureStoryScene } from "../scripts/scenes/FeatureStoryScene";
+  import { FeaturePreview } from "../scripts/FeaturePreview";
+  import { AmbientField } from "../scripts/AmbientField";
+  const section = document.querySelector<HTMLElement>("[data-features]");
+  if (section) {
+    new FeatureStoryScene(section);
+    new FeaturePreview(section);
+    // Dark glyphs on paper, capped at 20% (prototype `fxAmb`)
+    new AmbientField(section.querySelector<HTMLCanvasElement>("[data-ref=ambient]")!, {
+      color: "#282c29",
+      maxAlpha: 0.2,
+      baseAlpha: 0.06,
+      stepAlpha: 0.045,
+    });
+  }
+</script>
+
+<style>
+  /* Figma palette for this section (paper, ink, muted, hairline, badge, sage accent, bubble, faint) */
+  .features {
+    --paper: #fafaf7;
+    --ink: #282c29;
+    --muted: #747a77;
+    --line: #e6e9e4;
+    --badge: #eff3ea;
+    --sage: #536e50;
+    --bubble: #f1f3f0;
+    --faint: #a0a6a1;
+    --ease: cubic-bezier(0.22, 1, 0.36, 1);
+    position: relative;
+    background: var(--paper);
+    color: var(--ink);
+    overflow-x: clip;
+  }
+  .ambient {
+    position: sticky;
+    top: 0;
+    display: block;
+    width: 100%;
+    height: 100vh;
+    margin-bottom: -100vh;
+    pointer-events: none;
+  }
+  .story {
+    position: relative;
+  }
+
+  /* ───── Copy ───── */
+  .copy {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .eyebrow {
+    color: var(--muted);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    line-height: 16px;
+    font-weight: 500;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  .title {
+    margin-top: 20px;
+    color: rgb(40 44 41 / 55%);
+    font-size: 36px;
+    line-height: 40px;
+    font-weight: 400;
+    letter-spacing: -0.03em;
+  }
+  .title em {
+    color: var(--ink);
+    font-style: normal;
+    font-weight: 500;
+  }
+  .text {
+    margin-top: 20px;
+    max-width: 520px;
+    color: var(--muted);
+    font-size: 18px;
+    line-height: 27px;
+  }
+  .note {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    margin-top: 28px;
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 20px;
+  }
+  .note img {
+    flex: none;
+    width: 15px;
+    height: 15px;
+  }
+
+  /* ───── Stacked layout (below 1200px): copy, then the chapter's preview at the column width ───── */
+  .chapter {
+    padding: 64px 16px;
+  }
+  .slot {
+    container-type: inline-size;
+    margin-top: 24px;
+  }
+  .pin,
+  .bar {
+    display: none;
+  }
+  @media (width >= 768px) {
+    .chapter {
+      padding: 96px 40px;
+    }
+    .title {
+      font-size: 48px;
+      line-height: 52px;
+    }
+  }
+
+  /* ───── Pinned story (from 1200px): copy column 560 + gap 80 + preview column 1024, centred (x = 128 on 1920) ───── */
+  @media (width >= 1200px) {
+    /* Pull the story up under the hero's fade (160 of 1080) so chapter 1 sits centred once the hero has gone */
+    .ambient {
+      margin-bottom: calc(-100vh - 14.815vh);
+    }
+    .story {
+      display: grid;
+      grid-template-columns: calc(560 * var(--fx)) calc(1024 * var(--fx));
+      column-gap: calc(80 * var(--fx));
+      justify-content: center;
+    }
+    .chapter {
+      display: flex;
+      align-items: center;
+      height: 100vh;
+      min-height: 620px;
+      padding: 0;
+    }
+    .slot {
+      display: none;
+    }
+    .copy {
+      opacity: var(--copy-opacity, 1);
+      will-change: opacity;
+    }
+    .title {
+      margin-top: calc(28 * var(--fx));
+      font-size: calc(63.9 * var(--fx));
+      line-height: calc(67.1 * var(--fx));
+      letter-spacing: calc(-1.9 * var(--fx));
+    }
+    .eyebrow {
+      font-size: max(11px, calc(12 * var(--fx)));
+    }
+    .text {
+      margin-top: calc(28 * var(--fx));
+      max-width: none;
+      font-size: calc(24 * var(--fx));
+      white-space: pre-line;
+      line-height: calc(33.6 * var(--fx));
+    }
+    .note {
+      margin-top: calc(40 * var(--fx));
+      font-size: max(12px, calc(14 * var(--fx)));
+    }
+    .pin {
+      position: sticky;
+      top: 0;
+      display: flex;
+      align-items: center;
+      align-self: start;
+      height: 100vh;
+      min-height: 620px;
+    }
+    .host {
+      position: relative;
+      width: calc(1024 * var(--fx));
+      height: calc(740 * var(--fx));
+    }
+  }
+
+  /* ───── Preview stages: Figma px via --ux ───── */
+  .stage {
+    --ux: calc(100cqw / 960);
+    position: relative;
+    width: calc(1024 * var(--ux));
+    height: calc(var(--h) * var(--ux));
+    /* The card sits 32 in from the stage's left edge; line it up with the copy column */
+    margin-left: calc(-32 * var(--ux));
+  }
+  @media (width >= 1200px) {
+    /* All five stacked in the pinned column, centred; only the active one shows (FeatureStoryScene) */
+    .host .stage {
+      --ux: var(--fx);
+      position: absolute;
+      top: 50%;
+      left: 0;
+      margin: calc(var(--h) * var(--ux) / -2) 0 0;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(25px) scale(0.985);
+      transition:
+        opacity 0.65s var(--ease),
+        transform 0.85s var(--ease),
+        visibility 0.85s;
+    }
+    .host .stage.is-active {
+      z-index: 2;
+      opacity: 1;
+      visibility: visible;
+      transform: none;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .host .stage {
+      transform: none;
+      transition: none;
+    }
+  }
+
+  /* Soft grey glow under each card (Figma .atm) */
+  .atm {
+    position: absolute;
+    border-radius: 50%;
+    background: #dfe0dc;
+    filter: blur(calc(44 * var(--ux)));
+    pointer-events: none;
+  }
+  .ui {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--line);
+    background: #fff;
+    box-shadow: 0 calc(14 * var(--ux)) calc(44 * var(--ux)) rgb(40 44 41 / 6%);
+  }
+  .hr {
+    flex: none;
+    align-self: stretch;
+    height: 1px;
+    background: var(--line);
+  }
+  .row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .grow {
+    flex: 1;
+  }
+  .dot {
+    flex: none;
+    width: calc(5 * var(--ux));
+    height: calc(5 * var(--ux));
+    border-radius: 50%;
+    background: var(--sage);
+  }
+  .dot-6 {
+    width: calc(6 * var(--ux));
+    height: calc(6 * var(--ux));
+  }
+  .ttl {
+    font-size: calc(17 * var(--ux));
+    line-height: calc(23.8 * var(--ux));
+    font-weight: 500;
+  }
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: calc(7 * var(--ux));
+    border-radius: calc(100 * var(--ux));
+    background: var(--badge);
+    color: var(--sage);
+    font-size: calc(12 * var(--ux));
+    line-height: calc(16.8 * var(--ux));
+    font-weight: 500;
+  }
+  .pill-icon {
+    width: calc(14 * var(--ux));
+    height: calc(14 * var(--ux));
+  }
+  .send {
+    display: grid;
+    flex: none;
+    place-items: center;
+    border-radius: calc(7 * var(--ux));
+    background: var(--ink);
+  }
+  .send img {
+    width: calc(18 * var(--ux));
+    height: calc(18 * var(--ux));
+  }
+  .send-32 {
+    width: calc(32 * var(--ux));
+    height: calc(32 * var(--ux));
+  }
+  .send-34 {
+    width: calc(34 * var(--ux));
+    height: calc(34 * var(--ux));
+  }
+  .stage button {
+    cursor: pointer;
+    text-align: inherit;
+  }
+  .stage button:focus-visible,
+  .bar a:focus-visible {
+    outline: 2px solid var(--sage);
+    outline-offset: 2px;
+  }
+
+  /* 01 Agent Hub (card 960×520 at 800,280 on the 1920 frame) */
+  .s-hub .atm {
+    left: calc(92 * var(--ux));
+    top: calc(180 * var(--ux));
+    width: calc(840 * var(--ux));
+    height: calc(360 * var(--ux));
+    opacity: 0.3;
+  }
+  .s-hub .ui {
+    left: calc(32 * var(--ux));
+    top: calc(100 * var(--ux));
+    width: calc(960 * var(--ux));
+    height: calc(520 * var(--ux));
+    gap: calc(24 * var(--ux));
+    padding: calc(40 * var(--ux));
+    border-radius: calc(20 * var(--ux));
+  }
+  .hub-hd {
+    height: calc(36 * var(--ux));
+  }
+  .hub-hd b {
+    font-size: calc(22 * var(--ux));
+    line-height: calc(30 * var(--ux));
+    font-weight: 500;
+  }
+  .hub-hd span {
+    color: var(--muted);
+    font-size: calc(14 * var(--ux));
+    line-height: calc(22 * var(--ux));
+  }
+  .hub-opts {
+    display: flex;
+    gap: calc(20 * var(--ux));
+    height: calc(156 * var(--ux));
+  }
+  .hub-opt {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: calc(6 * var(--ux));
+    border: 1px solid var(--line);
+    border-radius: calc(12 * var(--ux));
+    background: #fff;
+    transition:
+      background-color 0.25s,
+      border-color 0.25s;
+  }
+  .hub-opt.is-on {
+    border-color: var(--sage);
+    background: var(--badge);
+  }
+  .hub-opt:not(.is-on):hover {
+    border-color: #c3c9bf;
+  }
+  .hub-opt b {
+    font-size: calc(20 * var(--ux));
+    line-height: calc(28 * var(--ux));
+    font-weight: 500;
+  }
+  .hub-opt > span:last-child {
+    color: var(--muted);
+    font-size: calc(13 * var(--ux));
+    line-height: calc(20 * var(--ux));
+  }
+  /* 40×40 icon box; layers placed at their Figma offsets (inline style) */
+  .hub-icon {
+    position: relative;
+    width: calc(40 * var(--ux));
+    height: calc(40 * var(--ux));
+  }
+  .hub-icon img {
+    position: absolute;
+    max-width: none;
+  }
+  .hub-sel {
+    height: calc(68 * var(--ux));
+  }
+  .hub-sel b {
+    display: block;
+    font-size: calc(25 * var(--ux));
+    line-height: calc(34 * var(--ux));
+    font-weight: 500;
+  }
+  .status {
+    display: flex;
+    align-items: center;
+    gap: calc(8 * var(--ux));
+    margin-top: calc(4 * var(--ux));
+    color: var(--sage);
+    font-size: calc(14 * var(--ux));
+    line-height: calc(22 * var(--ux));
+  }
+  .hub-btn {
+    display: grid;
+    place-items: center;
+    width: calc(184 * var(--ux));
+    height: calc(46 * var(--ux));
+    border-radius: calc(9 * var(--ux));
+    background: var(--ink);
+    color: #fff;
+    font-size: calc(15 * var(--ux));
+    line-height: 1;
+  }
+  .hub-model {
+    display: flex;
+    align-items: center;
+    gap: calc(20 * var(--ux));
+    height: calc(72 * var(--ux));
+    padding: calc(16 * var(--ux));
+    border-radius: calc(10 * var(--ux));
+    background: var(--bubble);
+  }
+  .hub-model small {
+    display: block;
+    margin-bottom: calc(2 * var(--ux));
+    color: var(--muted);
+    font-size: calc(11 * var(--ux));
+    line-height: calc(15 * var(--ux));
+    font-weight: 500;
+  }
+  .hub-model b {
+    display: block;
+    font-size: calc(20 * var(--ux));
+    line-height: calc(28 * var(--ux));
+    font-weight: 500;
+  }
+  .loc {
+    display: flex;
+    align-items: center;
+    gap: calc(8 * var(--ux));
+    width: calc(150 * var(--ux));
+    color: var(--muted);
+    font-size: calc(13 * var(--ux));
+    line-height: calc(18 * var(--ux));
+  }
+  .chev {
+    color: var(--muted);
+    font-size: calc(18 * var(--ux));
+    line-height: calc(25 * var(--ux));
+    font-weight: 500;
+  }
+
+  /* 02 Private Chat (card 960 wide at 800,326) */
+  .s-chat .atm,
+  .s-zero .atm,
+  .s-flow .atm {
+    left: 0;
+    width: calc(1024 * var(--ux));
+    height: calc(440 * var(--ux));
+  }
+  .s-chat .atm {
+    top: calc(80 * var(--ux));
+  }
+  .s-chat .ui {
+    left: calc(32 * var(--ux));
+    top: calc(86 * var(--ux));
+    width: calc(960 * var(--ux));
+    gap: calc(25 * var(--ux));
+    padding: calc(32 * var(--ux));
+    border-radius: calc(16 * var(--ux));
+  }
+  .s-chat .pill {
+    width: calc(130 * var(--ux));
+    padding: calc(8 * var(--ux));
+  }
+  .chat-q {
+    display: flex;
+    flex-direction: column;
+    align-self: flex-end;
+    gap: calc(12 * var(--ux));
+    width: calc(700 * var(--ux));
+    padding: calc(20 * var(--ux));
+    border-radius: calc(10 * var(--ux));
+    background: var(--bubble);
+  }
+  .doc {
+    display: flex;
+    align-items: center;
+    gap: calc(9 * var(--ux));
+    color: var(--muted);
+    font-size: calc(13 * var(--ux));
+    line-height: calc(18.2 * var(--ux));
+    font-weight: 500;
+  }
+  .doc img {
+    width: calc(19 * var(--ux));
+    height: calc(19 * var(--ux));
+  }
+  .chat-q p {
+    font-size: calc(20 * var(--ux));
+    line-height: calc(27 * var(--ux));
+  }
+  .chat-a b {
+    display: block;
+    margin-bottom: calc(10 * var(--ux));
+    font-size: calc(22 * var(--ux));
+    line-height: calc(29.7 * var(--ux));
+    font-weight: 500;
+  }
+  .chat-a p {
+    color: var(--muted);
+    font-size: calc(18 * var(--ux));
+    line-height: calc(28.8 * var(--ux));
+  }
+  .ph {
+    color: var(--faint);
+    font-size: calc(17 * var(--ux));
+    line-height: calc(23.8 * var(--ux));
+  }
+  .chat-meta {
+    display: flex;
+    align-items: center;
+    gap: calc(18 * var(--ux));
+  }
+  .lm {
+    display: flex;
+    align-items: center;
+    gap: calc(7 * var(--ux));
+    width: calc(150 * var(--ux));
+    color: var(--muted);
+    font-size: calc(13 * var(--ux));
+    line-height: calc(18.2 * var(--ux));
+    font-weight: 500;
+  }
+
+  /* 03 No AI Credits (card 960 wide at 800,284) */
+  .s-zero .atm,
+  .s-flow .atm {
+    top: calc(110 * var(--ux));
+  }
+  .s-zero .ui {
+    left: calc(32 * var(--ux));
+    top: calc(64 * var(--ux));
+    width: calc(960 * var(--ux));
+    gap: calc(24 * var(--ux));
+    padding: calc(36 * var(--ux));
+    border-radius: calc(16 * var(--ux));
+  }
+  .s-zero .pill {
+    gap: calc(8 * var(--ux));
+    width: calc(128 * var(--ux));
+    padding: calc(9 * var(--ux));
+  }
+  .zero {
+    display: flex;
+    align-items: center;
+    gap: calc(32 * var(--ux));
+  }
+  .zero .n {
+    width: calc(150 * var(--ux));
+    color: var(--muted);
+    font-size: calc(132 * var(--ux));
+    line-height: calc(142 * var(--ux));
+    font-weight: 500;
+    letter-spacing: -0.04em;
+  }
+  .zero b {
+    display: block;
+    margin-bottom: calc(8 * var(--ux));
+    font-size: calc(25 * var(--ux));
+    line-height: calc(30 * var(--ux));
+    font-weight: 500;
+  }
+  .zero div span {
+    display: block;
+    color: var(--muted);
+    font-size: calc(16 * var(--ux));
+    line-height: calc(22.4 * var(--ux));
+  }
+  .acts {
+    display: flex;
+    flex-direction: column;
+    gap: calc(20 * var(--ux));
+  }
+  .act {
+    display: flex;
+    align-items: center;
+    gap: calc(18 * var(--ux));
+  }
+  .act i {
+    width: calc(30 * var(--ux));
+    color: var(--faint);
+    font-size: calc(13 * var(--ux));
+    line-height: calc(18.2 * var(--ux));
+    font-style: normal;
+  }
+  .act span {
+    flex: 1;
+    font-size: calc(18 * var(--ux));
+    line-height: calc(25.2 * var(--ux));
+  }
+  .act em {
+    color: var(--sage);
+    font-size: calc(13 * var(--ux));
+    line-height: calc(18.2 * var(--ux));
+    font-style: normal;
+    font-weight: 500;
+  }
+  .zero-ft span {
+    color: var(--muted);
+    font-size: calc(15 * var(--ux));
+    line-height: calc(21 * var(--ux));
+  }
+  .zero-ft b {
+    font-size: calc(14 * var(--ux));
+    line-height: calc(19.6 * var(--ux));
+    font-weight: 500;
+  }
+
+  /* 04 Your existing workflow (composer 960×272 at 800,300; menu 560 wide at 832,550) */
+  .comp {
+    left: calc(32 * var(--ux));
+    top: calc(80 * var(--ux));
+    justify-content: space-between;
+    width: calc(960 * var(--ux));
+    height: calc(272 * var(--ux));
+    padding: calc(32 * var(--ux));
+    border-radius: calc(16 * var(--ux));
+  }
+  .comp-hd {
+    display: flex;
+    align-items: center;
+    gap: calc(16 * var(--ux));
+  }
+  .comp-hd b {
+    font-size: calc(18 * var(--ux));
+    line-height: calc(25.2 * var(--ux));
+    font-weight: 500;
+  }
+  .comp-hd span {
+    color: var(--muted);
+    font-size: calc(15 * var(--ux));
+    line-height: calc(21 * var(--ux));
+  }
+  .msg {
+    font-size: calc(23 * var(--ux));
+    line-height: calc(33.4 * var(--ux));
+  }
+  .sel {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: calc(344 * var(--ux));
+    padding: calc(11 * var(--ux));
+    border-radius: calc(9 * var(--ux));
+    background: var(--bubble);
+    font-size: calc(15 * var(--ux));
+    line-height: calc(21 * var(--ux));
+    font-weight: 500;
+  }
+  .sel img {
+    width: calc(18 * var(--ux));
+    height: calc(18 * var(--ux));
+    transition: transform 0.25s;
+  }
+  .sel[aria-expanded="false"] img {
+    transform: rotate(-90deg);
+  }
+  .menu {
+    z-index: 2;
+    left: calc(64 * var(--ux));
+    top: calc(330 * var(--ux));
+    width: calc(560 * var(--ux));
+    gap: calc(12 * var(--ux));
+    padding: calc(16 * var(--ux));
+    border-radius: calc(12 * var(--ux));
+  }
+  .menu[hidden] {
+    display: none;
+  }
+  .cap {
+    color: var(--muted);
+    font-size: calc(13 * var(--ux));
+    line-height: calc(18.2 * var(--ux));
+    font-weight: 500;
+  }
+  .opt {
+    display: flex;
+    align-items: center;
+    gap: calc(16 * var(--ux));
+    width: 100%;
+    padding: calc(16 * var(--ux));
+    border-radius: calc(8 * var(--ux));
+    transition: background-color 0.25s;
+  }
+  .opt.is-on {
+    background: var(--badge);
+  }
+  .opt:not(.is-on):hover {
+    background: #f6f7f4;
+  }
+  .opt b {
+    display: block;
+    margin-bottom: calc(5 * var(--ux));
+    font-size: calc(18 * var(--ux));
+    line-height: calc(25.2 * var(--ux));
+    font-weight: 500;
+  }
+  .opt .grow > span {
+    display: block;
+    color: var(--sage);
+    font-size: calc(13 * var(--ux));
+    line-height: calc(18.2 * var(--ux));
+  }
+  .opt:not(.is-on) b {
+    color: var(--muted);
+    font-size: calc(17 * var(--ux));
+    line-height: calc(23.8 * var(--ux));
+    font-weight: 400;
+  }
+  .opt:not(.is-on) .grow > span {
+    color: var(--faint);
+  }
+  .check {
+    width: calc(20 * var(--ux));
+    height: calc(20 * var(--ux));
+    visibility: hidden;
+  }
+  .opt.is-on .check {
+    visibility: visible;
+  }
+  .api {
+    position: absolute;
+    left: calc(666 * var(--ux));
+    top: calc(460 * var(--ux));
+    display: flex;
+    flex-direction: column;
+    gap: calc(9 * var(--ux));
+    width: calc(334 * var(--ux));
+    color: var(--muted);
+  }
+  .api b {
+    display: flex;
+    align-items: center;
+    gap: calc(9 * var(--ux));
+    font-size: calc(13 * var(--ux));
+    line-height: calc(18.2 * var(--ux));
+    font-weight: 500;
+  }
+  .api > span {
+    font-size: calc(13 * var(--ux));
+    line-height: calc(18.2 * var(--ux));
+  }
+  .api small {
+    font-size: calc(12 * var(--ux));
+    line-height: calc(16.8 * var(--ux));
+  }
+
+  /* 05 Router (task at 1010,202; node at 1150,350; option cards 456×340 at 800/1304,510) */
+  .s-route .atm {
+    left: calc(112 * var(--ux));
+    top: calc(245 * var(--ux));
+    width: calc(800 * var(--ux));
+    height: calc(430 * var(--ux));
+    opacity: 0.42;
+  }
+  .stem {
+    position: absolute;
+    left: calc(511.25 * var(--ux));
+    top: calc(140 * var(--ux));
+    width: max(1px, calc(1.5 * var(--ux)));
+    height: calc(40 * var(--ux));
+    background: var(--line);
+  }
+  .fork {
+    position: absolute;
+    left: calc(260 * var(--ux));
+    top: calc(252 * var(--ux));
+    width: calc(504 * var(--ux));
+    max-width: none;
+    height: calc(98 * var(--ux));
+  }
+  .task {
+    left: calc(242 * var(--ux));
+    top: calc(32 * var(--ux));
+    width: calc(540 * var(--ux));
+    height: calc(108 * var(--ux));
+    gap: calc(10 * var(--ux));
+    padding: calc(24 * var(--ux));
+    border-radius: calc(16 * var(--ux));
+  }
+  .task small {
+    color: var(--muted);
+    font-size: calc(11 * var(--ux));
+    line-height: calc(16 * var(--ux));
+    font-weight: 500;
+  }
+  .task p {
+    font-size: calc(21 * var(--ux));
+    line-height: calc(30 * var(--ux));
+  }
+  .node {
+    left: calc(382 * var(--ux));
+    top: calc(180 * var(--ux));
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: calc(12 * var(--ux));
+    width: calc(260 * var(--ux));
+    height: calc(72 * var(--ux));
+    padding: calc(14 * var(--ux));
+    border-radius: calc(18 * var(--ux));
+    box-shadow: none;
+  }
+  .node img {
+    flex: none;
+    width: calc(24 * var(--ux));
+    height: calc(24 * var(--ux));
+  }
+  .node div {
+    width: calc(180 * var(--ux));
+  }
+  .node b {
+    display: block;
+    margin-bottom: calc(2 * var(--ux));
+    font-size: calc(18 * var(--ux));
+    line-height: calc(25 * var(--ux));
+    font-weight: 500;
+  }
+  .node span {
+    display: block;
+    color: var(--muted);
+    font-size: calc(12 * var(--ux));
+    line-height: calc(17 * var(--ux));
+  }
+  .opt-card {
+    top: calc(340 * var(--ux));
+    gap: calc(18 * var(--ux));
+    width: calc(456 * var(--ux));
+    height: calc(340 * var(--ux));
+    padding: calc(28 * var(--ux));
+    border-radius: calc(20 * var(--ux));
+  }
+  .opt-card.is-local {
+    left: calc(32 * var(--ux));
+  }
+  .opt-card.is-cloud {
+    left: calc(536 * var(--ux));
+  }
+  .who {
+    display: flex;
+    align-items: center;
+    gap: calc(12 * var(--ux));
+    height: calc(34 * var(--ux));
+    font-size: calc(25 * var(--ux));
+    line-height: calc(34 * var(--ux));
+    font-weight: 500;
+  }
+  .who img {
+    width: calc(20 * var(--ux));
+    height: calc(20 * var(--ux));
+  }
+  .for {
+    color: var(--muted);
+    font-size: calc(18 * var(--ux));
+    line-height: calc(26 * var(--ux));
+  }
+  .box {
+    height: calc(76 * var(--ux));
+    padding: calc(16 * var(--ux));
+    border-radius: calc(10 * var(--ux));
+    background: var(--bubble);
+  }
+  .is-local .box {
+    background: var(--badge);
+  }
+  .box small {
+    display: block;
+    margin-bottom: calc(4 * var(--ux));
+    color: var(--muted);
+    font-size: calc(11 * var(--ux));
+    line-height: calc(14 * var(--ux));
+    font-weight: 500;
+  }
+  .box b {
+    display: block;
+    font-size: calc(20 * var(--ux));
+    line-height: calc(28 * var(--ux));
+    font-weight: 500;
+  }
+  .nt {
+    color: var(--muted);
+    font-size: calc(14 * var(--ux));
+    line-height: calc(20 * var(--ux));
+  }
+  .do {
+    display: grid;
+    place-items: center;
+    height: calc(44 * var(--ux));
+    border-radius: calc(9 * var(--ux));
+    font-size: calc(15 * var(--ux));
+    line-height: 1;
+  }
+  .is-local .do {
+    background: var(--badge);
+    color: var(--sage);
+  }
+  .is-cloud .do {
+    border: 1px solid var(--line);
+    background: #fff;
+  }
+
+  /* ───── Chapter bar (from 1200px): 80 tall, fades in while the story covers the viewport ───── */
+  @media (width >= 1200px) {
+    .bar {
+      position: sticky;
+      bottom: 0;
+      z-index: 5;
+      display: flex;
+      align-items: center;
+      gap: 28px;
+      height: 80px;
+      margin-top: -80px;
+      padding-inline: calc(128 * var(--fx));
+      background: linear-gradient(rgb(250 250 247 / 0%), var(--paper) 60%);
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 16px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.35s;
+    }
+    .bar.is-shown {
+      opacity: 1;
+      pointer-events: auto;
+    }
+  }
+  .count {
+    display: flex;
+    gap: 10px;
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+  }
+  .count b {
+    color: var(--ink);
+    font-weight: 500;
+  }
+  .count i {
+    color: #c9cec5;
+    font-style: normal;
+  }
+  .links {
+    display: flex;
+    gap: 24px;
+  }
+  .links a {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-width: 88px;
+    transition: color 0.3s;
+  }
+  .links a.is-on {
+    color: var(--ink);
+  }
+  /* Grey track with the sage active line growing from the left */
+  .line {
+    position: relative;
+    height: 1px;
+    background: #d9ded6;
+  }
+  .line::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: var(--sage);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.5s var(--ease);
+  }
+  .links a.is-on .line::after {
+    transform: scaleX(1);
+  }
+  .cue {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-left: auto;
+    transition: opacity 0.3s;
+  }
+  .cue i {
+    font-size: 16px;
+    font-style: normal;
+  }
+  .bar.is-end .cue {
+    opacity: 0;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .line::after {
+      transition: none;
+    }
+  }
+</style>

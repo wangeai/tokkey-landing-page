@@ -27,6 +27,7 @@ const links = [
   </ul>
   <!-- Figma: 192×52.8 white pill, 16 semibold -->
   <a
+    data-ref="cta"
     class="ml-auto inline-flex h-[52px] items-center rounded-full bg-white px-5 text-[16px]/6 font-semibold text-[#111] min-[901px]:ml-0"
     href="/software#early">Reserve your spot</a
   >
@@ -44,11 +45,26 @@ const links = [
   /* No background over the hero; .is-solid brings the black bar back once the hero is past */
   nav[data-over-hero] {
     transition:
+      color 0.3s,
       background-color 0.3s,
       border-color 0.3s;
   }
   nav[data-over-hero]:not(.is-solid) {
     border-color: transparent;
     background-color: transparent;
+  }
+  /* Over [data-nav-light] sections (Figma: Software · D · 03 header): frosted paper bar, ink text, ink CTA */
+  nav.is-light {
+    border-color: rgb(17 17 16 / 8%);
+    background-color: rgb(250 250 247 / 82%);
+    backdrop-filter: blur(20px);
+    color: var(--color-ink);
+  }
+  nav.is-light :global(.brand) {
+    color: var(--color-ink);
+  }
+  nav.is-light [data-ref="cta"] {
+    background: var(--color-ink);
+    color: #fff;
   }
 </style>
