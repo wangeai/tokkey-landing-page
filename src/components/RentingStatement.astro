@@ -1,0 +1,101 @@
+---
+// "You've been renting intelligence. What if you could own it?" (Figma 900:1933): a one-screen statement. Words fade up
+// out of a blur one after another each time the section comes into view, then "own it?" pulses with a soft glow
+// (prototype #s12; src/scripts/scenes/StatementScene.ts). Desktop sizes are Figma px via --fx.
+import { STATEMENT_LINE_1, STATEMENT_LINE_2 } from "../config/statement";
+---
+
+<section data-statement class="statement relative flex items-center justify-center overflow-hidden bg-black text-center text-white">
+  <h2 class="text">
+    <span class="line-1">
+      {STATEMENT_LINE_1.map((word, i) => <>{i > 0 && " "}<span data-ref="word" class="word">{word}</span></>)}<span
+        data-ref="word"
+        class="word"><span class="dot" aria-hidden="true"></span></span
+      >
+    </span>
+    <span class="line-2">
+      {
+        STATEMENT_LINE_2.map(({ word, from, to, glow }) => (
+          <>
+            <span data-ref="word" class:list={["word", "chrome", { glow }]} style={`--from:${from};--to:${to}`}>
+              {word}
+            </span>{" "}
+          </>
+        ))
+      }
+    </span>
+  </h2>
+</section>
+
+<script>
+  import { StatementScene } from "../scripts/scenes/StatementScene";
+  const section = document.querySelector<HTMLElement>("[data-statement]");
+  if (section) new StatementScene(section);
+</script>
+
+<style>
+  .statement {
+    padding: 96px var(--spacing-gutter-sm);
+  }
+  .text {
+    font-size: var(--text-h2-sm);
+    line-height: 1.1;
+    letter-spacing: -0.04em;
+  }
+  .line-1,
+  .line-2 {
+    display: block;
+  }
+  .line-1 {
+    font-weight: 300;
+    color: #d9d9d9;
+  }
+  .line-2 {
+    font-weight: 700;
+  }
+  .word {
+    display: inline-block;
+  }
+  /* This word's slice of Figma's chrome gradient (padding keeps descenders inside the clipped box) */
+  .chrome {
+    padding-block: 0.1em 0.2em;
+    margin-block: -0.1em -0.2em;
+    background: linear-gradient(90deg, var(--from), var(--to));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  /* "own it?" breathes a soft blue glow while the statement is on screen */
+  .statement[data-active] .glow {
+    animation: own-glow 3.2s ease-in-out 1.6s infinite;
+  }
+  @keyframes own-glow {
+    0%,
+    100% {
+      filter: drop-shadow(0 0 0 rgb(143 184 255 / 0));
+    }
+    50% {
+      filter: drop-shadow(0 0 18px rgb(143 184 255 / 0.75));
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .statement[data-active] .glow {
+      animation: none;
+    }
+  }
+
+  @media (width >= 768px) {
+    .statement {
+      min-height: calc(1080 * var(--fx));
+      padding: 0;
+    }
+    .text {
+      font-size: calc(80 * var(--fx));
+      line-height: calc(96 * var(--fx));
+    }
+    .line-1,
+    .line-2 {
+      white-space: nowrap;
+    }
+  }
+</style>

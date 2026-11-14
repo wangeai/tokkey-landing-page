@@ -1,0 +1,422 @@
+---
+// "Personal intelligence. Personal privacy." scene (Figma 900:2932, a 1920 × 4094 frame; prototype #s9). From 1200px
+// every block sits at its Figma position (`--x` / `--y`, in Figma px via --fx) along a vertical spine; below that the
+// blocks stack in reading order. Blocks fade up as they enter, the spine draws with the scroll and the diagram's
+// connectors draw in (src/scripts/scenes/PersonalScene.ts).
+
+/** Context rows in the "On your Mac" memory panel */
+const MEMORY_ROWS = ["Project notes", "Your preferences", "Working draft"];
+/** Spine segments: top and length in Figma px; each ends in a green dot */
+const SPINES = [
+  { y: 222, h: 652 },
+  { y: 944, h: 652 },
+  { y: 1716, h: 1242 },
+];
+---
+
+<section data-personal class="personal relative overflow-hidden bg-black text-white">
+  {SPINES.map(({ y, h }) => <i data-ref="spine" class="spine" style={`--y:${y};--h:${h}`} aria-hidden="true"><u /><b /></i>)}
+
+  <h2 data-reveal class="heading at" style="--x:146;--y:128">
+    <span class="font-light text-white/55">Personal intelligence.</span><br />
+    <span class="font-medium">Personal privacy</span><span class="dot" aria-hidden="true"></span>
+  </h2>
+
+  <!-- Hardware -->
+  <h3 data-reveal class="title at" style="--x:1089;--y:258">Tokkey — The World’s Smallest AI Hardware.</h3>
+  <img data-reveal class="photo at" style="--x:1091;--y:330" src="/assets/images/personal/hardware.webp" width="1400" height="1056" loading="lazy" alt="Tokkey held between two fingers" />
+
+  <!-- Keep control -->
+  <div data-reveal class="block at" style="--x:109;--y:920">
+    <h3 class="title">Keep Your Data Close. Keep Control.</h3>
+    <p class="body mt-[calc(16*var(--fx))]">Work with sensitive files and code locally. Nothing goes to a cloud AI service without your approval.</p>
+  </div>
+  <img data-reveal class="photo at" style="--x:109;--y:1072" src="/assets/images/personal/workspace.webp" width="1400" height="1056" loading="lazy" alt="A MacBook lid lifting with Tokkey plugged into the side port" />
+
+  <!-- Memory -->
+  <div data-reveal class="block at" style="--x:1076;--y:1716">
+    <h3 class="title">AI That Remembers You. Memory That Belongs to You.</h3>
+    <p class="body mt-[calc(8*var(--fx))]">
+      Build personal AI memory around your work, preferences, and context—so your AI can pick up where you left off, with
+      that memory under your control.
+    </p>
+  </div>
+  <div data-reveal class="memory at" style="--x:1078;--y:1900">
+    <p class="memory-label">On your Mac</p>
+    <div class="model">
+      <p class="model-name">Local model</p>
+      <p class="model-note">Processes on your Mac</p>
+    </div>
+    <i class="link" aria-hidden="true"></i>
+    <ul class="rows" role="list">
+      {
+        MEMORY_ROWS.map((row) => (
+          <li class="row">
+            <img src="/assets/images/personal/file.svg" width="31" height="31" alt="" aria-hidden="true" />
+            {row}
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+
+  <!-- Local power -->
+  <h2 data-reveal class="heading at" style="--x:155;--y:2520">
+    <span class="font-light text-white/55">Local power.</span><br />
+    <span class="font-medium">Cloud by choice</span><span class="dot" aria-hidden="true"></span>
+  </h2>
+  <p data-reveal class="lead-text at" style="--x:155;--y:2760">
+    Tokkey brings larger local models to your Mac.<br class="max-lg:hidden" /> When a task needs more, bring in the cloud—<br
+      class="max-lg:hidden"
+    /> with the context you choose to share.
+  </p>
+
+  <div data-reveal data-ref="diagram" class="diagram at" style="--x:152;--y:2957">
+    <!-- Connectors from the device to cloud and local models (Figma Vector 1 / Vector 2) -->
+    <svg class="links" viewBox="0 0 1618 1044" fill="none" aria-hidden="true">
+      <path data-ref="link" pathLength="1" d="M566 509H716Q760 509 760 465V279Q760 235 804 235H900"></path>
+      <path data-ref="link" pathLength="1" d="M566 509H716Q760 509 760 553V742Q760 786 804 786H900"></path>
+      <circle cx="566" cy="509" r="5"></circle><circle cx="905" cy="235" r="5"></circle><circle cx="905" cy="786" r="5"></circle>
+    </svg>
+
+    <h3 class="diagram-title at" style="--x:135;--y:222;--w:427">
+      <span class="text-chrome">Your device you decide</span>
+    </h3>
+    <img class="device at" style="--x:135;--y:351" src="/assets/images/personal/device.webp" width="431" height="291" loading="lazy" alt="Tokkey plugged into a Mac" />
+    <div class="chips at" style="--x:135;--y:682">
+      <p class="chip"><b>Project notes</b><span>Available locally</span></p>
+      <p class="chip"><b>Selected summary</b><span>Shared with permission</span></p>
+    </div>
+
+    <h3 class="diagram-title at" style="--x:884;--y:33;--w:576"><span class="text-chrome">Cloud capability</span></h3>
+    <img class="sphere at" style="--x:975;--y:113" src="/assets/images/personal/sphere.webp" width="394" height="396" loading="lazy" alt="" aria-hidden="true" />
+
+    <h3 class="diagram-title at" style="--x:964;--y:581;--w:400"><span class="text-chrome">Local models</span></h3>
+    <img class="stack at" style="--x:968;--y:669" src="/assets/images/personal/local-models.webp" width="408" height="305" loading="lazy" alt="Layered local compute" />
+  </div>
+</section>
+
+<script>
+  import { PersonalScene } from "../scripts/scenes/PersonalScene";
+  const section = document.querySelector<HTMLElement>("[data-personal]");
+  if (section) new PersonalScene(section);
+</script>
+
+<style>
+  /* Mobile / tablet first: one column in reading order. Sizes in --fx scale from 768px (1px below) */
+  .personal {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    padding: 96px var(--spacing-gutter-sm);
+  }
+  @media (width >= 768px) {
+    .personal {
+      padding: 120px var(--spacing-gutter);
+    }
+  }
+  .spine {
+    display: none;
+  }
+  .heading {
+    font-size: var(--text-h2-sm);
+    line-height: var(--text-h2-sm--line-height);
+    letter-spacing: -0.03em;
+  }
+  .title {
+    font-size: 24px;
+    line-height: 32px;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+  }
+  .body {
+    margin-top: 8px;
+    font-size: 18px;
+    line-height: 28px;
+    letter-spacing: -0.01em;
+    color: rgb(255 255 255 / 0.55);
+  }
+  .lead-text {
+    font-size: 20px;
+    line-height: 30px;
+    letter-spacing: -0.01em;
+    color: var(--color-ash);
+  }
+  .photo {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 700 / 528;
+    border-radius: 16px;
+    object-fit: cover;
+  }
+
+  /* "On your Mac" memory panel: label, local model card, a link down to the selected context rows */
+  .memory {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 31px 16px 51px;
+    border: 1.3px solid rgb(255 255 255 / 0.2);
+    border-radius: 31px;
+    background: linear-gradient(144deg, rgb(255 255 255 / 0.13), rgb(255 255 255 / 0.04) 71%);
+  }
+  .memory-label {
+    font-family: var(--font-mono);
+    font-size: calc(20.8 * var(--fx));
+    line-height: calc(24 * var(--fx));
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    color: #a1a1a6;
+  }
+  .model,
+  .rows {
+    width: calc(458 * var(--fx));
+    max-width: 100%;
+  }
+  .model {
+    margin-top: calc(30 * var(--fx));
+    padding: calc(30 * var(--fx)) calc(30 * var(--fx)) calc(52 * var(--fx));
+    border: 1.3px solid rgb(255 255 255 / 0.2);
+    border-radius: calc(31.2 * var(--fx));
+    background: linear-gradient(165deg, rgb(70 70 82 / 0.92), rgb(24 24 30 / 0.94) 71%);
+  }
+  .model-name {
+    font-size: calc(31.2 * var(--fx));
+    line-height: calc(41.6 * var(--fx));
+    font-weight: 600;
+    color: var(--color-fog);
+  }
+  .model-note {
+    margin-top: calc(10.4 * var(--fx));
+    font-size: calc(20.8 * var(--fx));
+    line-height: calc(31.2 * var(--fx));
+    color: var(--color-ash);
+  }
+  /* Vertical link with a green dot where it meets the context rows */
+  .link {
+    position: relative;
+    width: 1px;
+    height: calc(91 * var(--fx));
+    background: rgb(255 255 255 / 0.3);
+  }
+  .link::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: calc(-4.5 * var(--fx));
+    width: calc(9 * var(--fx));
+    height: calc(9 * var(--fx));
+    border-radius: 50%;
+    background: var(--color-accent);
+    transform: translateX(-50%);
+  }
+  .rows {
+    display: flex;
+    flex-direction: column;
+    gap: calc(14 * var(--fx));
+    margin-top: calc(27 * var(--fx));
+  }
+  .row {
+    display: flex;
+    align-items: center;
+    gap: calc(20.8 * var(--fx));
+    height: calc(62 * var(--fx));
+    padding: 0 calc(20.8 * var(--fx));
+    border-radius: calc(20.8 * var(--fx));
+    background: rgb(255 255 255 / 0.05);
+    font-size: calc(20.8 * var(--fx));
+    line-height: calc(31.2 * var(--fx));
+    color: var(--color-fog);
+  }
+  .row img {
+    width: calc(31.2 * var(--fx));
+    height: calc(31.2 * var(--fx));
+  }
+
+  /* Device → cloud / local models diagram */
+  .diagram {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+    padding: 40px 16px;
+    border: 1px solid rgb(255 255 255 / 0.14);
+    border-radius: 32px;
+    background: linear-gradient(135deg, #212121, #0b0b0b 80%);
+  }
+  .links {
+    display: none;
+  }
+  .diagram-title {
+    font-size: 24px;
+    line-height: 32px;
+    font-weight: 600;
+    letter-spacing: -0.04em;
+    text-align: center;
+  }
+  .diagram-title:not(:first-of-type) {
+    margin-top: 24px;
+  }
+  .device,
+  .stack {
+    width: 100%;
+    max-width: 431px;
+    height: auto;
+    border-radius: 32px;
+  }
+  .sphere {
+    width: 100%;
+    max-width: 320px;
+    height: auto;
+    mix-blend-mode: screen;
+  }
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 14px;
+  }
+  .chip {
+    display: flex;
+    flex-direction: column;
+    width: 211px;
+    padding: 12px 16px;
+    border: 1px solid rgb(255 255 255 / 0.2);
+    border-radius: 16px;
+    background: linear-gradient(166deg, rgb(255 255 255 / 0.13), rgb(255 255 255 / 0.04) 71%);
+    font-size: 16px;
+    line-height: 24px;
+    color: var(--color-ash);
+    white-space: nowrap;
+  }
+  .chip b {
+    font-weight: 500;
+    color: var(--color-fog);
+  }
+
+  /* From 1200px: the Figma layout. `.at` blocks sit at (--x, --y) Figma px inside the 1920 × 4094 frame */
+  @media (width >= 1200px) {
+    .personal {
+      display: block;
+      height: calc(4094 * var(--fx));
+      padding: 0;
+    }
+    .at {
+      position: absolute;
+      left: calc(var(--x) * var(--fx));
+      top: calc(var(--y) * var(--fx));
+      margin: 0;
+    }
+    .spine {
+      display: block;
+      position: absolute;
+      left: calc(973 * var(--fx));
+      top: calc(var(--y) * var(--fx));
+      width: 1px;
+      height: calc(var(--h) * var(--fx));
+    }
+    .spine u {
+      position: absolute;
+      inset: 0;
+      background: rgb(255 255 255 / 0.28);
+      transform-origin: 50% 0;
+    }
+    .spine b {
+      position: absolute;
+      left: calc(-4.7 * var(--fx));
+      bottom: calc(-5.2 * var(--fx));
+      width: calc(10.4 * var(--fx));
+      height: calc(10.4 * var(--fx));
+      border-radius: 50%;
+      background: var(--color-accent);
+    }
+    .heading {
+      font-size: calc(80 * var(--fx));
+      line-height: calc(88 * var(--fx));
+      white-space: nowrap;
+    }
+    .title {
+      width: calc(704 * var(--fx));
+      font-size: calc(32 * var(--fx));
+      line-height: calc(40 * var(--fx));
+    }
+    .block {
+      width: calc(704 * var(--fx));
+    }
+    .body {
+      font-size: calc(20 * var(--fx));
+      line-height: calc(32 * var(--fx));
+    }
+    .lead-text {
+      width: calc(654 * var(--fx));
+      font-size: calc(24 * var(--fx));
+      line-height: calc(32 * var(--fx));
+    }
+    .photo {
+      width: calc(700 * var(--fx));
+      border-radius: calc(24 * var(--fx));
+    }
+    .memory {
+      width: calc(657 * var(--fx));
+      height: calc(636 * var(--fx));
+      padding: calc(31 * var(--fx)) 0 0;
+      border-radius: calc(31.2 * var(--fx));
+    }
+    .diagram {
+      display: block;
+      width: calc(1618 * var(--fx));
+      height: calc(1044 * var(--fx));
+      padding: 0;
+      border-radius: calc(32 * var(--fx));
+    }
+    .links {
+      display: block;
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+    .links path {
+      stroke: rgb(255 255 255 / 0.3);
+      stroke-width: 1.5;
+      stroke-dasharray: 1;
+    }
+    .links circle {
+      fill: var(--color-accent);
+    }
+    .diagram-title {
+      width: calc(var(--w) * var(--fx));
+      font-size: calc(32 * var(--fx));
+      line-height: calc(39 * var(--fx));
+    }
+    .diagram-title:not(:first-of-type) {
+      margin-top: 0;
+    }
+    .device {
+      width: calc(431 * var(--fx));
+      max-width: none;
+      border-radius: calc(37.5 * var(--fx));
+    }
+    .stack {
+      width: calc(408 * var(--fx));
+      max-width: none;
+      border-radius: calc(44 * var(--fx));
+    }
+    .sphere {
+      width: calc(394 * var(--fx));
+      max-width: none;
+    }
+    .chips {
+      flex-wrap: nowrap;
+      gap: calc(14 * var(--fx));
+    }
+    .chip {
+      width: calc(211 * var(--fx));
+      height: calc(72 * var(--fx));
+      padding: calc(12 * var(--fx)) calc(16 * var(--fx));
+      border-radius: calc(16 * var(--fx));
+      font-size: calc(16 * var(--fx));
+      line-height: calc(24 * var(--fx));
+    }
+  }
+</style>
