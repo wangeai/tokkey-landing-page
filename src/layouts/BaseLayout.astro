@@ -3,6 +3,7 @@
 import "../styles/global.css";
 import Nav from "../components/Nav.astro";
 import Footer from "../components/Footer.astro";
+import KickstarterWidget from "../components/KickstarterWidget.astro";
 
 interface Props {
   title?: string;
@@ -42,6 +43,7 @@ const {
       <slot />
     </main>
     <Footer aurora={footerAurora} />
+    <KickstarterWidget />
     <script>
       // Start Lenis + GSAP ScrollTrigger once for the whole page
       import { ScrollEngine } from "../scripts/ScrollEngine";
