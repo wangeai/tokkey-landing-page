@@ -1,11 +1,11 @@
 ---
-// Hero frame stage: every frame sequence in src/config/timeline.ts plays as one scroll-driven strip, scrubbing one video
-// per sequence inside [data-ref=frames] (src/scripts/scenes/FrameStageScene.ts); it pins while the page scrolls
-// through it. Overlays for effect segments go in the slot, above the videos.
+// Hero frame stage: every frame sequence in src/config/timeline.ts plays as one scroll-driven strip on the canvas
+// (src/scripts/scenes/FrameStageScene.ts); it pins while the page scrolls through it. Overlays for effect segments
+// go in the slot, above the canvas.
 ---
 
 <section class="relative h-svh overflow-hidden bg-black" data-frame-stage>
-  <div data-ref="frames" class="absolute inset-0"></div>
+  <canvas data-ref="frames" class="absolute inset-0 size-full"></canvas>
   <slot />
 </section>
 

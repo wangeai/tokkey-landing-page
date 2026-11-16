@@ -1,40 +1,43 @@
-// Plays the whole TIMELINE as one continuous strip of frames, scrubbing one all-intra video per sequence (FrameVideos).
-// ScrollScrubber maps page scroll to a target on the timeline; the playhead eases toward it each tick (Apple's
-// catch-up), so even a jump in scroll (a fast touch flick, a scrollbar drag) plays through the frames in between
-// instead of cutting to the end. Effect segments report their progress to handlers from onEffect().
+// Plays the whole TIMELINE as one continuous strip of frames on a canvas. ScrollScrubber maps page scroll to the
+// playhead, so frames follow the scroll exactly: a slow scroll plays slowly, a fast flick plays fast. Effect segments
+// report their progress to handlers from onEffect().
 import { gsap } from "./gsap";
+import { FrameCanvas } from "./FrameCanvas";
+import { FrameStore } from "./FrameStore";
 import { FrameTimeline } from "./FrameTimeline";
-import { FrameVideos } from "./FrameVideos";
 import { ScrollScrubber, type ScrubberOptions } from "./ScrollScrubber";
-import type { FrameSize } from "../config/frames";
+import { FRAME_SIZES, type FrameSize } from "../config/frames";
 import { TIMELINE } from "../config/timeline";
 
 export interface StageProfile extends ScrubberOptions {
   size: FrameSize;
+  /** Load every `step`-th frame */
+  step: number;
   mobile: boolean;
 }
 
 export type EffectHandler = (progress: number) => void;
 
 export class FrameStage {
-  /** Share of the gap to the scroll target the playhead covers per tick */
-  private static readonly CATCH_UP = 0.25;
+  /** Frames are 16:9 */
+  private static readonly ASPECT = 16 / 9;
 
   private readonly timeline: FrameTimeline;
-  private readonly videos: FrameVideos;
+  private readonly store: FrameStore;
+  private readonly painter: FrameCanvas;
   private readonly scrubber: ScrollScrubber;
   private readonly effectHandlers = new Map<string, EffectHandler>();
   private readonly effectProgress = new Map<string, number>();
   /** Where the playhead is (source frames) */
-  private position: number;
+  private position = 0;
+  private direction: 1 | -1 = 1;
   private readonly tick = () => this.update();
 
-  constructor(section: HTMLElement, host: HTMLElement, profile: StageProfile) {
-    this.timeline = new FrameTimeline(TIMELINE, profile.mobile);
-    this.videos = new FrameVideos(host, this.timeline.sequences, profile.size);
+  constructor(section: HTMLElement, canvas: HTMLCanvasElement, profile: StageProfile) {
+    this.timeline = new FrameTimeline(TIMELINE, profile.size, profile.step, profile.mobile);
+    this.store = new FrameStore(this.timeline.urls, FRAME_SIZES[profile.size].width);
+    this.painter = new FrameCanvas(canvas, FrameStage.ASPECT, (width) => this.store.setDecodeWidth(width));
     this.scrubber = new ScrollScrubber(section, this.timeline.end, profile);
-    // Start where the scroll already is (a refresh can restore the page mid-pin)
-    this.position = this.scrubber.target;
     gsap.ticker.add(this.tick);
   }
 
@@ -48,15 +51,19 @@ export class FrameStage {
   destroy(): void {
     gsap.ticker.remove(this.tick);
     this.scrubber.destroy();
-    this.videos.destroy();
+    this.painter.destroy();
+    this.store.destroy();
   }
 
-  /** Ease the playhead toward the scroll position, then show its frame and report effects */
+  /** Move the playhead to the scroll position, then draw and report effects */
   private update(): void {
     const gap = this.scrubber.target - this.position;
-    this.position = Math.abs(gap) < 0.05 ? this.scrubber.target : this.position + gap * FrameStage.CATCH_UP;
+    if (gap) this.direction = gap > 0 ? 1 : -1;
+    this.position = this.scrubber.target;
     const point = this.timeline.at(this.position);
-    this.videos.show(point.sequence, point.frame, point.fit, point.filter);
+    this.store.setFocus(point.frame, this.direction);
+    this.painter.setFilter(point.filter);
+    this.painter.draw(this.store.get(point.frame), point.fit);
     this.reportEffects();
   }
 
