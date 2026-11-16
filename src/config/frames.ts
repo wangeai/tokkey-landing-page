@@ -8,6 +8,7 @@ export const FRAME_SEQUENCES = {
   "004": { prefix: "004", count: 65 },
   "005": { prefix: "底板飘散", count: 149 },
   "006": { prefix: "006", count: 199 },
+  "007": { prefix: "007", count: 172 },
 } as const;
 
 export type SequenceName = keyof typeof FRAME_SEQUENCES;

@@ -5,7 +5,8 @@
 ---
 
 <section class="relative h-svh overflow-hidden bg-black" data-frame-stage>
-  <canvas data-ref="frames" class="absolute inset-0 size-full"></canvas>
+  <!-- Starts below the fixed nav so frames aren't hidden behind it -->
+  <canvas data-ref="frames" class="absolute inset-x-0 top-header h-[calc(100%-var(--spacing-header))] w-full"></canvas>
   <slot />
 </section>
 

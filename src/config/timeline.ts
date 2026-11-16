@@ -31,4 +31,5 @@ export const TIMELINE: TimelineSegment[] = [
   { kind: "frames", sequence: "004", mobileFit: "contain" }, // laptop rotates to show its underside
   { kind: "frames", sequence: "005", mobileFit: "contain" }, // lightning reveals the internals
   { kind: "frames", sequence: "006", mobileFit: "contain" }, // energy flows through the internals
+  { kind: "frames", sequence: "007", mobileFit: "contain" }, // follows on from 006
 ];
