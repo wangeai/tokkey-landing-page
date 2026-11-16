@@ -1,0 +1,552 @@
+---
+// "A private agent on your Mac." over the end of scene 003 (effect "privateAgent", prototype `#s3` / `#p0`): the
+// heading appears above the laptop and the agent UI lights up on its screen, looping ask → think → answer while a
+// gradient ring turns around the screen. Desktop draws the UI onto the screen in the frame; phones show it as a card
+// under the heading. Goes in FrameStage's slot. Behavior: src/scripts/scenes/PrivateAgentScene.ts + AgentDialog.ts.
+const QUESTION = "“Summarize this week’s meeting notes and list the open actions.”";
+const ACTIONS = ["Finalize the launch page copy", "Review the shipping timeline", "Send the revised product brief"];
+/** Slogans that take turns under the dialog; each word animates on its own (`--i` staggers them) */
+const SLOGANS = [
+  { lead: ["Own ", "Your "], em: "Intelligence" },
+  { lead: ["Turn ", "your ", "Mac ", "into ", "an "], em: "AI Mac" },
+];
+---
+
+<div
+  data-private-agent
+  class="pointer-events-none absolute inset-0 flex flex-col gap-6 px-gutter-sm pt-[calc(var(--spacing-header)+24px)] md:block md:p-0"
+>
+  <h2
+    data-ref="title"
+    class="title text-h2-sm font-medium text-white/55 md:absolute md:inset-x-0 md:top-0 md:text-center md:text-[min(64px,8vh)] md:leading-[1.1] md:tracking-[-0.03em]"
+  >
+    A private agent <span class="text-white">on your Mac</span><span class="dot" aria-hidden="true"></span>
+  </h2>
+
+  <!-- Desktop: 1000px-wide design box, placed and scaled onto the laptop screen by JS -->
+  <div data-ref="screen" class="screen" role="img" aria-label="An on-device agent answering on the Mac, run locally via Tokkey">
+    <div data-ref="stage" class="stage ag-idle" aria-hidden="true">
+      <!-- Phones have no laptop screen behind the card, so the card brings the frame's wallpaper -->
+      <img class="wall md:hidden" src="/assets/images/private-agent/wallpaper.webp" alt="" loading="lazy" decoding="async" />
+      <div class="glow"><i></i></div>
+
+      <div class="dialog">
+        <i class="orb"></i>
+        <b class="name">Siri</b>
+        <small class="via">Apple Intelligence · on-device via Tokkey</small>
+        <p class="ask" data-ref="question" data-text={QUESTION}><span data-ref="typed"></span><span class="caret"></span></p>
+        <div class="answer">
+          <h4 data-ref="line">Three actions are still open:</h4>
+          {
+            ACTIONS.map((action, i) => (
+              <div data-ref="line">
+                <span class="font-mono">{String(i + 1).padStart(2, "0")}</span>
+                {action}
+              </div>
+            ))
+          }
+        </div>
+        <span class="local"><i></i>Ran locally · 0 B sent</span>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head">
+          <img src="/assets/icons/tokkey_logo.svg" alt="" width="10" height="10" />Tokkey
+        </div>
+        <div class="segment"><b>Status</b><span></span><span></span></div>
+        <dl>
+          <div><dt>Tokkey</dt><dd>Connected ↗</dd></div>
+          <div><dt>Local Model</dt><dd><i></i>Qwen 3.5 9B ↗</dd></div>
+          <div><dt>Router</dt><dd>On ↗</dd></div>
+        </dl>
+        <div class="bar"><i></i></div>
+      </div>
+
+      {
+        SLOGANS.map(({ lead, em }, s) => (
+          <h3 class:list={["slogan", s > 0 && "off"]} data-ref="slogan">
+            {lead.map((word, i) => (
+              <span class="word" style={`--i:${i}`}>{word}</span>
+            ))}
+            <span class="word em" style={`--i:${lead.length}`}>{em}</span>
+          </h3>
+        ))
+      }
+      <i class="ring"></i>
+    </div>
+  </div>
+</div>
+
+<script>
+  import { PrivateAgentScene } from "../scripts/scenes/PrivateAgentScene";
+  const root = document.querySelector<HTMLElement>("[data-private-agent]");
+  const section = root?.closest<HTMLElement>("[data-frame-stage]");
+  if (root && section) new PrivateAgentScene(root, section);
+</script>
+
+<style>
+  /* Hidden until the effect starts; JS drives opacity from the scroll */
+  .title,
+  .screen {
+    opacity: 0;
+  }
+
+  /* Agent UI, in the prototype's design px (1000 wide). Desktop: JS sets left/top/scale/height to cover the screen */
+  .screen {
+    position: relative;
+    height: 556px;
+  }
+  .stage {
+    --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+    /* Rotating ring colors; JS turns --angle and sets --glow (0..1) from the dialog state */
+    --ring: conic-gradient(
+      from var(--angle, 0deg),
+      #8cb8ff 0%,
+      #6b4df2 15%,
+      #9933ff 30%,
+      #fff 45%,
+      #e5c74d 56%,
+      #ffa61a 68%,
+      #b8e0ff 80%,
+      #8cb8ff 100%
+    );
+    position: absolute;
+    inset: 0;
+    border-radius: 18px;
+    overflow: hidden;
+    color: var(--color-white);
+  }
+  @media (min-width: 768px) {
+    .screen {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 1000px;
+      height: 645px;
+      transform-origin: 0 0;
+    }
+    .stage {
+      border-radius: 14px;
+    }
+  }
+  .wall {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* Gradient ring around the screen, with a blurred copy as its glow */
+  .ring,
+  .glow {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+  }
+  .ring {
+    padding: 2px;
+    background: var(--ring);
+    opacity: calc(0.7 + 0.3 * var(--glow, 0.5));
+    mask:
+      linear-gradient(#000 0 0) content-box exclude,
+      linear-gradient(#000 0 0);
+  }
+  .glow {
+    filter: blur(14px);
+    opacity: calc(0.55 + 0.3 * var(--glow, 0.5));
+  }
+  .glow i {
+    position: absolute;
+    inset: -6px;
+    border-radius: 18px;
+    padding: 20px;
+    background: var(--ring);
+    mask:
+      linear-gradient(#000 0 0) content-box exclude,
+      linear-gradient(#000 0 0);
+  }
+
+  /* Agent dialog: appears on summon, grows as the answer comes in */
+  .dialog {
+    position: absolute;
+    left: 39px;
+    top: 36px;
+    width: 297px;
+    height: 124px;
+    overflow: hidden;
+    border-radius: 22px;
+    background: rgb(62 62 66 / 0.72);
+    backdrop-filter: blur(30px);
+    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.08);
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+    transition:
+      opacity 500ms var(--ease),
+      transform 500ms var(--ease),
+      height 600ms var(--ease);
+  }
+  .stage:not(.ag-idle) .dialog {
+    opacity: 1;
+    transform: none;
+  }
+  .ag-answer .dialog {
+    height: 214px;
+  }
+  .ag-done .dialog {
+    height: 248px;
+  }
+  .orb {
+    position: absolute;
+    left: 17px;
+    top: 17px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: conic-gradient(from 20deg, #ff6a8d, #ffb05e, #7dffa0, #57d6ff, #8a6bff, #ff6ad5, #ff6a8d);
+    box-shadow: inset 0 0 0 5px rgb(255 255 255 / 0.35);
+    transition: filter 600ms var(--ease);
+  }
+  .ag-think .orb,
+  .ag-answer .orb {
+    animation: orb 1.6s ease-in-out infinite;
+  }
+  .name {
+    position: absolute;
+    left: 69px;
+    top: 21px;
+    font: 600 14px/20px var(--font-sans);
+  }
+  .via {
+    position: absolute;
+    left: 69px;
+    top: 39px;
+    font: 400 10px/15px var(--font-sans);
+    color: #a1a1a6;
+  }
+  .ask {
+    position: absolute;
+    left: 17px;
+    top: 77px;
+    width: 263px;
+    min-height: 34px;
+    margin: 0;
+    font: 400 13px/17px var(--font-sans);
+    color: #e8e8ea;
+  }
+  .caret {
+    display: inline-block;
+    width: 1.5px;
+    height: 13px;
+    margin-left: 2px;
+    background: var(--color-white);
+    vertical-align: -2px;
+    animation: blink 1s steps(1) infinite;
+  }
+  .stage:is(.ag-idle, .ag-think, .ag-answer, .ag-done) .caret {
+    display: none;
+  }
+  .answer {
+    position: absolute;
+    left: 17px;
+    top: 120px;
+    width: 263px;
+    padding-top: 10px;
+    border-top: 1px solid rgb(255 255 255 / 0.14);
+    opacity: 0;
+    transition: opacity 300ms var(--ease);
+  }
+  .stage:is(.ag-answer, .ag-done) .answer {
+    opacity: 1;
+  }
+  .answer h4 {
+    margin: 0 0 4px;
+    font: 600 13px/17px var(--font-sans);
+  }
+  .answer div {
+    display: flex;
+    gap: 8px;
+    font: 400 12px/17px var(--font-sans);
+    color: #e8e8ea;
+  }
+  .answer div span {
+    font-size: 9px;
+    color: #8e8e93;
+  }
+  .answer > * {
+    opacity: 0;
+    transform: translateY(5px);
+    transition:
+      opacity 400ms var(--ease),
+      transform 400ms var(--ease);
+  }
+  .answer > .in {
+    opacity: 1;
+    transform: none;
+  }
+  .local {
+    position: absolute;
+    left: 25px;
+    top: 208px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    height: 23px;
+    padding: 0 12px 0 9px;
+    border-radius: 12px;
+    background: rgb(40 40 44 / 0.9);
+    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.12);
+    font: 400 10px/12px var(--font-sans);
+    color: #d1d1d6;
+    opacity: 0;
+    transition: opacity 500ms var(--ease);
+  }
+  .ag-done .local {
+    opacity: 1;
+  }
+  .local i,
+  .panel dd i {
+    display: block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--color-accent);
+  }
+
+  /* Tokkey status panel: drops in just after the dialog, its bar tracks the answer */
+  .panel {
+    position: absolute;
+    left: 425px;
+    top: 36px;
+    width: 228px;
+    height: 127px;
+    overflow: hidden;
+    border-radius: 20px;
+    background: rgb(48 48 52 / 0.72);
+    backdrop-filter: blur(30px);
+    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.08);
+    opacity: 0;
+    transform: translateY(-6px);
+    transition:
+      opacity 500ms var(--ease) 150ms,
+      transform 500ms var(--ease) 150ms;
+  }
+  .stage:not(.ag-idle) .panel {
+    opacity: 1;
+    transform: none;
+  }
+  .panel-head {
+    position: absolute;
+    left: 11px;
+    top: 6px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    height: 20px;
+    font: 600 10px/12px var(--font-sans);
+  }
+  .segment {
+    position: absolute;
+    left: 11px;
+    top: 34px;
+    width: 206px;
+    height: 17px;
+    display: flex;
+    overflow: hidden;
+    border-radius: 5px;
+    background: rgb(255 255 255 / 0.1);
+  }
+  .segment b {
+    width: 86px;
+    display: flex;
+    align-items: center;
+    padding-left: 22px;
+    border-radius: 5px;
+    background: rgb(255 255 255 / 0.16);
+    font: 600 9px/10px var(--font-sans);
+  }
+  .segment span {
+    position: relative;
+    flex: 1;
+    border-left: 1px solid rgb(255 255 255 / 0.14);
+  }
+  /* Two tab glyphs: a screen and a circle */
+  .segment span::before {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 9px;
+    height: 6px;
+    margin: -3px 0 0 -4.5px;
+    border: 1px solid rgb(255 255 255 / 0.55);
+    border-radius: 1.5px;
+  }
+  .segment span + span::before {
+    width: 7px;
+    height: 7px;
+    margin: -3.5px 0 0 -3.5px;
+    border-radius: 50%;
+  }
+  .panel dl {
+    position: absolute;
+    left: 11px;
+    top: 60px;
+    width: 206px;
+    margin: 0;
+  }
+  .panel dl div {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 21.5px;
+    font: 400 9px/10px var(--font-sans);
+  }
+  .panel dt {
+    color: #8e8e93;
+  }
+  .panel dd {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin: 0;
+    font-weight: 600;
+  }
+  .ag-think .panel dd i,
+  .ag-answer .panel dd i {
+    animation: pulse 0.9s ease-in-out infinite;
+  }
+  .bar {
+    position: absolute;
+    inset: auto 0 0;
+    height: 2px;
+    background: rgb(255 255 255 / 0.12);
+  }
+  .bar i {
+    display: block;
+    width: 0;
+    height: 2px;
+    background: var(--color-white);
+    transition: width 300ms linear;
+  }
+  .ag-think .bar i {
+    width: 45%;
+    transition-duration: 1600ms;
+  }
+  .ag-answer .bar i {
+    width: 100%;
+    transition-duration: 2200ms;
+  }
+  .ag-done .bar i {
+    width: 100%;
+    opacity: 0;
+    transition: opacity 600ms;
+  }
+
+  /* Slogans: words blur up in one after another; the highlighted word turns bold while the agent works */
+  .slogan {
+    position: absolute;
+    left: 79px;
+    /* Prototype sits it 35px above the bottom of its 698px-tall screen; anchored to the bottom so any height fits */
+    bottom: 35px;
+    margin: 0;
+    font: 400 64px/75px var(--font-sans);
+    letter-spacing: -0.02em;
+    white-space: nowrap;
+    filter: drop-shadow(0 0 calc(22px * var(--glow, 0.5)) rgb(150 180 255 / 0.28));
+  }
+  .word {
+    display: inline-block;
+    white-space: pre;
+    transition:
+      opacity 600ms var(--ease),
+      transform 600ms var(--ease),
+      filter 600ms var(--ease);
+    transition-delay: calc(320ms + var(--i, 0) * 80ms);
+  }
+  .slogan.off .word {
+    opacity: 0;
+    transform: translateY(16px);
+    filter: blur(6px);
+    transition-duration: 240ms;
+    transition-delay: 0ms;
+  }
+  .em {
+    background: linear-gradient(100deg, #fff 0%, #fff 38%, #9cc4ff 46%, #fff 50%, #ffe2a3 54%, #fff 62%, #fff 100%);
+    background-size: 320% 100%;
+    background-position: 100% 0;
+    background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+    transition-property: opacity, transform, filter, font-weight;
+  }
+  .stage:is(.ag-think, .ag-answer, .ag-done) .em {
+    font-weight: 700;
+  }
+  .ag-done .slogan:not(.off) .em {
+    animation: sweep 1800ms ease-in-out 900ms both;
+  }
+
+  /* Phone card (prototype `.agm`): full width, the dialog stretches, the panel sits under it, the slogan wraps */
+  @media (max-width: 767px) {
+    .dialog {
+      left: 12px;
+      right: 12px;
+      top: 38px;
+      width: auto;
+    }
+    .ask,
+    .answer {
+      right: 17px;
+      width: auto;
+    }
+    .panel {
+      left: 12px;
+      top: 302px;
+    }
+    .slogan {
+      inset: auto 18px 22px;
+      font-size: 30px;
+      line-height: 36px;
+      white-space: normal;
+    }
+    .glow i {
+      padding: 14px;
+      border-radius: 22px;
+    }
+  }
+
+  @keyframes orb {
+    50% {
+      transform: scale(1.07);
+      filter: brightness(1.2);
+    }
+  }
+  @keyframes blink {
+    50% {
+      opacity: 0;
+    }
+  }
+  @keyframes pulse {
+    50% {
+      opacity: 0.25;
+    }
+  }
+  @keyframes sweep {
+    from {
+      background-position: 100% 0;
+    }
+    to {
+      background-position: 0% 0;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .orb,
+    .caret,
+    .panel dd i,
+    .em {
+      animation: none !important;
+    }
+  }
+</style>

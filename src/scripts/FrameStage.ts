@@ -63,6 +63,7 @@ export class FrameStage {
     const point = this.timeline.at(this.position);
     this.store.setFocus(point.frame, this.direction);
     this.painter.setFilter(point.filter);
+    this.painter.setLowered(point.lowered);
     this.painter.draw(this.store.get(point.frame), point.fit);
     this.reportEffects();
   }

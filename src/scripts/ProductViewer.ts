@@ -33,7 +33,7 @@ export class ProductViewer {
   /** Studio three-quarter view, slightly above and in front */
   private static readonly VIEW_DIR = new THREE.Vector3(0.82, 0.4, 0.41).normalize();
   /** Look-at height as a share of the model height */
-  private static readonly TARGET_Y = 0.43;
+  private static readonly TARGET_Y = 0.54;
 
   private readonly renderer: THREE.WebGLRenderer;
   private readonly scene = new THREE.Scene();

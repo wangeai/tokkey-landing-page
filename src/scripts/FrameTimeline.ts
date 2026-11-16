@@ -24,6 +24,8 @@ export interface TimelinePoint {
   frame: number;
   fit: FrameFit;
   filter: string;
+  /** How far the frames are lowered (0..1 of LOWER_VH): eases in over the `lower` segment, 0 on mobile */
+  lowered: number;
 }
 
 export class FrameTimeline {
@@ -32,6 +34,8 @@ export class FrameTimeline {
   /** Last valid position */
   readonly end: number;
   private readonly spans: Span[] = [];
+  /** The `lower` segment's span, if any */
+  private readonly lowerSpan: Span | undefined;
 
   constructor(
     segments: TimelineSegment[],
@@ -57,6 +61,7 @@ export class FrameTimeline {
       }
     }
     this.end = Math.max(0, start - 1);
+    this.lowerSpan = this.spans.find((s) => s.segment.kind === "frames" && s.segment.lower);
   }
 
   /** Frame, fit and filter to show at `position` */
@@ -70,6 +75,7 @@ export class FrameTimeline {
       frame,
       fit: this.mobile && span.look ? span.look.mobileFit : "cover",
       filter: span.look?.filter ?? "",
+      lowered: this.lowered(position),
     };
   }
 
@@ -80,6 +86,12 @@ export class FrameTimeline {
       if (segment.kind === "effect") progress.set(segment.id, Math.min(1, Math.max(0, (position - start) / length)));
     }
     return progress;
+  }
+
+  private lowered(position: number): number {
+    if (this.mobile || !this.lowerSpan) return 0;
+    const { start, length } = this.lowerSpan;
+    return Math.min(1, Math.max(0, (position - start) / length));
   }
 
   private spanAt(position: number): Span {

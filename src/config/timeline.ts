@@ -13,6 +13,9 @@ export type TimelineSegment =
       mobileFit: FrameFit;
       /** Optional CSS filter on the canvas while these frames show (color-matches older renders) */
       filter?: string;
+      /** Desktop: the frames slide down LOWER_VH while this segment plays and stay down after it, giving the overlay
+       *  headings room above the laptop. Set it on a segment whose frames have a black background, so no edge shows */
+      lower?: boolean;
     }
   | {
       kind: "effect";
@@ -22,12 +25,16 @@ export type TimelineSegment =
       length: number;
     };
 
+/** How far `lower` moves the frames down, in vh */
+export const LOWER_VH = 8;
+
 export const TIMELINE: TimelineSegment[] = [
   { kind: "effect", id: "heroTitle", length: 10 }, // "Own Your Intelligence." fades out on the first slight scroll (HeroTitleScene)
   { kind: "frames", sequence: "001", mobileFit: "contain" }, // lid lifts, logo glows
   { kind: "frames", sequence: "002", mobileFit: "cover" }, // laptop opens, camera moves in to the plugged-in key
   { kind: "effect", id: "aiMac", length: 120 }, // "Turn your Mac into an AI Mac.": agent chips fly into the key (AiMacScene)
-  { kind: "frames", sequence: "003", mobileFit: "contain" }, // camera pulls back to the laptop's front view
+  { kind: "frames", sequence: "003", mobileFit: "contain", lower: true }, // camera pulls back to the laptop's front view
+  { kind: "effect", id: "privateAgent", length: 200 }, // "A private agent on your Mac.": agent UI plays on the screen (PrivateAgentScene)
   { kind: "frames", sequence: "004", mobileFit: "contain" }, // laptop rotates to show its underside
   { kind: "frames", sequence: "005", mobileFit: "contain" }, // lightning reveals the internals
   { kind: "frames", sequence: "006", mobileFit: "contain" }, // energy flows through the internals

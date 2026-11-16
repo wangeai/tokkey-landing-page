@@ -1,10 +1,12 @@
 // Draws one decoded frame at a time onto a <canvas>, fitted like CSS object-fit, and repaints on resize.
-import type { FrameFit } from "../config/timeline";
+import { LOWER_VH, type FrameFit } from "../config/timeline";
 
 export class FrameCanvas {
   private readonly ctx: CanvasRenderingContext2D;
   private readonly resizeObserver: ResizeObserver;
   private drawn: { bitmap: ImageBitmap; fit: FrameFit } | null = null;
+  /** Last share passed to setLowered (the browser may rewrite the style string, so don't compare against it) */
+  private lowered = 0;
 
   constructor(
     readonly canvas: HTMLCanvasElement,
@@ -35,6 +37,13 @@ export class FrameCanvas {
   /** Set a CSS filter on the canvas (no-op when unchanged) */
   setFilter(filter: string): void {
     if (this.canvas.style.filter !== filter) this.canvas.style.filter = filter;
+  }
+
+  /** Move the canvas down by `share` of LOWER_VH (no-op when unchanged) */
+  setLowered(share: number): void {
+    if (share === this.lowered) return;
+    this.lowered = share;
+    this.canvas.style.translate = share ? `0 ${share * LOWER_VH}vh` : "";
   }
 
   destroy(): void {

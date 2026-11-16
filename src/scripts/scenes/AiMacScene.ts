@@ -3,6 +3,7 @@
 // the agent chips fade in under it in two columns, then each chip arcs into the key and shrinks away while the halo
 // around the key brightens with every chip absorbed. Everything fades out before scene 003 moves the camera.
 import { gsap } from "../gsap";
+import { StageOverlay } from "../StageOverlay";
 import { FrameStageScene, type StageEffect } from "./FrameStageScene";
 import { MOBILE_MAX_WIDTH } from "../../config/breakpoints";
 
@@ -22,7 +23,6 @@ export class AiMacScene {
   private static readonly EFFECT_ID = "aiMac";
   /** Key center in scene 002's last frame, as a share of the frame (frames are 16:9, drawn cover-fit) */
   private static readonly KEY = { x: 0.436, y: 0.549 };
-  private static readonly ASPECT = 16 / 9;
   /** Prototype spacing: chips start 6% in, columns up to 250px apart */
   private static readonly DESKTOP: ChipLayout = {
     left: (w) => w * 0.06,
@@ -61,11 +61,6 @@ export class AiMacScene {
       .add(`(max-width: ${MOBILE_MAX_WIDTH}px)`, () => this.useLayout(AiMacScene.MOBILE));
   }
 
-  /** Progress of `p` through [a, b], clamped to 0..1 */
-  private static seg(p: number, a: number, b: number): number {
-    return gsap.utils.clamp(0, 1, (p - a) / (b - a));
-  }
-
   private useLayout(layout: ChipLayout): void {
     this.layout = layout;
     this.render(this.progress);
@@ -73,19 +68,14 @@ export class AiMacScene {
 
   /** Key center relative to the root, from where the canvas draws the cover-fit frame */
   private keyPoint(): { x: number; y: number } {
-    const box = this.canvas.getBoundingClientRect();
-    const origin = this.root.getBoundingClientRect();
-    const fw = Math.max(box.width, box.height * AiMacScene.ASPECT);
-    const fh = fw / AiMacScene.ASPECT;
-    return {
-      x: box.left - origin.left + (box.width - fw) / 2 + AiMacScene.KEY.x * fw,
-      y: box.top - origin.top + (box.height - fh) / 2 + AiMacScene.KEY.y * fh,
-    };
+    const frame = StageOverlay.frameBox(this.canvas, this.root);
+    return { x: frame.left + AiMacScene.KEY.x * frame.width, y: frame.top + AiMacScene.KEY.y * frame.height };
   }
 
   private render(progress: number): void {
     this.progress = progress;
-    const { seg, ease } = AiMacScene;
+    const { seg } = StageOverlay;
+    const { ease } = AiMacScene;
     const { width, height } = this.root.getBoundingClientRect();
     const key = this.keyPoint();
 
