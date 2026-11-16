@@ -1,7 +1,7 @@
 // Hero frame stage (markup: src/components/FrameStage.astro). Builds a FrameStage per breakpoint: desktop loads the
 // full-size frames (half-size on small or 1x screens), mobile loads the half-size frames and moves more per px.
 // Effect segments' progress is re-dispatched on the section as EFFECT_EVENT, so overlays in the slot can follow it.
-import { gsap } from "../gsap";
+import { gsap, ScrollTrigger } from "../gsap";
 import { FrameStage, type StageProfile } from "../FrameStage";
 import { MOBILE_MAX_WIDTH } from "../../config/breakpoints";
 import { FRAME_SIZES } from "../../config/frames";
@@ -21,6 +21,7 @@ export class FrameStageScene {
   private static readonly EFFECT_IDS = TIMELINE.flatMap((s) => (s.kind === "effect" ? [s.id] : []));
 
   constructor(section: HTMLElement) {
+    FrameStageScene.startAtTop();
     const canvas = section.querySelector<HTMLCanvasElement>("[data-ref=frames]")!;
     gsap
       .matchMedia()
@@ -28,6 +29,12 @@ export class FrameStageScene {
       .add(`(max-width: ${MOBILE_MAX_WIDTH}px)`, () =>
         this.build(section, canvas, { size: "sm", step: 1, mobile: true, framesPerPx: 0.25 }),
       );
+  }
+
+  /** A reload always replays the story from the hero title: no browser / ScrollTrigger scroll restore (links to a #section still jump there) */
+  private static startAtTop(): void {
+    ScrollTrigger.clearScrollMemory("manual");
+    if (!location.hash) window.scrollTo(0, 0);
   }
 
   /** Full-size frames only when the screen would show more than the small set's pixels */

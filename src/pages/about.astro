@@ -1,0 +1,85 @@
+---
+// About page — Tokkey Editions, Winter '26 (ported from the tokkey-editions-v2 prototype): an intro, three chapters
+// (Prometheus, Archimedes, Arthur), a marquee and the closing CTA. Styles: src/styles/about.css. Behaviour: AboutPage
+// (src/scripts/about/). Linked from the nav and the footer's Company › About.
+import BaseLayout from "../layouts/BaseLayout.astro";
+import ChapterPrometheus from "../components/about/ChapterPrometheus.astro";
+import ChapterArchimedes from "../components/about/ChapterArchimedes.astro";
+import ChapterArthur from "../components/about/ChapterArthur.astro";
+import { ABOUT_INDEX } from "../config/about";
+import "../styles/about.css";
+
+// Marquee phrases, repeated twice so the -50% loop is seamless
+const marquee = ["Local first", "Private by default", "Plug in, light up", "No cloud required"];
+---
+
+<BaseLayout title="About — Tokkey Editions" description="Tokkey Editions, Winter '26: fire, a lever and a sword — why intelligence belongs on the device you own.">
+  <!-- Inter italic for the emphasised words (BaseLayout loads upright Inter only) -->
+  <link slot="head" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@1,400;1,600&display=swap" />
+
+  <div class="about" data-about>
+    <!-- Intro overlay: brackets and the edition title while the scene is dark -->
+    <div class="intro-ui" data-ref="intro" aria-hidden="true">
+      <i class="brk tl"></i><i class="brk tr"></i><i class="brk bl"></i><i class="brk br"></i>
+      <div class="title"><span>The</span><em>Prometheus</em><span>Edition</span></div>
+      <div class="skip">Click to skip</div>
+    </div>
+
+    <!-- Shared filters for the torn paper edges (src/components/about/Tear.astro) -->
+    <svg width="0" height="0" aria-hidden="true" style="position:absolute">
+      <defs>
+        <filter id="tfib" x="-5%" y="-80%" width="110%" height="260%"
+          ><feTurbulence type="fractalNoise" baseFrequency="0.32 0.025" numOctaves="3" seed="7" result="n"
+          ></feTurbulence><feDisplacementMap in="SourceGraphic" in2="n" scale="16" xChannelSelector="R" yChannelSelector="G"
+          ></feDisplacementMap><feGaussianBlur stdDeviation="0.7"></feGaussianBlur></filter
+        >
+        <filter id="trag" x="-5%" y="-80%" width="110%" height="260%"
+          ><feTurbulence type="fractalNoise" baseFrequency="0.9 0.35" numOctaves="2" seed="3" result="n"
+          ></feTurbulence><feDisplacementMap in="SourceGraphic" in2="n" scale="7" xChannelSelector="R" yChannelSelector="G"
+          ></feDisplacementMap></filter
+        >
+        <filter id="tsoft" x="-5%" y="-80%" width="110%" height="260%"><feGaussianBlur stdDeviation="9"></feGaussianBlur></filter>
+      </defs>
+    </svg>
+
+    <nav class="index" data-ref="index" aria-label="Chapters">
+      {
+        ABOUT_INDEX.map((c) => (
+          <a href={c.href}>
+            <span>{c.label}</span>
+            <i>{c.numeral}</i>
+          </a>
+        ))
+      }
+    </nav>
+
+    <ChapterPrometheus />
+    <ChapterArchimedes />
+    <ChapterArthur />
+
+    <div class="marquee" aria-hidden="true">
+      <div>
+        {
+          [...marquee, ...marquee].map((m) => (
+            <>
+              {m} <em>✦</em>{" "}
+            </>
+          ))
+        }
+      </div>
+    </div>
+
+    <section id="cta">
+      <canvas id="embers" aria-hidden="true"></canvas>
+      <h2>Take the <em>fire</em><span class="p">.</span></h2>
+      <p>Tokkey Editions. Winter '26.</p>
+      <a class="cta-btn" href="/software#early"><span class="led"></span>Reserve your spot</a>
+    </section>
+  </div>
+</BaseLayout>
+
+<script>
+  import { AboutPage } from "../scripts/about/AboutPage";
+  const root = document.querySelector<HTMLElement>("[data-about]");
+  if (root) new AboutPage(root);
+</script>

@@ -1,0 +1,31 @@
+---
+// Product focus marker on an About hero: corner brackets around the device, a leader line and a small label.
+// Positioned every frame by PrometheusHero (chapter 1) or SceneFx (chapters 2, 3, from data-px/py/pw/ph).
+interface Props {
+  /** Label under "Tokkey" */
+  label: string;
+  /** Label above the device instead of below */
+  up?: boolean;
+  /** Chapter 1 marker: hidden until the intro lights the scene */
+  first?: boolean;
+  /** Device centre and size as fractions of the source painting (chapters 2, 3) */
+  px?: number;
+  py?: number;
+  pw?: number;
+  ph?: number;
+}
+const { label, up = false, first = false, px, py, pw, ph } = Astro.props;
+---
+
+<div
+  class:list={["hot", { up, first }]}
+  data-ref={first ? "hot" : undefined}
+  data-px={px}
+  data-py={py}
+  data-pw={pw}
+  data-ph={ph}
+>
+  <div class="box"><i class="tl"></i><i class="tr"></i><i class="bl"></i><i class="br"></i></div>
+  <span class="lead"></span>
+  <div class="lbl"><b>Tokkey</b>{label}</div>
+</div>

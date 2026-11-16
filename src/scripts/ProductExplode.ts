@@ -59,6 +59,14 @@ export class ProductExplode {
     this.running = true;
   }
 
+  /** Snap back to assembled, stopping any run */
+  reset(): void {
+    this.goal = 0;
+    this.running = false;
+    this.groupP.fill(0);
+    this.apply();
+  }
+
   /** Advance the animation; returns true when parts moved */
   step(now: number): boolean {
     if (!this.running || !this.groupCount) return false;

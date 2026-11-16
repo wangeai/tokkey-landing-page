@@ -1,0 +1,347 @@
+---
+// About · Chapter I (Prometheus): fire-and-smoke hero with the intro, "Three gifts" mask, and the "How the fire
+// travels" board of live mocks. Behaviour: PrometheusHero, AboutIntro, BoardMocks (src/scripts/about/).
+import FocusBox from "./FocusBox.astro";
+import Tear from "./Tear.astro";
+const img = "/assets/images/about";
+---
+
+<div class="chapter" id="ch1" style={`--img:url(${img}/sketch.jpg)`}>
+  <section class="scene hero" id="hero">
+    <div class="stage" data-ref="stage">
+      <img class="color" id="bg" src={`${img}/bg.jpg`} alt="" draggable="false" />
+      <canvas id="fog"></canvas>
+      <img id="fig" src={`${img}/figure.webp`} alt="Prometheus reaching for the Tokkey cube" draggable="false" />
+      <canvas id="fire"></canvas>
+      <i id="anchor"></i>
+      <div class="hero-dark" data-ref="dark"></div>
+      <!-- Golden-ratio construction lines, drawn in during the intro -->
+      <svg id="phi" viewBox="0 0 1672 941" preserveAspectRatio="none" aria-hidden="true"
+        ><path pathLength="1" class="g" d="M638.7 0V941M0 359.5H1672M1033.3 0V941M0 581.5H1672"></path><path
+          pathLength="1"
+          class="r"
+          d="M29.6 -178.2h1522.6v941.0h-1522.6ZM970.6 -178.2L970.6 762.8M970.6 403.3L1552.2 403.3M1192.7 403.3L1192.7 762.8M970.6 540.6L1192.7 540.6M1107.9 403.3L1107.9 540.6M1107.9 488.2L1192.7 488.2M1140.3 488.2L1140.3 540.6M1107.9 508.2L1140.3 508.2M1127.9 488.2L1127.9 508.2M1127.9 500.6L1140.3 500.6M1132.6 500.6L1132.6 508.2"
+        ></path><path
+          pathLength="1"
+          class="s"
+          d="M29.6 762.8 A941.0 941.0 0 0 1 970.6 -178.2 A581.6 581.6 0 0 1 1552.2 403.3 A359.4 359.4 0 0 1 1192.7 762.8 A222.1 222.1 0 0 1 970.6 540.6 A137.3 137.3 0 0 1 1107.9 403.3 A84.8 84.8 0 0 1 1192.7 488.2 A52.4 52.4 0 0 1 1140.3 540.6 A32.4 32.4 0 0 1 1107.9 508.2 A20.0 20.0 0 0 1 1127.9 488.2 A12.4 12.4 0 0 1 1140.3 500.6 A7.7 7.7 0 0 1 1132.6 508.2"
+        ></path></svg
+      >
+    </div>
+    <img class="charcoal" src={`${img}/sketch.jpg`} alt="" draggable="false" />
+    <div class="veil"></div>
+    <FocusBox first label="Local AI, in your hand" />
+    <div class="vignette"></div>
+    <div class="grain"></div>
+  </section>
+  <div class="copy">
+    <div class="headline fadein">
+      <div class="eyebrow">The Prometheus Edition</div>
+      <h1>Fire, brought <em>down</em> to your desk<span class="p">.</span></h1>
+      <p class="lede">
+        The gods kept intelligence in the cloud. Tokkey carries it home: a small cube that runs your AI on your own
+        machine, with your data staying where it belongs.
+      </p>
+      <p class="own">Your model. Your keys. Your fire.</p>
+    </div>
+    <div class="foot fadein"><span>Move to tilt. Hover the light to pull the flame.</span><span><em>Scroll</em></span></div>
+  </div>
+  <div class="hold" aria-hidden="true"></div>
+
+  <section class="mask">
+    <Tear />
+    <div class="inner">
+      <div class="kicker">What's new this edition</div>
+      <h2>Three gifts from <em>the fire</em><span class="p">.</span></h2>
+      <p class="sub">
+        Everything the cloud kept for itself, brought down to a cube that plugs into the machine you already own.
+        Nothing here asks you to rent back what was yours.
+      </p>
+      <div class="cards">
+        <article class="card c1">
+          <span class="n">01 / Ownership</span>
+          <div class="viz v1" aria-hidden="true">
+            <svg viewBox="0 0 300 180">
+              <circle class="ring" cx="150" cy="90" r="74"></circle>
+              <circle cx="150" cy="90" r="48" fill="none" stroke="rgba(255,255,255,.14)"></circle>
+              <g class="orbit"
+                ><circle cx="150" cy="42" r="3.2" fill="#fff"></circle><circle cx="198" cy="90" r="2.4" fill="#ffcf7a"
+                ></circle><circle cx="116" cy="124" r="2.4" fill="#fff" opacity=".7"></circle></g
+              >
+              <g class="orbit b"
+                ><circle cx="150" cy="164" r="2.6" fill="#ffcf7a"></circle><circle
+                  cx="86"
+                  cy="66"
+                  r="2.2"
+                  fill="#fff"
+                  opacity=".8"></circle><circle cx="214" cy="56" r="2.2" fill="#fff"></circle></g
+              >
+              <g transform="translate(150 90)" stroke="#fff" stroke-width="1.2" stroke-linejoin="round">
+                <path d="M0 -22 L20 -11 L0 0 L-20 -11Z" fill="rgba(255,255,255,.32)"></path>
+                <path d="M-20 -11 L0 0 L0 23 L-20 12Z" fill="rgba(255,255,255,.14)"></path>
+                <path d="M20 -11 L0 0 L0 23 L20 12Z" fill="rgba(255,255,255,.06)"></path>
+              </g>
+              <path class="cloud" d="M258 18a9 9 0 0 1 17 3 7 7 0 0 1 1 14h-25a7 7 0 0 1 7-17z"></path>
+              <path class="cut" d="M214 56 L246 34"></path>
+            </svg>
+            <span class="chip" style="left:4px;bottom:6px">On-device</span>
+            <span class="chip off" style="right:4px;top:50px">Cloud: off</span>
+          </div>
+          <div>
+            <h3>Intelligence you <em>keep</em></h3>
+            <p>Models run on your hardware. Prompts and files never leave the machine unless you send them.</p>
+          </div>
+        </article>
+        <article class="card c2">
+          <span class="n">02 / Spark</span>
+          <div class="viz v2" aria-hidden="true">
+            <svg viewBox="0 0 300 180">
+              <g fill="none" stroke="rgba(255,255,255,.75)" stroke-width="1.2" stroke-linejoin="round">
+                <rect x="186" y="24" width="96" height="58" rx="5"></rect>
+                <rect x="193" y="31" width="82" height="44" rx="2" stroke="rgba(255,255,255,.25)"></rect>
+                <path d="M176 92 h116 l-8 8 h-100z"></path>
+              </g>
+              <circle class="wave" cx="186" cy="80" r="16" stroke-width="1.2"></circle>
+              <circle class="wave w2" cx="186" cy="80" r="26" stroke-width="1"></circle>
+              <circle class="wave w3" cx="186" cy="80" r="38" stroke-width=".8"></circle>
+              <g class="plug">
+                <g transform="translate(140 80)" stroke="#fff" stroke-width="1.2" stroke-linejoin="round">
+                  <path d="M-14 -20 L6 -10 L-14 0 L-34 -10Z" fill="rgba(255,255,255,.35)"></path>
+                  <path d="M-34 -10 L-14 0 L-14 20 L-34 10Z" fill="rgba(255,255,255,.15)"></path>
+                  <path d="M6 -10 L-14 0 L-14 20 L6 10Z" fill="rgba(255,255,255,.06)"></path>
+                  <path d="M6 -4 h40 v8 h-40" fill="rgba(255,255,255,.2)"></path>
+                </g>
+              </g>
+            </svg>
+            <div class="steps"><span>Plug in</span><span>Detected</span><span>Runtime ready</span></div>
+          </div>
+          <div>
+            <h3>Plug in. <em>Light up.</em></h3>
+            <p>Tokkey pairs with your Mac in seconds and sets up the runtime for you. No terminal needed.</p>
+          </div>
+        </article>
+        <article class="card c3">
+          <span class="n">03 / Flow</span>
+          <div class="viz v3" aria-hidden="true">
+            <svg viewBox="0 0 300 180">
+              <path class="ln" d="M70 90 C140 90 150 22 214 22"></path><path class="ln" d="M70 90 C140 90 150 68 214 68"
+              ></path>
+              <path class="ln" d="M70 90 C140 90 150 114 214 114"></path><path
+                class="ln"
+                d="M70 90 C140 90 150 160 214 160"></path>
+              <path class="flow" d="M70 90 C140 90 150 22 214 22"></path><path
+                class="flow"
+                d="M70 90 C140 90 150 68 214 68"></path>
+              <path class="flow" d="M70 90 C140 90 150 114 214 114"></path><path
+                class="flow"
+                d="M70 90 C140 90 150 160 214 160"></path>
+              <g transform="translate(50 90)" stroke="#0a0807" stroke-width="1.2" stroke-linejoin="round">
+                <path d="M0 -18 L16 -9 L0 0 L-16 -9Z" fill="#ffcf7a"></path>
+                <path d="M-16 -9 L0 0 L0 18 L-16 9Z" fill="#f2b45a"></path>
+                <path d="M16 -9 L0 0 L0 18 L16 9Z" fill="#e2933a"></path>
+              </g>
+            </svg>
+            <span class="chip" style="left:2px;bottom:4px">localhost endpoint</span>
+            <span class="chip" style="right:0;top:2%">Code editor</span>
+            <span class="chip" style="right:0;top:30%">Notes</span>
+            <span class="chip" style="right:0;top:56%">Chat</span>
+            <span class="chip" style="right:0;top:82%">Terminal</span>
+          </div>
+          <div>
+            <h3>One key, <em>every app</em></h3>
+            <p>A single local endpoint your tools already speak, so the fire reaches every workflow.</p>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <div class="run" aria-hidden="true"></div>
+  <div class="row">
+    <section class="board">
+      <div class="kicker">How the fire travels</div>
+      <h2>From the cloud, <em>down to the desk</em><span class="p">.</span></h2>
+      <p class="intro">
+        Each move is a decision the cloud used to make for you, handed back. The interfaces below are working previews.
+      </p>
+      <div class="tiles">
+        <article class="tile wide">
+          <div class="art night" style="--pos:70% 30%">
+            <div class="slot" data-ui="ai-mac">
+              <div class="mac">
+                <div class="mac-screen">
+                  <div class="menubar">
+                    <span class="apple"></span><b>Finder</b><span>File</span><span>Edit</span><span>View</span><span
+                      >Go</span
+                    ><span>Window</span><span>Help</span><i class="mb-tk"></i>
+                  </div>
+                  <div class="assistant glass">
+                    <div class="as-head">
+                      <span class="as-orb"></span>
+                      <div><b>Assistant</b><small>on-device via Tokkey</small></div>
+                    </div>
+                    <p class="as-q" data-q></p>
+                    <div class="as-a" hidden><p data-a></p><ul data-list></ul></div>
+                  </div>
+                  <div class="tkpanel glass">
+                    <div class="tk-head"><i class="tk-logo"></i><b>Tokkey</b></div>
+                    <div class="seg" role="tablist">
+                      <button class="on" data-tab="status">Status</button><button data-tab="models">Models</button><button
+                        data-tab="logs">Logs</button
+                      >
+                    </div>
+                    <div class="tk-body" data-pane="status">
+                      <div class="kv"><span>Tokkey</span><b>Connected ↗</b></div>
+                      <div class="kv"><span>Local model</span><b><i class="led"></i>Qwen 3.5 9B ↗</b></div>
+                      <div class="kv"><span>Router</span><b>On ↗</b></div>
+                    </div>
+                    <div class="tk-body" data-pane="models" hidden>
+                      <div class="kv"><span><i class="led"></i>Qwen 3.5 9B</span><b>Active</b></div>
+                      <div class="kv"><span>Qwen 3 4B</span><b>On disk</b></div>
+                      <div class="kv"><span>Add a model</span><b>+</b></div>
+                    </div>
+                    <div class="tk-body" data-pane="logs" hidden>
+                      <div class="kv"><span>Summarize notes</span><b>Local</b></div>
+                      <div class="kv"><span>Draft a reply</span><b>Local</b></div>
+                      <div class="kv"><span>Sent to cloud today</span><b>0</b></div>
+                    </div>
+                  </div>
+                  <div class="mac-cap" data-cap>Own your <b>intelligence</b></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <h3>Turn your Mac into an AI Mac</h3>
+          <p>
+            Plug in the cube and an assistant answers on your own machine. The menu bar shows what is running, which
+            model, and whether anything left.
+          </p>
+          <a class="chip-link" href="/software">See it working <span>↗</span></a>
+        </article>
+
+        <article class="tile">
+          <div class="art" style="--tint:#b38a45;--pos:15% 85%">
+            <div class="slot" data-ui="weights">
+              <div class="mk">
+                <div class="c-title">Models on this Mac</div>
+                <div class="w-row">
+                  <div class="w-ico"></div>
+                  <div class="w-meta"><b>Qwen 3.5 9B</b><small data-wstate>Loading into memory…</small></div>
+                  <span class="pill" data-wpill>On disk</span>
+                </div>
+                <div class="bar"><i data-wbar></i></div>
+                <div class="w-foot">Stored on your SSD. No session expires it.</div>
+              </div>
+            </div>
+          </div>
+          <h3>The weights come home</h3>
+          <p>A model that lived in a data center now lives on the disk you own. It loads once and stays.</p>
+          <a class="chip-link" href="#">How loading works <span>↗</span></a>
+        </article>
+
+        <article class="tile">
+          <div class="art" style="--tint:#8e3a4f;--pos:30% 60%">
+            <div class="slot" data-ui="setup">
+              <div class="mk dark-card setup">
+                <div class="c-title">Setting up</div>
+                <ol data-steps>
+                  <li><i></i>Tokkey plugged in</li>
+                  <li><i></i>Hardware detected<small>24 GB unified memory</small></li>
+                  <li><i></i>Model picked to fit</li>
+                  <li><i></i>Endpoint ready<small>localhost:8080</small></li>
+                </ol>
+              </div>
+            </div>
+          </div>
+          <h3>The runtime lights itself</h3>
+          <p>No terminal, no account. The runtime finds the hardware, picks a model that fits, and starts a local endpoint.</p>
+          <a class="chip-link" href="#">Setup guide <span>↗</span></a>
+        </article>
+
+        <article class="tile">
+          <div class="art" style="--tint:#4d8a92;--pos:85% 20%">
+            <div class="slot" data-ui="endpoint">
+              <div class="mk term">
+                <div class="t-bar"><i></i><i></i><i></i><span>Terminal</span></div>
+                <pre data-term></pre>
+              </div>
+              <div class="apps">
+                <span><i class="led"></i>Editor</span><span><i class="led"></i>Notes</span><span
+                  ><i class="led"></i>Chat</span
+                >
+              </div>
+            </div>
+          </div>
+          <h3>Your tools already speak it</h3>
+          <p>
+            One local endpoint that your editor, your notes, and your terminal can call. The fire reaches the workflow you
+            already have.
+          </p>
+          <a class="chip-link" href="#">Connect an app <span>↗</span></a>
+        </article>
+
+        <article class="tile">
+          <div class="art" style="--tint:#7f9466;--pos:55% 75%">
+            <div class="slot" data-ui="privacy">
+              <div class="mk">
+                <div class="c-title">Privacy</div>
+                <label class="sw-row"
+                  ><span>Cloud route<small data-privnote>Off. Everything stays on this Mac.</small></span><button
+                    class="sw"
+                    role="switch"
+                    aria-checked="false"
+                    aria-label="Cloud route"
+                    data-sw></button
+                  ></label
+                >
+                <div class="kv"><span>Sent off this device today</span><b>0 requests</b></div>
+                <div class="kv" data-ask hidden><span>Before sending</span><b>Ask me every time</b></div>
+              </div>
+            </div>
+          </div>
+          <h3>Nothing leaves unless you send it</h3>
+          <p>
+            Prompts, files, and memory stay on the machine. When a task needs more, the route out is visible, named, and
+            reversible.
+          </p>
+          <a class="chip-link" href="/privacy">Privacy controls <span>↗</span></a>
+        </article>
+
+        <article class="tile wide">
+          <div class="art" style="--tint:#5b6fa8;--pos:40% 15%">
+            <div class="slot" data-ui="compare">
+              <div class="mk cmp">
+                <div class="seg">
+                  <button class="on" data-side="cloud">In the cloud</button><button data-side="local">On Tokkey</button>
+                </div>
+                <div class="cmp-rows" data-cmp>
+                  <div class="kv">
+                    <span>Where the model runs</span><b data-c="A data center you never see" data-l="The machine on your desk"
+                    ></b>
+                  </div>
+                  <div class="kv">
+                    <span>Who handles the prompt</span><b
+                      data-c="The provider, under its policy"
+                      data-l="It stays on your machine"></b>
+                  </div>
+                  <div class="kv">
+                    <span>Cost over time</span><b data-c="A bill that grows with every token" data-l="No per-token bill"></b>
+                  </div>
+                  <div class="kv">
+                    <span>When the provider changes</span><b
+                      data-c="Models retire, prices and terms move"
+                      data-l="Nothing changes unless you change it"></b>
+                  </div>
+                  <div class="kv"><span>Getting started</span><b data-c="An account, a key, a usage plan" data-l="Plug it in"></b></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <h3>The same task, two places to run it</h3>
+          <p>Switch between the two columns to see what changes when the model lives with you.</p>
+          <a class="chip-link" href="#">Compare in detail <span>↗</span></a>
+        </article>
+      </div>
+    </section>
+  </div>
+</div>

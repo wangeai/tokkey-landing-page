@@ -1,0 +1,260 @@
+---
+// About · Chapter II (Archimedes): lever hero, "The research, drawn out" mask, and "The journal" board.
+// Behaviour: SceneFx (lever), BoardMocks (src/scripts/about/).
+import FocusBox from "./FocusBox.astro";
+import Tear from "./Tear.astro";
+const img = "/assets/images/about";
+---
+
+<div class="chapter" id="ch2" style={`--img:url(${img}/archimedes-sketch.jpg)`}>
+  <section class="scene" data-fx="lever">
+    <img class="color" src={`${img}/archimedes.jpg`} alt="" draggable="false" loading="lazy" />
+    <img class="charcoal" src={`${img}/archimedes-sketch.jpg`} alt="" draggable="false" loading="lazy" />
+    <div class="veil"></div>
+    <canvas class="fx-canvas"></canvas>
+    <div class="spot"></div>
+    <FocusBox up label="The fulcrum, on your desk" px={0.423} py={0.836} pw={0.093} ph={0.046} />
+  </section>
+  <div class="copy">
+    <div class="headline">
+      <div class="eyebrow">The Archimedes Edition</div>
+      <h1>A lever, long enough <em>for the world</em><span class="p">.</span></h1>
+      <p class="lede">
+        Archimedes asked for one firm place to stand. Tokkey is that place: a fulcrum on your desk that moves models too
+        large to hold, without ever handing them to the cloud.
+      </p>
+      <p class="own">Give me a point to stand, and I will move it.</p>
+    </div>
+    <div class="foot"><span>Move to tilt the scene.</span><span><em>Scroll</em></span></div>
+  </div>
+  <div class="hold" aria-hidden="true"></div>
+
+  <section class="mask">
+    <Tear />
+    <div class="inner">
+      <div class="kicker">What we work on</div>
+      <h2>The research, <em>drawn</em> out<span class="p">.</span></h2>
+      <p class="sub">
+        OneToken builds the infrastructure that brings intelligence home. The sketch underneath is the idea. The work on
+        top is the research.
+      </p>
+      <div class="mask-grid">
+        <article>
+          <div class="lab" aria-hidden="true">
+            <svg viewBox="0 0 640 230">
+              <g fill="none" stroke="rgba(244,239,231,.16)" stroke-width="1">
+                <path d="M40 190 H600"></path><path d="M40 146 H600"></path><path d="M40 102 H600"></path><path
+                  d="M40 58 H600"></path>
+              </g>
+              <path
+                d="M40 178 C120 174 150 166 200 152 C270 132 300 114 360 94 C420 74 460 66 560 44"
+                fill="none"
+                stroke="#ffcf7a"
+                stroke-width="1.6"></path>
+              <path
+                d="M40 186 C140 184 180 178 240 168 C320 154 350 142 420 124 C490 106 520 98 600 84"
+                fill="none"
+                stroke="rgba(255,138,42,.55)"
+                stroke-width="1.2"></path>
+              <g fill="#ffcf7a"
+                ><circle cx="200" cy="152" r="3"></circle><circle cx="360" cy="94" r="3"></circle><circle
+                  cx="560"
+                  cy="44"
+                  r="3"></circle></g
+              >
+              <g font-size="11" fill="rgba(244,239,231,.6)">
+                <text x="44" y="30">memory per token</text><text x="500" y="216">context length →</text>
+              </g>
+            </svg>
+            <span class="cap">KV cache, kept close to the model</span>
+          </div>
+          <div class="body">
+            <div class="tag2">Inference<span>01</span></div>
+            <h3>Serving that <em>fits</em> the machine</h3>
+            <p>
+              Scheduling, batching, and KV cache management for models running on the hardware people already own, where
+              every megabyte of memory is spoken for.
+            </p>
+          </div>
+        </article>
+        <div class="stack">
+          <article>
+            <div class="tag2">Storage<span>02</span></div>
+            <h3>Weights that <em>move</em> fast</h3>
+            <p>SSD-aware loading and caching, so a model that does not fit in RAM can still start in seconds instead of minutes.</p>
+          </article>
+          <article>
+            <div class="tag2">Training<span>03</span></div>
+            <h3>Learning, <em>on device</em></h3>
+            <p>Fine-tuning and distillation small enough to run where the data already lives, instead of shipping it to a cluster.</p>
+          </article>
+          <article>
+            <div class="tag2">Infrastructure<span>04</span></div>
+            <h3>One runtime, <em>every app</em></h3>
+            <p>A local endpoint the tools people already use can speak, so the model is infrastructure rather than another window.</p>
+          </article>
+        </div>
+      </div>
+      <div class="metrics">
+        <div>Seconds<span>to a running model</span></div>
+        <div>On device<span>where the data already is</span></div>
+        <div>One endpoint<span>every tool already speaks</span></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="run" aria-hidden="true"></div>
+  <div class="row">
+    <section class="board" id="journal">
+      <div class="kicker">The journal</div>
+      <h2>What we <em>measure</em>, and what we publish<span class="p">.</span></h2>
+      <p class="intro">Engineering notes from OneToken. Every claim has a workload and a reproducible setup behind it.</p>
+      <div class="tiles">
+        <article class="tile wide">
+          <div class="art photo" style="--pos:30% 55%">
+            <div class="slot" data-ui="essay">
+              <div class="mk essay"><span class="meta">Featured · Perspective</span><b>The fulcrum is the point</b><small>8 min read</small></div>
+            </div>
+          </div>
+          <h3>The fulcrum is the point</h3>
+          <p>
+            Archimedes never said the lever was the hard part. The hard part was a place to stand. For local AI, the model
+            is the lever and the machine you own is the ground.
+          </p>
+          <a class="chip-link" href="#">Read the essay <span>↗</span></a>
+        </article>
+
+        <article class="tile">
+          <div class="art" style="--tint:#5b6fa8;--pos:80% 20%">
+            <div class="slot" data-ui="scorecard">
+              <div class="mk score">
+                <div class="c-title">Scorecard <small>same task, one run</small></div>
+                <div class="sc-row"><span>Quality</span><div class="bar"><i style="--w:86%"></i></div></div>
+                <div class="sc-row"><span>First response</span><div class="bar"><i style="--w:72%"></i></div></div>
+                <div class="sc-row"><span>Completion</span><div class="bar"><i style="--w:64%"></i></div></div>
+                <div class="sc-row"><span>Memory</span><div class="bar"><i style="--w:48%"></i></div></div>
+                <div class="w-foot">Illustrative values</div>
+              </div>
+            </div>
+          </div>
+          <span class="meta-line">Engineering · 2026-10 · 5 min</span>
+          <h3>Measure what actually gets done</h3>
+          <p>A faster token only counts when the system finishes the right task.</p>
+          <a class="chip-link" href="#">Read <span>↗</span></a>
+        </article>
+
+        <article class="tile">
+          <div class="art" style="--tint:#b38a45;--pos:20% 70%">
+            <div class="slot" data-ui="density">
+              <div class="mk dens">
+                <div class="c-title">Intelligence density</div>
+                <svg viewBox="0 0 200 110" aria-hidden="true"
+                  ><path
+                    d="M20 100 A80 80 0 0 1 180 100"
+                    fill="none"
+                    stroke="rgba(22,18,14,.12)"
+                    stroke-width="12"
+                    stroke-linecap="round"></path><path
+                    class="g"
+                    d="M20 100 A80 80 0 0 1 180 100"
+                    fill="none"
+                    stroke="#c9500e"
+                    stroke-width="12"
+                    stroke-linecap="round"
+                    pathLength="100"></path></svg
+                >
+                <div class="dens-v"><b data-dens>0</b><small>useful work per GB · per watt</small></div>
+              </div>
+            </div>
+          </div>
+          <span class="meta-line">Engineering · 2026-09 · 7 min</span>
+          <h3>More intelligence, a smaller footprint</h3>
+          <p>How much useful work a model does per megabyte of memory and per watt, on hardware people already own.</p>
+          <a class="chip-link" href="#">Read <span>↗</span></a>
+        </article>
+
+        <article class="tile">
+          <div class="art" style="--tint:#4d8a92;--pos:65% 40%">
+            <div class="slot" data-ui="offload">
+              <div class="mk offl">
+                <div class="c-title">Loading Qwen 3.5 9B</div>
+                <div class="lane">
+                  <span>SSD</span>
+                  <div class="track"><i class="ld-blk b1"></i><i class="ld-blk b2"></i><i class="ld-blk b3"></i></div>
+                  <span>RAM</span>
+                </div>
+                <div class="kv"><span>Layers resident</span><b data-layers>0 / 36</b></div>
+                <div class="kv"><span>Ready to answer</span><b data-ready>…</b></div>
+              </div>
+            </div>
+          </div>
+          <span class="meta-line">Systems · 2026-09 · 6 min</span>
+          <h3>Weights that move fast</h3>
+          <p>SSD offloading for models that do not fit in RAM, so a model starts in seconds instead of minutes.</p>
+          <a class="chip-link" href="#">Read <span>↗</span></a>
+        </article>
+
+        <article class="tile">
+          <div class="art" style="--tint:#7f9466;--pos:40% 30%">
+            <div class="slot" data-ui="route">
+              <div class="mk route">
+                <div class="c-title">Where should this run?</div>
+                <div class="rt-task" data-rtask>Summarize my meeting notes</div>
+                <div class="rt-paths">
+                  <span class="rt on" data-rt="local"><i class="led"></i>On device</span><span class="rt" data-rt="cloud"
+                    >Selected cloud model</span
+                  >
+                </div>
+                <div class="w-foot" data-rwhy>Private file. Kept local.</div>
+              </div>
+            </div>
+          </div>
+          <span class="meta-line">Product · 2026-08 · 6 min</span>
+          <h3>Local and cloud, by choice</h3>
+          <p>Which tasks stay on device, which may reach a selected cloud model, and how that choice stays visible.</p>
+          <a class="chip-link" href="#">Read <span>↗</span></a>
+        </article>
+
+        <article class="tile">
+          <div class="art" style="--tint:#8e3a4f;--pos:75% 75%">
+            <div class="slot" data-ui="memory">
+              <div class="mk mem">
+                <div class="c-title">Moving to a new Mac</div>
+                <label><input type="checkbox" checked /> Preferences</label>
+                <label><input type="checkbox" checked /> Project notes</label>
+                <label><input type="checkbox" /> Chat history</label>
+                <label><input type="checkbox" /> Contacts</label>
+                <div class="w-foot">Nothing travels unless it is ticked.</div>
+              </div>
+            </div>
+          </div>
+          <span class="meta-line">Product · 2026-08 · 6 min</span>
+          <h3>A memory that belongs to you</h3>
+          <p>What should travel when an agent moves between devices, and what should not travel automatically.</p>
+          <a class="chip-link" href="#">Read <span>↗</span></a>
+        </article>
+
+        <article class="tile">
+          <div class="art" style="--tint:#7a5f8f;--pos:10% 20%">
+            <div class="slot" data-ui="rent">
+              <div class="mk rent">
+                <div class="c-title">This month</div>
+                <div class="kv"><span>Cloud subscription</span><b>$20.00</b></div>
+                <div class="kv"><span>API usage</span><b data-rent>$0.00</b></div>
+                <div class="kv tot"><span>Running total</span><b data-renttot>$20.00</b></div>
+                <div class="w-foot">Illustrative. A bill that grows with every token.</div>
+              </div>
+            </div>
+          </div>
+          <span class="meta-line">Perspective · 2026-07 · 4 min</span>
+          <h3>Stop renting intelligence</h3>
+          <p>Personal intelligence should not become another monthly bill.</p>
+          <a class="chip-link" href="#">Read <span>↗</span></a>
+        </article>
+      </div>
+      <div class="quote">
+        <q>Give me a place to stand, and I will move the earth.</q><span>Archimedes, as told by Pappus of Alexandria</span>
+      </div>
+    </section>
+  </div>
+</div>

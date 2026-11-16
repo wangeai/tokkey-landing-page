@@ -27,6 +27,12 @@ export class ScrollEngine {
     gsap.ticker.lagSmoothing(0);
   }
 
+  /** Hold or release smooth scrolling (e.g. while an intro plays); no-op when Lenis is off */
+  setPaused(paused: boolean): void {
+    if (paused) this.lenis?.stop();
+    else this.lenis?.start();
+  }
+
   /** Smooth-scroll (or jump, with `immediate`) to an element or y position; falls back to native when Lenis is off */
   scrollTo(target: string | HTMLElement | number, immediate = false): void {
     if (this.lenis) {
