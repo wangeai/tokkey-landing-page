@@ -1,0 +1,28 @@
+---
+// "Release the True Power." (prototype `#rtt` / `#s6`) at the start of scene 007 (effect "truePower"): the heading rises in over scene 006's last frame,
+// then rises out as scene 007 plays. Goes in FrameStage's slot. Behavior: src/scripts/scenes/TruePowerScene.ts.
+---
+
+<div data-true-power class="pointer-events-none absolute inset-0">
+  <h2
+    data-ref="title"
+    class="title absolute inset-x-0 top-[15vh] px-gutter-sm text-center text-h2-sm font-medium text-white/55 md:whitespace-nowrap md:px-gutter md:text-h2 md:tracking-[-0.03em]"
+  >
+    Release the <span class="text-white">True Power</span><span class="dot" aria-hidden="true"></span>
+  </h2>
+</div>
+
+<script>
+  import { TruePowerScene } from "../scripts/scenes/TruePowerScene";
+  const root = document.querySelector<HTMLElement>("[data-true-power]");
+  const section = root?.closest<HTMLElement>("[data-frame-stage]");
+  if (root && section) new TruePowerScene(root, section);
+</script>
+
+<style>
+  /* Hidden until the effect starts; JS drives opacity and transform from the scroll */
+  .title {
+    opacity: 0;
+    will-change: transform, opacity;
+  }
+</style>

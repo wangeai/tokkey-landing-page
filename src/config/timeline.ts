@@ -38,6 +38,7 @@ export const TIMELINE: TimelineSegment[] = [
   { kind: "frames", sequence: "004", mobileFit: "contain" }, // laptop rotates to show its underside
   { kind: "frames", sequence: "005", mobileFit: "contain" }, // lightning reveals the internals
   { kind: "frames", sequence: "006", mobileFit: "contain" }, // energy flows through the internals
+  { kind: "effect", id: "truePower", length: 60 }, // "Release the True Power.": heading rises in and out over 006's last frame (TruePowerScene)
   { kind: "frames", sequence: "007", mobileFit: "contain" }, // follows on from 006
   { kind: "effect", id: "productViewer", length: 100 }, // last frame crossfades into the live 3D key (ProductViewerScene)
 ];
