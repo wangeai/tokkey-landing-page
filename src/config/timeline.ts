@@ -11,6 +11,10 @@ export type TimelineSegment =
       sequence: SequenceName;
       /** How frames fit a portrait phone screen: "cover" crops to fill, "contain" shows the whole frame */
       mobileFit: FrameFit;
+      /** Optional first / last source frame to play (inclusive, defaults to the whole sequence), so one sequence can
+       *  be split around effects that pause on a frame in its middle */
+      from?: number;
+      to?: number;
       /** Optional CSS filter on the canvas while these frames show (color-matches older renders) */
       filter?: string;
       /** Desktop: the frames slide down LOWER_VH while this segment plays and stay down after it, giving the overlay
@@ -39,6 +43,10 @@ export const TIMELINE: TimelineSegment[] = [
   { kind: "frames", sequence: "005", mobileFit: "contain" }, // lightning reveals the internals
   { kind: "frames", sequence: "006", mobileFit: "contain" }, // energy flows through the internals
   { kind: "effect", id: "truePower", length: 60 }, // "Release the True Power.": heading rises in and out over 006's last frame (TruePowerScene)
-  { kind: "frames", sequence: "007", mobileFit: "contain" }, // follows on from 006
+  { kind: "frames", sequence: "007", mobileFit: "contain", to: 20 }, // zooms in on the internals, key plugged in, energy flowing
+  { kind: "effect", id: "withTokkey", length: 120 }, // "With Tokkey.": heading and its list come in (TokkeyCompareScene)
+  { kind: "frames", sequence: "007", mobileFit: "contain", from: 21, to: 44 }, // key unplugs, the energy dies out
+  { kind: "effect", id: "withoutTokkey", length: 120 }, // "Without Tokkey.": "out" grows in, its list comes in (TokkeyCompareScene)
+  { kind: "frames", sequence: "007", mobileFit: "contain", from: 45 }, // key flies out toward the viewer
   { kind: "effect", id: "productViewer", length: 100 }, // last frame crossfades into the live 3D key (ProductViewerScene)
 ];

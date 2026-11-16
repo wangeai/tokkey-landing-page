@@ -50,10 +50,13 @@ export class FrameTimeline {
       if (segment.kind === "frames") {
         look = segment;
         const { count } = FRAME_SEQUENCES[segment.sequence];
+        const first = segment.from ?? 0;
+        const last = Math.min(count - 1, segment.to ?? count - 1);
+        const length = last - first + 1;
         const firstFrame = this.urls.length;
-        for (let i = 0; i < count; i += step) this.urls.push(frameUrl(segment.sequence, i, size));
-        this.spans.push({ segment, look, start, length: count, firstFrame, frameCount: this.urls.length - firstFrame });
-        start += count;
+        for (let i = first; i <= last; i += step) this.urls.push(frameUrl(segment.sequence, i, size));
+        this.spans.push({ segment, look, start, length, firstFrame, frameCount: this.urls.length - firstFrame });
+        start += length;
       } else {
         // Holds the last frame before it (or the first frame, if the timeline opens with an effect)
         this.spans.push({ segment, look, start, length: segment.length, firstFrame: Math.max(0, this.urls.length - 1), frameCount: 0 });

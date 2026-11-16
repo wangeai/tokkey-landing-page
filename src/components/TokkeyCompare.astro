@@ -1,0 +1,73 @@
+---
+// "With Tokkey." / "Without Tokkey." inside scene 007 (prototype `#sr` `.cgw` / `.cgo`, final look: big heading + numbered
+// list). Effect "withTokkey" pauses on the plugged-in key with energy flowing: the heading and the With list come in.
+// Effect "withoutTokkey" pauses on the unplugged key: "out" grows into the heading and the Without list takes over.
+// Goes in FrameStage's slot. Behavior: src/scripts/scenes/TokkeyCompareScene.ts.
+const LISTS = {
+  with: [
+    { title: "Instant inference", text: "Full speed. No queue." },
+    { title: "Schedule compute", text: "Close the lid. It keeps running." },
+    { title: "Zero upload", text: "Your data stays on this Mac." },
+  ],
+  without: [
+    { title: "Memory bottleneck", text: "Big models don’t fit." },
+    { title: "Paying per token", text: "Every prompt is billed." },
+    { title: "Lid closed", text: "Work stops." },
+  ],
+};
+---
+
+<!-- Desktop: a column on the left, centered (the laptop fills the right); phones: above the contained frame -->
+<div
+  data-tokkey-compare
+  class="pointer-events-none absolute inset-0 flex flex-col px-gutter-sm pt-[calc(var(--spacing-header)+16px)] md:justify-center md:pl-[7vw] md:pr-0 md:pt-0"
+>
+  <h2
+    data-ref="title"
+    class="title whitespace-nowrap text-h2-sm font-medium text-white md:text-h2 md:tracking-[-0.03em]"
+    aria-label="With Tokkey"
+  >
+    <span class="text-white/55">With<span data-ref="out" class="out">out</span></span> Tokkey<span class="dot" aria-hidden="true"></span>
+  </h2>
+  <!-- Both lists share one spot; JS crossfades them -->
+  <div class="relative mt-6 md:mt-10">
+    {
+      Object.entries(LISTS).map(([name, items], l) => (
+        <ol data-ref={name} class:list={["flex w-full flex-col gap-4 md:w-[min(32vw,480px)] md:gap-8", l > 0 && "absolute inset-x-0 top-0"]}>
+          {items.map(({ title, text }, i) => (
+            <li class="item relative pl-10 md:pl-14">
+              <span class="absolute left-0 top-0.5 font-mono text-body text-white/50 md:top-2">{i + 1}</span>
+              <b class="block text-body font-medium text-white md:text-h3 md:font-normal md:tracking-[-0.02em]">{title}</b>
+              <span class="block text-body text-white/50 md:mt-1 md:text-lead">{text}</span>
+            </li>
+          ))}
+        </ol>
+      ))
+    }
+  </div>
+</div>
+
+<script>
+  import { TokkeyCompareScene } from "../scripts/scenes/TokkeyCompareScene";
+  const root = document.querySelector<HTMLElement>("[data-tokkey-compare]");
+  const section = root?.closest<HTMLElement>("[data-frame-stage]");
+  if (root && section) new TokkeyCompareScene(root, section);
+</script>
+
+<style>
+  /* Hidden until the effect starts; JS drives opacity and transform from the scroll */
+  .title,
+  .item {
+    opacity: 0;
+    will-change: transform, opacity;
+  }
+  /* Prototype `.ot`: "out" opens from nothing (--grow 0..1, set by JS) and pushes "Tokkey" right */
+  .out {
+    display: inline-block;
+    overflow: hidden;
+    vertical-align: bottom;
+    white-space: nowrap;
+    max-width: calc(var(--grow, 0) * 1.9em);
+    opacity: var(--grow, 0);
+  }
+</style>
