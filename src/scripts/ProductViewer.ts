@@ -1,5 +1,5 @@
 // Three.js viewer for the 3D Tokkey key (ported from the standalone "tokkey-preview" viewer): studio HDRI lighting,
-// tuned metal finishes, drag to orbit, auto-rotate, clay mode, explode / assemble. Renders on a transparent
+// tuned metal finishes, drag to orbit, auto-rotate, explode / assemble. Renders on a transparent
 // canvas (the page's background shows through) only while active.
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
@@ -16,18 +16,6 @@ import {
   PRODUCT_MODEL,
   type MaterialTune,
 } from "../config/productModel";
-
-/** A material's own finish, restored when clay mode turns off */
-interface SavedFinish {
-  color: number;
-  metalness: number;
-  roughness: number;
-  envMapIntensity: number;
-  transmission: number;
-  transparent: boolean;
-  depthWrite: boolean;
-  side: THREE.Side;
-}
 
 export interface ViewerOptions {
   /** Cap on devicePixelRatio (the glass transmission pass renders the scene twice) */
@@ -56,8 +44,6 @@ export class ProductViewer {
     fill: new THREE.DirectionalLight(0xf2f4f7, 1.1),
     rim: new THREE.DirectionalLight(0xffffff, 1.4),
   };
-  /** Every tuned material with its finish, for clay mode */
-  private readonly finishes = new Map<THREE.MeshStandardMaterial, SavedFinish>();
   private readonly resizeObserver: ResizeObserver;
   private readonly tick = () => this.render();
   private model: THREE.Object3D | null = null;
@@ -138,27 +124,10 @@ export class ProductViewer {
     this.controls.autoRotate = on;
   }
 
-  /** Clay mode: every part plain matte white, to look at the form without the finishes */
-  setClay(on: boolean): void {
-    for (const [material, finish] of this.finishes) {
-      const clay = on ? ProductViewer.CLAY : finish;
-      material.color.setHex(clay.color);
-      material.metalness = clay.metalness;
-      material.roughness = clay.roughness;
-      material.envMapIntensity = clay.envMapIntensity;
-      if (material instanceof THREE.MeshPhysicalMaterial) material.transmission = clay.transmission;
-      material.transparent = clay.transparent;
-      material.depthWrite = clay.depthWrite;
-      material.side = clay.side;
-      material.needsUpdate = true;
-    }
-  }
-
-  /** Everything back to how it first appears: assembled, default view, auto-rotating, real finishes */
+  /** Everything back to how it first appears: assembled, default view, auto-rotating */
   resetAll(): void {
     this.explode?.reset();
     this.layout();
-    this.setClay(false);
     this.controls.autoRotate = true;
     this.fit(true);
   }
@@ -193,18 +162,6 @@ export class ProductViewer {
     });
     return controls;
   }
-
-  /** Clay mode finish */
-  private static readonly CLAY: SavedFinish = {
-    color: 0xf2f3f5,
-    metalness: 0,
-    roughness: 0.85,
-    envMapIntensity: 0.6,
-    transmission: 0,
-    transparent: false,
-    depthWrite: true,
-    side: THREE.FrontSide,
-  };
 
   /** Soft studio lighting: big key light, side fill, rim from behind */
   private addLights(): void {
@@ -249,7 +206,6 @@ export class ProductViewer {
         return tune.glass ? ProductViewer.glassMaterial(tune, m.name) : ProductViewer.tune(partTune ? m.clone() : m, tune);
       });
       o.material = Array.isArray(o.material) ? tuned : tuned[0];
-      for (const m of tuned) if (!this.finishes.has(m)) this.finishes.set(m, ProductViewer.finishOf(m));
     });
   }
 
@@ -260,19 +216,6 @@ export class ProductViewer {
     material.envMapIntensity = tune.envMapIntensity;
     material.needsUpdate = true;
     return material;
-  }
-
-  private static finishOf(m: THREE.MeshStandardMaterial): SavedFinish {
-    return {
-      color: m.color.getHex(),
-      metalness: m.metalness,
-      roughness: m.roughness,
-      envMapIntensity: m.envMapIntensity,
-      transmission: m instanceof THREE.MeshPhysicalMaterial ? m.transmission : 0,
-      transparent: m.transparent,
-      depthWrite: m.depthWrite,
-      side: m.side,
-    };
   }
 
   /** The clear top plate needs a physical material for transmission */

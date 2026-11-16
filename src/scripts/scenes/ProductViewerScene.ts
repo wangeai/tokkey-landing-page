@@ -17,7 +17,7 @@ export class ProductViewerScene {
   /** Canvas and controls, faded in only once the black layer fully hides the last frame */
   private readonly content: HTMLElement;
   private readonly hint: HTMLElement;
-  private readonly buttons: Record<"spin" | "clay" | "explode", HTMLButtonElement>;
+  private readonly buttons: Record<"spin" | "explode", HTMLButtonElement>;
   private viewer: ProductViewer | null = null;
   private loaded = false;
   /** Whether the viewer is rendering; leaving the screen resets it */
@@ -34,9 +34,8 @@ export class ProductViewerScene {
     this.content = root.querySelector<HTMLElement>("[data-ref=content]")!;
     this.hint = root.querySelector<HTMLElement>("[data-ref=hint]")!;
     const button = (ref: string) => root.querySelector<HTMLButtonElement>(`[data-ref=${ref}]`)!;
-    this.buttons = { spin: button("spin"), clay: button("clay"), explode: button("explode") };
+    this.buttons = { spin: button("spin"), explode: button("explode") };
     this.buttons.spin.addEventListener("click", () => this.toggleSpin());
-    this.buttons.clay.addEventListener("click", () => this.toggleClay());
     this.buttons.explode.addEventListener("click", () => this.toggleExplode());
     button("reset").addEventListener("click", () => this.viewer?.resetView());
 
@@ -101,12 +100,6 @@ export class ProductViewerScene {
     ProductViewerScene.press(this.buttons.spin, this.viewer.autoRotate);
   }
 
-  private toggleClay(): void {
-    const on = this.buttons.clay.getAttribute("aria-pressed") !== "true";
-    this.viewer?.setClay(on);
-    ProductViewerScene.press(this.buttons.clay, on);
-  }
-
   private toggleExplode(): void {
     const exploded = this.viewer?.toggleExplode() ?? false;
     this.buttons.explode.textContent = exploded ? "Assemble" : "Explode";
@@ -119,7 +112,6 @@ export class ProductViewerScene {
   private resetAll(): void {
     this.viewer?.resetAll();
     ProductViewerScene.press(this.buttons.spin, true);
-    ProductViewerScene.press(this.buttons.clay, false);
     ProductViewerScene.press(this.buttons.explode, false);
     this.buttons.explode.textContent = "Explode";
     this.hint.classList.remove("is-gone");
