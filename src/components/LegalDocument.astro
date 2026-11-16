@@ -1,0 +1,67 @@
+---
+// Long-form legal text (privacy policy, terms): the rendered Markdown from src/content/legal/ goes in the slot and is
+// styled here, since Markdown output has no classes of its own.
+---
+
+<section class="legal bg-black px-gutter-sm pt-[calc(var(--spacing-header)+64px)] pb-24 text-white md:px-gutter">
+  <article class="mx-auto max-w-[760px]">
+    <slot />
+  </article>
+</section>
+
+<style>
+  /* Markdown elements: page title, numbered sections, sub-sections, body copy */
+  .legal :global(h1) {
+    margin-bottom: 32px;
+    font-size: var(--text-h2-sm);
+    line-height: var(--text-h2-sm--line-height);
+    letter-spacing: var(--text-h2-sm--letter-spacing);
+    font-weight: 500;
+  }
+  .legal :global(h2) {
+    margin: 56px 0 16px;
+    font-size: var(--text-h3);
+    line-height: var(--text-h3--line-height);
+    font-weight: 500;
+  }
+  .legal :global(h3) {
+    margin: 32px 0 12px;
+    font-size: var(--text-lead);
+    line-height: var(--text-lead--line-height);
+    font-weight: 500;
+  }
+  .legal :global(p),
+  .legal :global(li) {
+    font-size: var(--text-body);
+    line-height: var(--text-body--line-height);
+    color: var(--color-silver);
+  }
+  .legal :global(p) {
+    margin-bottom: 16px;
+  }
+  .legal :global(ul) {
+    margin-bottom: 16px;
+    padding-left: 24px;
+    list-style: disc;
+  }
+  .legal :global(li) {
+    margin-bottom: 8px;
+  }
+  .legal :global(strong) {
+    color: var(--color-white);
+    font-weight: 600;
+  }
+  .legal :global(a) {
+    color: var(--color-white);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  @media (min-width: 768px) {
+    .legal :global(h1) {
+      font-size: var(--text-h2);
+      line-height: var(--text-h2--line-height);
+      letter-spacing: var(--text-h2--letter-spacing);
+    }
+  }
+</style>

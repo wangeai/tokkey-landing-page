@@ -30,8 +30,8 @@ export const FOOTER_COLUMNS: { title: string; links: FooterLink[] }[] = [
     title: "Resources",
     links: [
       { label: "FAQ", href: "/faq" },
-      { label: "Privacy", href: "#" },
-      { label: "Terms", href: "#" },
+      { label: "Privacy", href: "/privacy" },
+      { label: "Terms", href: "/terms" },
       { label: "Reserve your spot", href: "/software#early" },
     ],
   },

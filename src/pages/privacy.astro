@@ -1,0 +1,10 @@
+---
+// Privacy policy page; the text lives in src/content/legal/privacy.md (exported from the Feishu wiki).
+import BaseLayout from "../layouts/BaseLayout.astro";
+import LegalDocument from "../components/LegalDocument.astro";
+import { Content } from "../content/legal/privacy.md";
+---
+
+<BaseLayout title="Privacy Policy — Tokkey" description="How Tokkey handles personal information in the Mac app and online services.">
+  <LegalDocument><Content /></LegalDocument>
+</BaseLayout>

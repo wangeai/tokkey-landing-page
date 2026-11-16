@@ -1,0 +1,10 @@
+---
+// Terms of service page; the text lives in src/content/legal/terms.md (exported from the Feishu wiki).
+import BaseLayout from "../layouts/BaseLayout.astro";
+import LegalDocument from "../components/LegalDocument.astro";
+import { Content } from "../content/legal/terms.md";
+---
+
+<BaseLayout title="Terms of Service — Tokkey" description="The terms that govern use of the Tokkey Mac app and online services.">
+  <LegalDocument><Content /></LegalDocument>
+</BaseLayout>
