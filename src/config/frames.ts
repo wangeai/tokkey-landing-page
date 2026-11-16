@@ -2,13 +2,13 @@
 // when frames are added/removed. Frames are 2560×1440 with a transparent background; a 1280px copy of each lives in
 // <name>/sm/ (rebuild with `node scripts/resize-frames.mjs`).
 export const FRAME_SEQUENCES = {
-  "001": { prefix: "001", count: 47 },
-  "002": { prefix: "002", count: 70 },
-  "003": { prefix: "003", count: 61 },
-  "004": { prefix: "004", count: 65 },
-  "005": { prefix: "底板飘散", count: 149 },
-  "006": { prefix: "006", count: 199 },
-  "007": { prefix: "007", count: 172 },
+  "001": { prefix: "001", count: 24 },
+  "002": { prefix: "002", count: 36 },
+  "003": { prefix: "003", count: 31 },
+  "004": { prefix: "004", count: 34 },
+  "005": { prefix: "底板飘散", count: 75 },
+  "006": { prefix: "006", count: 100 },
+  "007": { prefix: "007", count: 87 },
 } as const;
 
 export type SequenceName = keyof typeof FRAME_SEQUENCES;

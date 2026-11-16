@@ -1,5 +1,5 @@
 // Hero frame stage (markup: src/components/FrameStage.astro). Builds a FrameStage per breakpoint: desktop loads the
-// full-size frames (half-size on small or 1x screens), mobile loads every other half-size frame and moves more per px.
+// full-size frames (half-size on small or 1x screens), mobile loads the half-size frames and moves more per px.
 // Effect segments' progress is re-dispatched on the section as EFFECT_EVENT, so overlays in the slot can follow it.
 import { gsap } from "../gsap";
 import { FrameStage, type StageProfile } from "../FrameStage";
@@ -26,7 +26,7 @@ export class FrameStageScene {
       .matchMedia()
       .add(`(min-width: ${MOBILE_MAX_WIDTH + 1}px)`, () => this.build(section, canvas, FrameStageScene.desktopProfile()))
       .add(`(max-width: ${MOBILE_MAX_WIDTH}px)`, () =>
-        this.build(section, canvas, { size: "sm", step: 2, mobile: true, framesPerPx: 0.5 }),
+        this.build(section, canvas, { size: "sm", step: 1, mobile: true, framesPerPx: 0.25 }),
       );
   }
 
@@ -34,8 +34,8 @@ export class FrameStageScene {
   private static desktopProfile(): StageProfile {
     const screenPx = window.innerWidth * Math.min(window.devicePixelRatio || 1, 2);
     const size = screenPx > FRAME_SIZES.sm.width * 1.25 ? "lg" : "sm";
-    // One mouse notch (~100px) ≈ 20 frames
-    return { size, step: 1, mobile: false, framesPerPx: 0.2 };
+    // One mouse notch (~100px) ≈ 10 frames
+    return { size, step: 1, mobile: false, framesPerPx: 0.1 };
   }
 
   /** Create the stage for one breakpoint; returns its cleanup for matchMedia */

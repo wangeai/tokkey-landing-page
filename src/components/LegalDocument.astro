@@ -46,6 +46,29 @@
   }
   .legal :global(li) {
     margin-bottom: 8px;
+    padding-left: 4px;
+  }
+  /* Bullets are coloured dots, like the source docs */
+  .legal :global(li::marker) {
+    color: var(--color-accent);
+  }
+  /* Two equal columns with hairline borders on every cell, as in the source docs */
+  .legal :global(table) {
+    width: 100%;
+    margin: 8px 0 24px;
+    border-collapse: collapse;
+    table-layout: fixed;
+  }
+  .legal :global(th),
+  .legal :global(td) {
+    padding: 10px 12px;
+    border: 1px solid var(--color-graphite);
+    text-align: left;
+    vertical-align: top;
+    font-size: var(--text-body);
+    line-height: var(--text-body--line-height);
+    color: var(--color-silver);
+    font-weight: 400;
   }
   .legal :global(strong) {
     color: var(--color-white);

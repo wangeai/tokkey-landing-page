@@ -18,12 +18,12 @@ export type TimelineSegment =
       kind: "effect";
       /** Name passed to FrameStage.onEffect */
       id: string;
-      /** Scroll length, in frames (60 = as much scrolling as 60 frames) */
+      /** Scroll length, in frames (30 = as much scrolling as 30 frames) */
       length: number;
     };
 
 export const TIMELINE: TimelineSegment[] = [
-  { kind: "effect", id: "heroTitle", length: 20 }, // "Own Your Intelligence." fades out on the first slight scroll (HeroTitleScene)
+  { kind: "effect", id: "heroTitle", length: 10 }, // "Own Your Intelligence." fades out on the first slight scroll (HeroTitleScene)
   { kind: "frames", sequence: "001", mobileFit: "contain" }, // lid lifts, logo glows
   { kind: "frames", sequence: "002", mobileFit: "cover" }, // laptop opens, camera moves in to the plugged-in key
   // Example of an effect between scenes: { kind: "effect", id: "agentsFly", length: 60 },
@@ -32,4 +32,5 @@ export const TIMELINE: TimelineSegment[] = [
   { kind: "frames", sequence: "005", mobileFit: "contain" }, // lightning reveals the internals
   { kind: "frames", sequence: "006", mobileFit: "contain" }, // energy flows through the internals
   { kind: "frames", sequence: "007", mobileFit: "contain" }, // follows on from 006
+  { kind: "effect", id: "productViewer", length: 50 }, // last frame crossfades into the live 3D key (ProductViewerScene)
 ];
