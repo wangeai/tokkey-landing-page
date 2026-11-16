@@ -12,6 +12,7 @@
     "check": "astro check"
   },
   "dependencies": {
+    "@astrojs/sitemap": "^3.7.5",
     "@tailwindcss/vite": "^4.3.3",
     "astro": "^7.4.4",
     "gsap": "^3.15.0",

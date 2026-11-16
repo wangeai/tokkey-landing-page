@@ -12,6 +12,11 @@ import Testimonials from "../components/Testimonials.astro";
 import RentingStatement from "../components/RentingStatement.astro";
 import PersonalPrivacy from "../components/PersonalPrivacy.astro";
 import Faq from "../components/Faq.astro";
+import { FAQ_ITEMS } from "../config/faq";
+import { StructuredData } from "../config/seo";
+
+// Structured data for Google: brand, product brief and the FAQ shown at the bottom of the page
+const schemas = [StructuredData.organization(), StructuredData.product(), StructuredData.faqPage(FAQ_ITEMS)];
 ---
 
 <BaseLayout navOverHero>
@@ -21,6 +26,7 @@ import Faq from "../components/Faq.astro";
     rel="stylesheet"
     href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;1,400&family=Cormorant+Garamond:wght@300&family=EB+Garamond:ital,wght@1,400&family=Bodoni+Moda:opsz,wght@6..96,400&family=DM+Serif+Display:ital@1&family=Josefin+Slab:wght@300&family=Space+Grotesk:wght@300&family=Bebas+Neue&family=Courier+Prime&display=swap"
   />
+  <script slot="head" type="application/ld+json" set:html={JSON.stringify(schemas)} is:inline />
   <FrameStage>
     <!-- Hero headline over the first frames; scrolls away as the stage starts playing (HeroTitleScene).
          Figma 1157:61: Inter Medium 128px / 0.95 on a 1920 frame (scales with the viewport), top at 31%, 0.12em word gap (two lines on mobile), round accent dot -->
