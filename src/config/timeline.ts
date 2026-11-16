@@ -32,5 +32,5 @@ export const TIMELINE: TimelineSegment[] = [
   { kind: "frames", sequence: "005", mobileFit: "contain" }, // lightning reveals the internals
   { kind: "frames", sequence: "006", mobileFit: "contain" }, // energy flows through the internals
   { kind: "frames", sequence: "007", mobileFit: "contain" }, // follows on from 006
-  { kind: "effect", id: "productViewer", length: 50 }, // last frame crossfades into the live 3D key (ProductViewerScene)
+  { kind: "effect", id: "productViewer", length: 100 }, // last frame crossfades into the live 3D key (ProductViewerScene)
 ];
