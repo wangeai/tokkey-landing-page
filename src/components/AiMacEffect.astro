@@ -1,0 +1,66 @@
+---
+// "Turn your Mac into an AI Mac." over the end of scene 002 (effect "aiMac", prototype `#t2` + `#ags`): the heading
+// rises in, the agent chips appear under it, then fly one by one into the plugged-in key while a halo grows around it.
+// Goes in FrameStage's slot. Behavior: src/scripts/scenes/AiMacScene.ts.
+const AGENTS: { name: string; icon?: string }[] = [
+  { name: "Claude Code", icon: "claude-code" },
+  { name: "Codex", icon: "codex" },
+  { name: "Cursor", icon: "cursor" },
+  { name: "Gemini CLI", icon: "gemini-cli" },
+  { name: "OpenClaw" },
+  { name: "Hermes" },
+  { name: "Cline", icon: "cline" },
+  { name: "Aider" },
+];
+---
+
+<div data-ai-mac class="pointer-events-none absolute inset-0">
+  <!-- Glow around the key; JS centers it on the key in the frame -->
+  <div data-ref="halo" class="halo absolute left-0 top-0" aria-hidden="true"></div>
+  <h2
+    data-ref="title"
+    class="title absolute left-gutter-sm top-[15vh] text-h2-sm font-medium text-white/55 md:left-[7vw] md:text-h2 md:tracking-[-0.03em]"
+  >
+    Turn your Mac<br />into an <span class="text-white">AI Mac</span><span class="dot" aria-hidden="true"></span>
+  </h2>
+  <ul data-ref="agents" aria-label="Works with your coding agents">
+    {
+      AGENTS.map(({ name, icon }) => (
+        <li
+          class:list={[
+            "agent absolute left-0 top-0 inline-flex items-center gap-3 rounded-full bg-white/10 py-2 text-body font-medium whitespace-nowrap text-white",
+            icon ? "pl-3 pr-6" : "px-6",
+          ]}
+        >
+          {icon && <img src={`/assets/icons/agents/${icon}.svg`} width="20" height="20" alt="" aria-hidden="true" />}
+          {name}
+        </li>
+      ))
+    }
+  </ul>
+</div>
+
+<script>
+  import { AiMacScene } from "../scripts/scenes/AiMacScene";
+  const root = document.querySelector<HTMLElement>("[data-ai-mac]");
+  const section = root?.closest<HTMLElement>("[data-frame-stage]");
+  if (root && section) new AiMacScene(root, section);
+</script>
+
+<style>
+  /* Hidden until the effect starts; JS drives opacity and transform from the scroll */
+  .title,
+  .agent,
+  .halo {
+    opacity: 0;
+    will-change: transform, opacity;
+  }
+  /* Prototype `#tkB .halo`: soft white radial glow, 520px */
+  .halo {
+    width: 520px;
+    height: 520px;
+    margin: -260px 0 0 -260px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgb(255 255 255 / 0.5), rgb(255 255 255 / 0) 62%);
+  }
+</style>
