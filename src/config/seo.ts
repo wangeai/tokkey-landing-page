@@ -13,6 +13,18 @@ export const SEO_BRIEF = {
 
 /** Builds schema.org JSON-LD objects for the page <head> */
 export class StructuredData {
+  /** The site itself; `name` is the site name Google shows above the result URL */
+  static webSite() {
+    return {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      name: "Tokkey",
+      // Other names people search for, so they map to this site
+      alternateName: ["Tokkey AI", "tokkey.ai"],
+      url: `${SITE_URL}/`,
+    };
+  }
+
   /** The company behind the site */
   static organization() {
     return {
@@ -20,7 +32,8 @@ export class StructuredData {
       "@type": "Organization",
       name: "Tokkey",
       url: SITE_URL,
-      logo: `${SITE_URL}/assets/icons/tokkey_logo.svg`,
+      // Google does not accept SVG logos; use the 180px PNG
+      logo: `${SITE_URL}/apple-touch-icon.png`,
     };
   }
 
