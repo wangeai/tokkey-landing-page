@@ -43,7 +43,7 @@ export class FrameStageScene {
     const screenPx = window.innerWidth * Math.min(window.devicePixelRatio || 1, 2);
     const size = screenPx > FRAME_SIZES.sm.width * 1.25 ? "lg" : "sm";
     // One mouse notch (~100px) ≈ 10 frames
-    return { size, mobile: false, framesPerPx: 0.1 };
+    return { size, mobile: false, framesPerPx: 0.05 };
   }
 
   /** Create the stage for one breakpoint; returns its cleanup for matchMedia */
