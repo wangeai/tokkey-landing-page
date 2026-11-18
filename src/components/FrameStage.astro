@@ -8,6 +8,9 @@
   <!-- Starts below the fixed nav so frames aren't hidden behind it; on desktop FrameCanvas slides it lower from scene
        003 on (see `lower` in src/config/timeline.ts) -->
   <canvas data-ref="frames" class="absolute inset-x-0 top-header h-[calc(100%-var(--spacing-header))] w-full"></canvas>
+  <!-- The sequences' videos (VideoStore), drawn onto the canvas; kept in the document but invisible, since some
+       browsers only decode videos that are in it -->
+  <div data-ref="videos" class="pointer-events-none absolute size-px overflow-hidden opacity-0" aria-hidden="true"></div>
   <slot />
 </section>
 

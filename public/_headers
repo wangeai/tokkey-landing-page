@@ -2,3 +2,7 @@
 # for a week rather than forever.
 /assets/frames/*
   Cache-Control: public, max-age=43200
+
+# Scene videos (scripts/encode_videos.py) also keep their names when re-encoded
+/assets/videos/*
+  Cache-Control: public, max-age=43200

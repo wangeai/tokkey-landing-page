@@ -1,5 +1,5 @@
 // Hero frame stage (markup: src/components/FrameStage.astro). Builds a FrameStage per breakpoint: desktop loads the
-// full-size frames (half-size on small or 1x screens), mobile loads the half-size frames and moves more per px.
+// full-size videos (half-size on small or 1x screens), mobile loads the half-size videos and moves more per px.
 // Effect segments' progress is re-dispatched on the section as EFFECT_EVENT, so overlays in the slot can follow it.
 import { gsap, ScrollTrigger } from "../gsap";
 import { FrameStage, type StageProfile } from "../FrameStage";
@@ -23,11 +23,12 @@ export class FrameStageScene {
   constructor(section: HTMLElement) {
     FrameStageScene.startAtTop();
     const canvas = section.querySelector<HTMLCanvasElement>("[data-ref=frames]")!;
+    const videos = section.querySelector<HTMLElement>("[data-ref=videos]")!;
     gsap
       .matchMedia()
-      .add(`(min-width: ${MOBILE_MAX_WIDTH + 1}px)`, () => this.build(section, canvas, FrameStageScene.desktopProfile()))
+      .add(`(min-width: ${MOBILE_MAX_WIDTH + 1}px)`, () => this.build(section, canvas, videos, FrameStageScene.desktopProfile()))
       .add(`(max-width: ${MOBILE_MAX_WIDTH}px)`, () =>
-        this.build(section, canvas, { size: "sm", step: 1, mobile: true, framesPerPx: 0.25 }),
+        this.build(section, canvas, videos, { size: "sm", mobile: true, framesPerPx: 0.25 }),
       );
   }
 
@@ -37,17 +38,17 @@ export class FrameStageScene {
     if (!location.hash) window.scrollTo(0, 0);
   }
 
-  /** Full-size frames only when the screen would show more than the small set's pixels */
+  /** Full-size videos only when the screen would show more than the small set's pixels */
   private static desktopProfile(): StageProfile {
     const screenPx = window.innerWidth * Math.min(window.devicePixelRatio || 1, 2);
     const size = screenPx > FRAME_SIZES.sm.width * 1.25 ? "lg" : "sm";
     // One mouse notch (~100px) ≈ 10 frames
-    return { size, step: 1, mobile: false, framesPerPx: 0.1 };
+    return { size, mobile: false, framesPerPx: 0.1 };
   }
 
   /** Create the stage for one breakpoint; returns its cleanup for matchMedia */
-  private build(section: HTMLElement, canvas: HTMLCanvasElement, profile: StageProfile): () => void {
-    const stage = new FrameStage(section, canvas, profile);
+  private build(section: HTMLElement, canvas: HTMLCanvasElement, videos: HTMLElement, profile: StageProfile): () => void {
+    const stage = new FrameStage(section, canvas, videos, profile);
     for (const id of FrameStageScene.EFFECT_IDS) {
       stage.onEffect(id, (progress) =>
         section.dispatchEvent(new CustomEvent<StageEffect>(FrameStageScene.EFFECT_EVENT, { detail: { id, progress } })),

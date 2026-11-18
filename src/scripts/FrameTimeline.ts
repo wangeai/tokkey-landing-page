@@ -1,6 +1,6 @@
 // Lays TIMELINE segments end to end on one axis measured in source frames, and maps a position on it to the frame to
-// draw (an index into one flat list of every frame URL) plus the progress of each effect segment.
-import { FRAME_SEQUENCES, frameUrl, type FrameSize } from "../config/frames";
+// draw (a sequence and a frame in it) plus the progress of each effect segment.
+import { FRAME_SEQUENCES, type SequenceName } from "../config/frames";
 import type { FrameFit, TimelineSegment } from "../config/timeline";
 
 type FramesSegment = Extract<TimelineSegment, { kind: "frames" }>;
@@ -13,14 +13,15 @@ interface Span {
   start: number;
   /** Scroll length in source frames */
   length: number;
-  /** Frames: flat index of its first frame. Effects: flat index of the frame held underneath */
+  /** Sequence on screen */
+  sequence: SequenceName;
+  /** Frames: its first source frame. Effects: the source frame held underneath */
   firstFrame: number;
-  /** Frames: number of frames loaded (fewer than the source count when `step` > 1) */
-  frameCount: number;
 }
 
 export interface TimelinePoint {
-  /** Flat index into `urls` */
+  sequence: SequenceName;
+  /** Source frame in `sequence` */
   frame: number;
   fit: FrameFit;
   filter: string;
@@ -28,53 +29,58 @@ export interface TimelinePoint {
   lowered: number;
 }
 
+/** Positions (inclusive) over which a sequence is on screen, effects held on its frames included */
+export interface Clip {
+  sequence: SequenceName;
+  start: number;
+  end: number;
+}
+
 export class FrameTimeline {
-  /** Every frame URL, in play order */
-  readonly urls: string[] = [];
   /** Last valid position */
   readonly end: number;
+  /** One per sequence, in play order */
+  readonly clips: Clip[] = [];
   private readonly spans: Span[] = [];
   /** The `lower` segment's span, if any */
   private readonly lowerSpan: Span | undefined;
 
   constructor(
     segments: TimelineSegment[],
-    size: FrameSize,
-    /** Load every `step`-th frame (mobile uses 2) */
-    private readonly step: number,
     private readonly mobile: boolean,
   ) {
+    // An effect before any frames holds the first frame of the first frames segment
+    const opening = segments.find((s): s is FramesSegment => s.kind === "frames")!;
     let start = 0;
     let look: FramesSegment | null = null;
     for (const segment of segments) {
       if (segment.kind === "frames") {
         look = segment;
-        const { count } = FRAME_SEQUENCES[segment.sequence];
         const first = segment.from ?? 0;
-        const last = Math.min(count - 1, segment.to ?? count - 1);
-        const length = last - first + 1;
-        const firstFrame = this.urls.length;
-        for (let i = first; i <= last; i += step) this.urls.push(frameUrl(segment.sequence, i, size));
-        this.spans.push({ segment, look, start, length, firstFrame, frameCount: this.urls.length - firstFrame });
-        start += length;
+        const last = Math.min(FRAME_SEQUENCES[segment.sequence].count - 1, segment.to ?? Infinity);
+        this.addSpan({ segment, look, start, length: last - first + 1, sequence: segment.sequence, firstFrame: first });
       } else {
-        // Holds the last frame before it (or the first frame, if the timeline opens with an effect)
-        this.spans.push({ segment, look, start, length: segment.length, firstFrame: Math.max(0, this.urls.length - 1), frameCount: 0 });
-        start += segment.length;
+        // Holds the last frame before it (or the opening frame, if the timeline starts with an effect)
+        const held = this.spans.at(-1);
+        const sequence = held?.sequence ?? opening.sequence;
+        const firstFrame = held ? held.firstFrame + (held.segment.kind === "frames" ? held.length - 1 : 0) : (opening.from ?? 0);
+        this.addSpan({ segment, look, start, length: segment.length, sequence, firstFrame });
       }
+      start += this.spans.at(-1)!.length;
     }
     this.end = Math.max(0, start - 1);
     this.lowerSpan = this.spans.find((s) => s.segment.kind === "frames" && s.segment.lower);
   }
 
-  /** Frame, fit and filter to show at `position` */
+  /** Sequence, frame, fit and filter to show at `position` */
   at(position: number): TimelinePoint {
     const span = this.spanAt(position);
     const frame =
       span.segment.kind === "frames"
-        ? span.firstFrame + Math.min(span.frameCount - 1, Math.floor((position - span.start) / this.step))
+        ? span.firstFrame + Math.min(span.length - 1, Math.floor(position - span.start))
         : span.firstFrame;
     return {
+      sequence: span.sequence,
       frame,
       fit: this.mobile && span.look ? span.look.mobileFit : "cover",
       filter: span.look?.filter ?? "",
@@ -89,6 +95,15 @@ export class FrameTimeline {
       if (segment.kind === "effect") progress.set(segment.id, Math.min(1, Math.max(0, (position - start) / length)));
     }
     return progress;
+  }
+
+  /** Record a span and stretch its sequence's clip over it */
+  private addSpan(span: Span): void {
+    this.spans.push(span);
+    const end = span.start + span.length - 1;
+    const clip = this.clips.find((c) => c.sequence === span.sequence);
+    if (clip) clip.end = end;
+    else this.clips.push({ sequence: span.sequence, start: span.start, end });
   }
 
   private lowered(position: number): number {

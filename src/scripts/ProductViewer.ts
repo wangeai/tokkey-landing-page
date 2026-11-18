@@ -4,6 +4,7 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
+import { MeshoptDecoder } from "three/examples/jsm/libs/meshopt_decoder.module.js";
 import { HDRLoader } from "three/examples/jsm/loaders/HDRLoader.js";
 import { RoomEnvironment } from "three/examples/jsm/environments/RoomEnvironment.js";
 import { gsap } from "./gsap";
@@ -24,6 +25,8 @@ export interface ViewerOptions {
   turntable: boolean;
   /** Scales the framed model (1 = fits like the standalone viewer, >1 = closer) */
   zoom: number;
+  /** Soft (PCF soft) shadow edges; off on phones, where the extra shadow samples cost too much */
+  softShadows: boolean;
   /** Called when the user starts dragging (auto-rotate has just turned off) */
   onDragStart?: () => void;
 }
@@ -62,7 +65,7 @@ export class ProductViewer {
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
     this.renderer.shadowMap.enabled = true;
-    this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    this.renderer.shadowMap.type = options.softShadows ? THREE.PCFSoftShadowMap : THREE.PCFShadowMap;
     // Shadows only change when parts move, so redraw the shadow map on demand
     this.renderer.shadowMap.autoUpdate = false;
     this.controls = this.createControls();
@@ -75,7 +78,8 @@ export class ProductViewer {
   async load(): Promise<void> {
     const [, gltf, table] = await Promise.all([
       this.loadEnvironment(),
-      new GLTFLoader().loadAsync(PRODUCT_MODEL.modelUrl),
+      // The GLB is Meshopt-compressed (see PRODUCT_MODEL.modelUrl)
+      new GLTFLoader().setMeshoptDecoder(MeshoptDecoder).loadAsync(PRODUCT_MODEL.modelUrl),
       fetch(PRODUCT_MODEL.explodeUrl)
         .then((r) => (r.ok ? (r.json() as Promise<ExplodeTable>) : null))
         .catch(() => null),
@@ -87,6 +91,8 @@ export class ProductViewer {
     if (table) this.explode = this.createExplode(this.model, table, scale);
     this.layout();
     this.fit(true);
+    // Compile shaders now (in parallel where the GPU driver allows) instead of stalling the first rendered frame
+    await this.renderer.compileAsync(this.scene, this.camera);
   }
 
   /** Whether explode / assemble is available (the table loaded) */

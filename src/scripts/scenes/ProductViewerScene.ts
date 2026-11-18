@@ -1,7 +1,8 @@
 // End of the hero (markup: src/components/ProductViewer.astro): after scene 007's last frame, the "productViewer"
 // effect crossfades into the live 3D key, with the standalone viewer's controls. Each time the viewer leaves the screen
-// it goes back to its starting state, so scrolling into it always starts fresh. The model (~9 MB with the HDRI) and
-// three.js load once the page is idle, and the viewer renders only while it's visible and the stage is on screen.
+// it goes back to its starting state, so scrolling into it always starts fresh. The model, HDRI and three.js load only
+// once the playhead nears the end of the hero (LOAD_EFFECT_ID), and the viewer renders only while it's visible and
+// the stage is on screen.
 import { gsap } from "../gsap";
 import type { ProductViewer, ViewerOptions } from "../ProductViewer";
 import { FrameStageScene, type StageEffect } from "./FrameStageScene";
@@ -12,6 +13,8 @@ export class ProductViewerScene {
   private static readonly EFFECT_ID = "productViewer";
   /** Share of the effect spent fading in; the rest holds the viewer before the stage unpins */
   private static readonly FADE_SHARE = 0.4;
+  /** Effect segment whose start begins loading the viewer: a couple of scenes before it shows */
+  private static readonly LOAD_EFFECT_ID = "truePower";
 
   private readonly canvas: HTMLCanvasElement;
   /** Canvas and controls, faded in only once the black layer fully hides the last frame */
@@ -25,6 +28,10 @@ export class ProductViewerScene {
   /** Crossfade amount from the scroll (0..1) */
   private fade = 0;
   private stageOnScreen = false;
+  /** Whether the playhead has reached LOAD_EFFECT_ID; then the viewer loads */
+  private near = false;
+  /** Load for the current breakpoint, waiting for `near` */
+  private pendingLoad: (() => void) | null = null;
 
   constructor(
     private readonly root: HTMLElement,
@@ -42,6 +49,8 @@ export class ProductViewerScene {
     section.addEventListener(FrameStageScene.EFFECT_EVENT, (event) => {
       const { id, progress } = (event as CustomEvent<StageEffect>).detail;
       if (id === ProductViewerScene.EFFECT_ID) this.setFade(Math.min(1, progress / ProductViewerScene.FADE_SHARE));
+      // Passed effects read 1, so landing further down the page (e.g. via a #link) loads it too
+      if (id === ProductViewerScene.LOAD_EFFECT_ID && progress > 0) this.markNear();
     });
     // The effect keeps reading 1 after the stage scrolls away: stop rendering then
     new IntersectionObserver(([entry]) => {
@@ -52,11 +61,11 @@ export class ProductViewerScene {
     gsap
       .matchMedia()
       // Desktop zoom: the canvas starts below the nav, so frame ~9% closer to match the standalone viewer's size
-      .add(`(min-width: ${MOBILE_MAX_WIDTH + 1}px)`, () => this.build({ maxDpr: 2, turntable: false, zoom: 1.09 }))
-      .add(`(max-width: ${MOBILE_MAX_WIDTH}px)`, () => this.build({ maxDpr: 1.5, turntable: true, zoom: 1 }));
+      .add(`(min-width: ${MOBILE_MAX_WIDTH + 1}px)`, () => this.build({ maxDpr: 2, turntable: false, zoom: 1.09, softShadows: true }))
+      .add(`(max-width: ${MOBILE_MAX_WIDTH}px)`, () => this.build({ maxDpr: 1.5, turntable: true, zoom: 1, softShadows: false }));
   }
 
-  /** Create the viewer for one breakpoint once the page is idle; returns its cleanup for matchMedia */
+  /** Create the viewer for one breakpoint once the playhead is near; returns its cleanup for matchMedia */
   private build(options: Omit<ViewerOptions, "onDragStart">): () => void {
     let viewer: ProductViewer | null = null;
     let cancelled = false;
@@ -84,14 +93,26 @@ export class ProductViewerScene {
       this.buttons.explode.disabled = !viewer.canExplode;
       this.update();
     };
-    const idle = window.requestIdleCallback ?? ((cb: () => void) => window.setTimeout(cb, 1500));
-    if (document.readyState === "complete") idle(start);
-    else window.addEventListener("load", () => idle(start), { once: true });
+    this.whenNear(start);
     return () => {
       cancelled = true;
+      if (this.pendingLoad === start) this.pendingLoad = null;
       viewer?.destroy();
       if (this.viewer === viewer) this.viewer = null;
     };
+  }
+
+  /** Run `load` now if the playhead is already near, else once it gets there */
+  private whenNear(load: () => void): void {
+    if (this.near) load();
+    else this.pendingLoad = load;
+  }
+
+  private markNear(): void {
+    if (this.near) return;
+    this.near = true;
+    this.pendingLoad?.();
+    this.pendingLoad = null;
   }
 
   private toggleSpin(): void {
