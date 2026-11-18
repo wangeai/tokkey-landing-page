@@ -12,6 +12,7 @@ export class ScrollScrubber {
   /** Where the timeline is (0..end) */
   target = 0;
   private readonly trigger: ScrollTrigger;
+  private readonly framesPerPx: number;
 
   constructor(
     /** Section to pin while the timeline plays */
@@ -20,6 +21,7 @@ export class ScrollScrubber {
     end: number,
     options: ScrubberOptions,
   ) {
+    this.framesPerPx = options.framesPerPx;
     this.trigger = ScrollTrigger.create({
       trigger: section,
       start: "top top",
@@ -29,6 +31,11 @@ export class ScrollScrubber {
     });
     // A refresh can restore the page mid-pin: start where the scroll already is
     this.target = this.trigger.progress * end;
+  }
+
+  /** Page scroll y that puts the timeline at `position` */
+  scrollYAt(position: number): number {
+    return this.trigger.start + position / this.framesPerPx;
   }
 
   destroy(): void {

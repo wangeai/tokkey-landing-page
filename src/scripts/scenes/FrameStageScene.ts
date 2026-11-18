@@ -18,6 +18,12 @@ export interface StageEffect {
 export class FrameStageScene {
   /** CustomEvent<StageEffect> fired on the section whenever an effect's progress changes */
   static readonly EFFECT_EVENT = "stage-effect";
+  /** Fired on the section when the hero title's intro has finished; the opening scene auto-plays then */
+  static readonly INTRO_DONE_EVENT = "stage-intro-done";
+  /** How long the auto-played opening scene takes (s) */
+  private static readonly AUTOPLAY_DURATION = 2.5;
+  /** Inputs that mean the visitor is scrolling on their own */
+  private static readonly USER_INPUT = ["wheel", "touchstart", "keydown", "pointerdown"] as const;
   private static readonly EFFECT_IDS = TIMELINE.flatMap((s) => (s.kind === "effect" ? [s.id] : []));
 
   constructor(section: HTMLElement) {
@@ -43,7 +49,7 @@ export class FrameStageScene {
     const screenPx = window.innerWidth * Math.min(window.devicePixelRatio || 1, 2);
     const size = screenPx > FRAME_SIZES.sm.width * 1.25 ? "lg" : "sm";
     // One mouse notch (~100px) ≈ 10 frames
-    return { size, mobile: false, framesPerPx: 0.05 };
+    return { size, mobile: false, framesPerPx: 0.1 };
   }
 
   /** Create the stage for one breakpoint; returns its cleanup for matchMedia */
@@ -54,6 +60,25 @@ export class FrameStageScene {
         section.dispatchEvent(new CustomEvent<StageEffect>(FrameStageScene.EFFECT_EVENT, { detail: { id, progress } })),
       );
     }
-    return () => stage.destroy();
+    const stopAutoplay = FrameStageScene.autoplayOpening(section, stage);
+    return () => {
+      stopAutoplay();
+      stage.destroy();
+    };
+  }
+
+  /** Play the opening scene once the hero intro is done, unless the visitor has scrolled by then; returns the cleanup */
+  private static autoplayOpening(section: HTMLElement, stage: FrameStage): () => void {
+    const play = () => {
+      cancel();
+      if (window.scrollY === 0) stage.playOpening(FrameStageScene.AUTOPLAY_DURATION);
+    };
+    const cancel = () => {
+      section.removeEventListener(FrameStageScene.INTRO_DONE_EVENT, play);
+      for (const type of FrameStageScene.USER_INPUT) window.removeEventListener(type, cancel);
+    };
+    section.addEventListener(FrameStageScene.INTRO_DONE_EVENT, play);
+    for (const type of FrameStageScene.USER_INPUT) window.addEventListener(type, cancel, { passive: true });
+    return cancel;
   }
 }

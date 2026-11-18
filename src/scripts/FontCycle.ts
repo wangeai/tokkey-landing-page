@@ -15,16 +15,21 @@ export class FontCycle {
   /** Letter-spacing ease back to the CSS value at the end */
   private static readonly SETTLE = "letter-spacing .6s cubic-bezier(.25,.46,.45,.94)";
   private timer = 0;
+  /** Resolves the promise of the running play() */
+  private done: () => void = () => {};
 
   constructor(
     private readonly el: HTMLElement,
     private readonly fonts: CycleFont[],
   ) {}
 
-  /** Load every font, then run the cycle once */
+  /** Load every font, then run the cycle once; resolves when it settles (or is stopped) */
   async play(): Promise<void> {
     await Promise.all(this.fonts.map((f) => document.fonts.load(`${f.style} ${f.weight} 1em ${f.family}`))).catch(() => {});
-    this.timer = window.setTimeout(() => this.step(0), FontCycle.START_DELAY);
+    return new Promise((resolve) => {
+      this.done = resolve;
+      this.timer = window.setTimeout(() => this.step(0), FontCycle.START_DELAY);
+    });
   }
 
   /** Stop and drop back to the CSS font */
@@ -49,5 +54,6 @@ export class FontCycle {
   /** Clear the inline font so the element's own classes apply again, easing the letter-spacing over */
   private settle(): void {
     Object.assign(this.el.style, { transition: FontCycle.SETTLE, fontFamily: "", fontStyle: "", fontWeight: "", letterSpacing: "" });
+    this.done();
   }
 }

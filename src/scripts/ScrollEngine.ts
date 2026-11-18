@@ -33,10 +33,11 @@ export class ScrollEngine {
     else this.lenis?.start();
   }
 
-  /** Smooth-scroll (or jump, with `immediate`) to an element or y position; falls back to native when Lenis is off */
-  scrollTo(target: string | HTMLElement | number, immediate = false): void {
+  /** Smooth-scroll (or jump, with `immediate`) to an element or y position, over `duration` s if given; falls back to
+   *  native when Lenis is off */
+  scrollTo(target: string | HTMLElement | number, immediate = false, duration?: number): void {
     if (this.lenis) {
-      this.lenis.scrollTo(target, { immediate, force: true });
+      this.lenis.scrollTo(target, { immediate, force: true, duration });
       return;
     }
     const el = typeof target === "string" ? document.querySelector(target) : target;

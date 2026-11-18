@@ -7,7 +7,8 @@ import { FrameCanvas } from "./FrameCanvas";
 import { FrameTimeline } from "./FrameTimeline";
 import { ScrollScrubber, type ScrubberOptions } from "./ScrollScrubber";
 import { VideoStore } from "./VideoStore";
-import type { FrameSize } from "../config/frames";
+import { ScrollEngine } from "./ScrollEngine";
+import type { FrameSize, SequenceName } from "../config/frames";
 import { TIMELINE } from "../config/timeline";
 
 export interface StageProfile extends ScrubberOptions {
@@ -29,6 +30,8 @@ export class FrameStage {
   private readonly effectProgress = new Map<string, number>();
   /** Where the playhead is (source frames) */
   private position = 0;
+  /** Position of the frame on the canvas; lags `position` while a video downloads or seeks */
+  private shownPosition = 0;
   private readonly tick = () => this.update();
 
   constructor(section: HTMLElement, canvas: HTMLCanvasElement, videos: HTMLElement, profile: StageProfile) {
@@ -46,6 +49,11 @@ export class FrameStage {
     return this;
   }
 
+  /** Scroll the page so the timeline plays to the end of the opening sequence (title exit + 001) over `duration` s */
+  playOpening(duration: number): void {
+    ScrollEngine.instance.scrollTo(this.scrubber.scrollYAt(this.timeline.clips[0].end + 1), false, duration);
+  }
+
   destroy(): void {
     gsap.ticker.remove(this.tick);
     this.scrubber.destroy();
@@ -58,18 +66,29 @@ export class FrameStage {
     this.position = this.scrubber.target;
     const point = this.timeline.at(this.position);
     this.store.setFocus(this.position, point);
-    this.painter.setFilter(point.filter);
-    this.painter.setLowered(point.lowered);
     // The latest frame a seek has landed on; until a sequence's video is ready the previous frame stays up
     const shown = this.store.current(point.sequence);
-    if (shown) this.painter.draw(shown.video, point.fit, `${point.sequence}:${shown.frame}`);
+    if (shown) {
+      this.painter.draw(shown.video, point.fit, `${point.sequence}:${shown.frame}`);
+      this.trackShown(point.sequence, shown.frame, point.frame);
+    }
+    // Look and effects follow the frame on screen, not the scroll, so a slow download can't make them run early
+    const look = this.timeline.at(this.shownPosition);
+    this.painter.setFilter(look.filter);
+    this.painter.setLowered(look.lowered);
     this.reportEffects();
+  }
+
+  /** Update shownPosition from the frame just drawn; on the wanted frame it is the playhead (effects hold that frame) */
+  private trackShown(sequence: SequenceName, shownFrame: number, wantedFrame: number): void {
+    if (shownFrame === wantedFrame) this.shownPosition = this.position;
+    else this.shownPosition = this.timeline.positionOf(sequence, shownFrame) ?? this.shownPosition;
   }
 
   /** Call effect handlers whose progress changed */
   private reportEffects(): void {
     if (!this.effectHandlers.size) return;
-    for (const [id, progress] of this.timeline.effects(this.position)) {
+    for (const [id, progress] of this.timeline.effects(this.shownPosition)) {
       const handler = this.effectHandlers.get(id);
       if (!handler || this.effectProgress.get(id) === progress) continue;
       this.effectProgress.set(id, progress);

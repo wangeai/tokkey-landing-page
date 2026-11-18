@@ -97,6 +97,14 @@ export class FrameTimeline {
     return progress;
   }
 
+  /** Position where a frames segment plays `frame` of `sequence`, or null if none does */
+  positionOf(sequence: SequenceName, frame: number): number | null {
+    const span = this.spans.find(
+      (s) => s.segment.kind === "frames" && s.sequence === sequence && frame >= s.firstFrame && frame < s.firstFrame + s.length,
+    );
+    return span ? span.start + frame - span.firstFrame : null;
+  }
+
   /** Record a span and stretch its sequence's clip over it */
   private addSpan(span: Span): void {
     this.spans.push(span);

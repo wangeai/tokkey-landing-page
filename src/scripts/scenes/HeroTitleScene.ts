@@ -49,19 +49,24 @@ export class HeroTitleScene {
     });
     gsap
       .matchMedia()
-      .add(`(min-width: ${MOBILE_MAX_WIDTH + 1}px) and ${motion}`, () => this.play(title, inner, word, HeroTitleScene.DESKTOP))
-      .add(`(max-width: ${MOBILE_MAX_WIDTH}px) and ${motion}`, () => this.play(title, inner, word, HeroTitleScene.MOBILE))
+      .add(`(min-width: ${MOBILE_MAX_WIDTH + 1}px) and ${motion}`, () => this.play(section, title, inner, word, HeroTitleScene.DESKTOP))
+      .add(`(max-width: ${MOBILE_MAX_WIDTH}px) and ${motion}`, () => this.play(section, title, inner, word, HeroTitleScene.MOBILE))
       // Reduced motion: no intro or dance, just fade out with the scroll
       .add("(prefers-reduced-motion: reduce)", () => this.exit(title, { ...HeroTitleScene.MOBILE, exitRise: 0 }, false));
   }
 
-  /** Intro and font dance on load, plus the exit; returns the cleanup for matchMedia */
-  private play(title: HTMLElement, inner: HTMLElement, word: HTMLElement, motion: TitleMotion): () => void {
-    gsap.from(inner, { opacity: 0, y: motion.introRise, filter: "blur(10px)", duration: 1.6, delay: 0.2, ease: HeroTitleScene.EASE });
+  /** Intro and font dance on load, plus the exit; tells the stage when the intro is done; returns the cleanup for matchMedia */
+  private play(section: HTMLElement, title: HTMLElement, inner: HTMLElement, word: HTMLElement, motion: TitleMotion): () => void {
+    const intro = gsap.from(inner, { opacity: 0, y: motion.introRise, filter: "blur(10px)", duration: 1.6, delay: 0.2, ease: HeroTitleScene.EASE });
     const dance = new FontCycle(word, HeroTitleScene.DANCE);
-    dance.play();
+    let live = true;
+    Promise.all([intro.then(), dance.play()]).then(() => {
+      // Skip if a breakpoint change stopped this intro early
+      if (live) section.dispatchEvent(new Event(FrameStageScene.INTRO_DONE_EVENT));
+    });
     const cleanupExit = this.exit(title, motion, true);
     return () => {
+      live = false;
       dance.stop();
       cleanupExit();
     };
