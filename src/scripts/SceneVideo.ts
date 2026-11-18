@@ -33,11 +33,16 @@ export class SceneVideo {
     container.append(this.video);
   }
 
+  /** Whether the whole file has downloaded */
+  get downloaded(): boolean {
+    return this.blobUrl !== "";
+  }
+
   /** Start downloading (no-op if already loading or loaded) */
-  load(): void {
+  load(priority: RequestPriority): void {
     if (this.abort) return;
     const abort = (this.abort = new AbortController());
-    fetch(this.url, { signal: abort.signal })
+    fetch(this.url, { signal: abort.signal, priority })
       .then((response) => (response.ok ? response.blob() : Promise.reject(new Error(`${response.status} ${this.url}`))))
       .then((blob) => {
         if (this.abort !== abort) return;
