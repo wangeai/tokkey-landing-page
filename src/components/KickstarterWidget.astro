@@ -1,31 +1,20 @@
 ---
-// Floating "Sign up for Kickstarter" button, bottom-right on every page (prototype `#kkw`, glass style): opens an email
-// card; the Kickstarter sticker pops in beside the button for a while. Behavior: src/scripts/KickstarterWidget.ts.
+// Floating "Sign up for Kickstarter" link, bottom-right on every page (prototype `#kkw`, glass style): opens the shop
+// (shop.tokkey.ai) in a new tab; the Kickstarter sticker pops in beside the button for a while. Behavior: src/scripts/KickstarterWidget.ts.
+
+/** Shop page both the pill and the sticker open in a new tab */
+const SHOP_URL = "https://shop.tokkey.ai";
 ---
 
 <div data-kickstarter class="kk">
-  <img class="sticker" src="/assets/images/kickstarter/sticker.png" width="172" height="179" alt="" aria-hidden="true" />
-  <button data-ref="toggle" class="toggle" type="button" aria-expanded="false" aria-controls="kickstarter-card">
+  <!-- Sticker is a second, mouse-only route to the shop; the pill below is the accessible link -->
+  <a class="sticker" href={SHOP_URL} target="_blank" rel="noopener" tabindex="-1" aria-hidden="true">
+    <img src="/assets/images/kickstarter/sticker.png" width="172" height="179" alt="" />
+  </a>
+  <a class="toggle" href={SHOP_URL} target="_blank" rel="noopener">
     <img src="/assets/images/kickstarter/icon.png" width="21" height="24" alt="" />
     Sign up for Kickstarter
-  </button>
-
-  <div data-ref="card" id="kickstarter-card" class="card" role="dialog" aria-labelledby="kickstarter-title" inert>
-    <button data-ref="close" class="close" type="button" aria-label="Close">×</button>
-    <div class="intro">
-      <h2 id="kickstarter-title">Sign up for Kickstarter</h2>
-      <p>Leave your email and we’ll tell you when Tokkey is ready.</p>
-    </div>
-    <form data-ref="form" novalidate>
-      <input data-ref="email" type="email" placeholder="you@email.com" autocomplete="email" aria-label="Email" />
-      <p data-ref="error" class="error" role="alert"></p>
-      <button type="submit">Notify me</button>
-    </form>
-    <div class="done" role="status">
-      <strong><i></i>You’re on the list.</strong>
-      <p>We’ll email you as soon as Tokkey is ready.</p>
-    </div>
-  </div>
+  </a>
 </div>
 
 <script>
@@ -73,7 +62,7 @@
     height: 24px;
     width: auto;
   }
-  .kk :is(button, input):focus-visible {
+  .toggle:focus-visible {
     outline: 2px solid var(--color-accent);
     outline-offset: 2px;
   }
@@ -95,121 +84,19 @@
       opacity 0.3s,
       transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
   }
-  .kk.is-pop:not(.is-open) .sticker {
+  .sticker img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  /* Clickable only while it's visible */
+  .kk.is-pop .sticker {
+    pointer-events: auto;
     opacity: 1;
     transform: rotate(-10deg) scale(1);
   }
   .kk.is-pop .toggle {
     padding-left: 56px;
-  }
-
-  /* Email card: anchored to the button's corner, replaces it while open */
-  .card {
-    position: absolute;
-    right: 0;
-    bottom: 0;
-    width: 360px;
-    max-width: calc(100vw - 32px);
-    padding: 24px;
-    border: 1px solid rgb(255 255 255 / 20%);
-    border-radius: 24px;
-    background: rgb(40 40 44 / 55%);
-    backdrop-filter: blur(28px) saturate(180%);
-    box-shadow:
-      0 16px 48px rgb(0 0 0 / 45%),
-      inset 0 1px 0 rgb(255 255 255 / 14%);
-    opacity: 0;
-    transform: translateY(12px) scale(0.98);
-    pointer-events: none;
-    transition:
-      opacity 0.25s,
-      transform 0.25s;
-  }
-  .kk.is-open .card {
-    opacity: 1;
-    transform: none;
-    pointer-events: auto;
-  }
-  .kk.is-open .toggle {
-    opacity: 0;
-    transform: scale(0.9);
-    pointer-events: none;
-  }
-  .card h2,
-  .done strong {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    font-size: 20px;
-    line-height: 28px;
-    font-weight: 600;
-    letter-spacing: -0.01em;
-    color: #f2f2f2;
-  }
-  .card p {
-    margin: 8px 0 16px;
-    font-size: 16px;
-    line-height: 24px;
-    color: #a1a1a6;
-  }
-  .close {
-    position: absolute;
-    top: 12px;
-    right: 12px;
-    width: 32px;
-    height: 32px;
-    border-radius: 16px;
-    color: #a1a1a6;
-    font-size: 20px;
-    line-height: 32px;
-    cursor: pointer;
-  }
-  form {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-  }
-  input,
-  form button {
-    height: 48px;
-    border-radius: 16px;
-    font-size: 16px;
-    line-height: 24px;
-  }
-  input {
-    padding: 0 16px;
-    border: 1px solid rgb(255 255 255 / 20%);
-    background: rgb(0 0 0 / 28%);
-    color: #f2f2f2;
-  }
-  form button {
-    background: rgb(255 255 255 / 92%);
-    color: #000;
-    font-weight: 600;
-    cursor: pointer;
-  }
-  .card .error {
-    min-height: 20px;
-    margin: 0;
-    font-size: 14px;
-    line-height: 20px;
-    color: #f83830;
-  }
-
-  /* Success state swaps the intro and form for the confirmation */
-  .done {
-    display: none;
-  }
-  .card.is-done :is(.intro, form) {
-    display: none;
-  }
-  .card.is-done .done {
-    display: block;
-  }
-  .done i {
-    width: 8px;
-    height: 8px;
-    background: var(--color-accent);
   }
 
   @media (prefers-reduced-motion: reduce) {
