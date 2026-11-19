@@ -3,7 +3,8 @@
 import "../styles/global.css";
 import Nav from "../components/Nav.astro";
 import Footer from "../components/Footer.astro";
-import KickstarterWidget from "../components/KickstarterWidget.astro";
+// Floating "Sign up for Kickstarter" button: hidden for now, will be added back later
+// import KickstarterWidget from "../components/KickstarterWidget.astro";
 import { SEO_BRIEF } from "../config/seo";
 
 interface Props {
@@ -53,7 +54,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
       <slot />
     </main>
     <Footer aurora={footerAurora} />
-    <KickstarterWidget />
+    {/* <KickstarterWidget /> */}
     <script>
       // Start Lenis + GSAP ScrollTrigger once for the whole page
       import { ScrollEngine } from "../scripts/ScrollEngine";
