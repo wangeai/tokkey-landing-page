@@ -1,7 +1,8 @@
 // One frame sequence as a scroll-scrubbed video, the way Apple's scrub sections work: the whole file is downloaded
 // into a Blob first (so seeks never wait on the network), then each requested frame is a seek on a paused <video>,
 // with at most one seek in flight; requests made meanwhile collapse into the latest one, so a fast scroll skips frames
-// instead of queueing them.
+// instead of queueing them. iOS Safari decodes nothing until a video has played (and never fires `loadeddata` for a
+// paused one), so like Apple's VideoScrub the video is primed with a muted play() → pause() once its metadata is in.
 import { FRAME_FPS } from "../config/frames";
 
 export class SceneVideo {
@@ -26,10 +27,7 @@ export class SceneVideo {
     this.video.playsInline = true;
     this.video.preload = "auto";
     this.video.addEventListener("seeked", () => this.onSeeked());
-    this.video.addEventListener("loadeddata", () => {
-      this.ready = true;
-      this.seekNext();
-    });
+    this.video.addEventListener("loadedmetadata", () => this.prime());
     container.append(this.video);
   }
 
@@ -48,6 +46,7 @@ export class SceneVideo {
         if (this.abort !== abort) return;
         this.blobUrl = URL.createObjectURL(blob);
         this.video.src = this.blobUrl;
+        this.video.load();
       })
       .catch(() => {
         // Aborted, or a network error: the next load() retries
@@ -82,6 +81,19 @@ export class SceneVideo {
   destroy(): void {
     this.unload();
     this.video.remove();
+  }
+
+  /** Play then pause at once so iOS starts decoding; seeks begin after, whether or not play() was allowed */
+  private prime(): void {
+    const src = this.video.src;
+    const done = () => {
+      // An unload() meanwhile cleared the source
+      if (this.video.src !== src || !this.blobUrl) return;
+      this.video.pause();
+      this.ready = true;
+      this.seekNext();
+    };
+    this.video.play().then(done, done);
   }
 
   /** Seek to the wanted frame unless a seek is already running (onSeeked comes back here) */
