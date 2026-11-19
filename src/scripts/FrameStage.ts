@@ -85,10 +85,15 @@ export class FrameStage {
     else this.shownPosition = this.timeline.positionOf(sequence, shownFrame) ?? this.shownPosition;
   }
 
-  /** Call effect handlers whose progress changed */
+  /** Call effect handlers whose progress changed. An effect follows the frame on screen while the playhead is in it, but
+   *  once the playhead has left it (reads 0 or 1) it follows the playhead, so its overlay clears even while the next
+   *  sequence's video is still loading */
   private reportEffects(): void {
     if (!this.effectHandlers.size) return;
-    for (const [id, progress] of this.timeline.effects(this.shownPosition)) {
+    const atPlayhead = this.timeline.effects(this.position);
+    for (const [id, shown] of this.timeline.effects(this.shownPosition)) {
+      const playhead = atPlayhead.get(id)!;
+      const progress = playhead === 0 || playhead === 1 ? playhead : shown;
       const handler = this.effectHandlers.get(id);
       if (!handler || this.effectProgress.get(id) === progress) continue;
       this.effectProgress.set(id, progress);

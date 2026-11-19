@@ -38,7 +38,7 @@ export const TIMELINE: TimelineSegment[] = [
   { kind: "frames", sequence: "002", mobileFit: "contain" }, // laptop opens, camera moves in to the plugged-in key
   { kind: "effect", id: "aiMac", length: 120 }, // "Turn your Mac into an AI Mac.": agent chips fly into the key (AiMacScene)
   { kind: "frames", sequence: "003", mobileFit: "contain", lower: true }, // camera pulls back to the laptop's front view
-  { kind: "effect", id: "privateAgent", length: 200 }, // "A private agent on your Mac.": agent UI plays on the screen (PrivateAgentScene)
+  { kind: "effect", id: "privateAgent", length: 150 }, // "A private agent on your Mac.": agent UI plays on the screen (PrivateAgentScene)
   { kind: "frames", sequence: "004", mobileFit: "contain" }, // laptop rotates to show its underside
   { kind: "frames", sequence: "005", mobileFit: "contain" }, // lightning reveals the internals
   { kind: "frames", sequence: "006", mobileFit: "contain" }, // energy flows through the internals
