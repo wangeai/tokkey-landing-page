@@ -1,5 +1,5 @@
 // Floating "Sign up for Kickstarter" link (prototype `#kkw`): the Kickstarter sticker pops in beside the button after
-// 10 s and leaves after 30 s. The link itself opens shop.tokkey.ai in a new tab (plain markup, no JS needed).
+// 10 s and leaves after 30 s. The link itself jumps to the homepage email box (plain markup, no JS needed).
 export class KickstarterWidget {
   /** Delay before the sticker pops in, and how long it stays (ms) */
   private static readonly POP_DELAY = 10_000;

@@ -2,6 +2,7 @@
 // Fixed site header (Figma: UI (editable)): wordmark, primary links (hidden ≤ 900px), "Reserve your spot" CTA. With `overHero` it has no background
 // while over the hero and turns solid black past it (src/scripts/NavBackdrop.ts).
 import Logo from "./Logo.astro";
+import { RESERVE_HREF } from "../config/reserve";
 
 interface Props {
   /** Share the hero's background instead of a solid bar (software page) */
@@ -30,7 +31,7 @@ const links = [
   <a
     data-ref="cta"
     class="ml-auto inline-flex h-[52px] items-center rounded-full bg-white px-5 text-[16px]/6 font-semibold text-[#111] min-[901px]:ml-0"
-    href="/software#early">Reserve your spot</a
+    href={RESERVE_HREF}>Reserve your spot</a
   >
 </nav>
 

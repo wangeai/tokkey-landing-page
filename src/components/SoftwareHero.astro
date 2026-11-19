@@ -3,6 +3,7 @@
 // a drifting ambient character field, two pill CTAs, and a 160px fade into the paper-coloured features below. Sizes
 // are Figma px via --fx (the 1920 frame scales with the viewport). Field: src/scripts/AmbientField.ts.
 import { SOFTWARE_HERO } from "../config/software";
+import { RESERVE_HREF } from "../config/reserve";
 ---
 
 <section
@@ -39,7 +40,7 @@ import { SOFTWARE_HERO } from "../config/software";
       {SOFTWARE_HERO.text}
     </p>
     <div class="mt-8 flex flex-wrap justify-center gap-3 md:mt-[calc(48.3*var(--fx))] md:gap-[calc(12*var(--fx))]">
-      <a href="#early" class="hero-btn bg-white text-black">Get early access →</a>
+      <a href={RESERVE_HREF} class="hero-btn bg-white text-black">Get early access →</a>
       <a href="#features" class="hero-btn hero-btn-ghost text-white">See what it does</a>
     </div>
   </div>

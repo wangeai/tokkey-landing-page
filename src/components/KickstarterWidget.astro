@@ -1,17 +1,16 @@
 ---
-// Floating "Sign up for Kickstarter" link, bottom-right on every page (prototype `#kkw`, glass style): opens the shop
-// (shop.tokkey.ai) in a new tab; the Kickstarter sticker pops in beside the button for a while. Behavior: src/scripts/KickstarterWidget.ts.
-
-/** Shop page both the pill and the sticker open in a new tab */
-const SHOP_URL = "https://n1wgyk-eh.myshopify.com/products/tokkey-deposit-reservation";
+// Floating "Sign up for Kickstarter" link, bottom-right on every page (prototype `#kkw`, glass style): jumps to the
+// homepage email box (#reserve), which leads on to the shop; the Kickstarter sticker pops in beside the button for a
+// while. Behavior: src/scripts/KickstarterWidget.ts.
+import { RESERVE_HREF } from "../config/reserve";
 ---
 
 <div data-kickstarter class="kk">
-  <!-- Sticker is a second, mouse-only route to the shop; the pill below is the accessible link -->
-  <a class="sticker" href={SHOP_URL} target="_blank" rel="noopener" tabindex="-1" aria-hidden="true">
+  <!-- Sticker is a second, mouse-only route to the email box; the pill below is the accessible link -->
+  <a class="sticker" href={RESERVE_HREF} tabindex="-1" aria-hidden="true">
     <img src="/assets/images/kickstarter/sticker.png" width="172" height="179" alt="" />
   </a>
-  <a class="toggle" href={SHOP_URL} target="_blank" rel="noopener">
+  <a class="toggle" href={RESERVE_HREF}>
     <img src="/assets/images/kickstarter/icon.png" width="21" height="24" alt="" />
     Sign up for Kickstarter
   </a>

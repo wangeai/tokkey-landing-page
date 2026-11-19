@@ -1,0 +1,157 @@
+---
+// Homepage closing CTA "Reserve your spot": black block with eyebrow, H2 and a one-field email form. Every reserve /
+// Kickstarter CTA links here (src/config/reserve.ts); submitting registers the email and opens the shop
+// (src/scripts/EarlyAccessForm.ts). Desktop sizes are Figma px via --fx.
+import { RESERVE_ID } from "../config/reserve";
+---
+
+<section id={RESERVE_ID.slice(1)} data-reserve class="reserve bg-black text-white">
+  <p data-reveal class="label text-ash">Reserve your spot</p>
+  <h2 data-reveal class="heading font-bold">Be first in line<span class="dot" aria-hidden="true"></span></h2>
+
+  <form data-reveal data-ref="form" class="form" novalidate>
+    <label class="sr-only" for="reserve-email">Email</label>
+    <input id="reserve-email" name="email" type="email" autocomplete="email" placeholder="you@example.com" required class="field" />
+    <button type="submit" class="submit">Submit</button>
+    <!-- Error line (full row), filled by EarlyAccessForm -->
+    <p data-ref="status" class="status" role="status" aria-live="polite"></p>
+  </form>
+</section>
+
+<script>
+  import { ScrollReveal } from "../scripts/ScrollReveal";
+  import { EarlyAccessForm } from "../scripts/EarlyAccessForm";
+  const section = document.querySelector<HTMLElement>("[data-reserve]");
+  if (section) {
+    ScrollReveal.section(section);
+    const form = new EarlyAccessForm(section.querySelector<HTMLFormElement>("[data-ref=form]")!);
+    // Remind them to enter their email whenever a reserve CTA brings them here: landing on /#reserve, or a same-page click
+    const hash = `#${section.id}`;
+    if (location.hash === hash) form.nudge();
+    document.addEventListener("click", (event) => {
+      const link = (event.target as Element).closest<HTMLAnchorElement>("a[href]");
+      if (link && link.pathname === location.pathname && link.hash === hash) form.nudge();
+    });
+  }
+</script>
+
+<style>
+  .reserve {
+    padding: 96px var(--spacing-gutter-sm);
+  }
+  .heading {
+    margin-top: 16px;
+    font-size: var(--text-h2-sm);
+    line-height: var(--text-h2-sm--line-height);
+    letter-spacing: -0.02em;
+  }
+  .lead {
+    max-width: 560px;
+    margin-top: 24px;
+    color: rgb(255 255 255 / 0.6);
+    font-size: 16px;
+    line-height: 24px;
+  }
+  /* Field + button in one row from 768px, stacked on phones */
+  .form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    max-width: 560px;
+    margin-top: 32px;
+  }
+  .field {
+    flex: 1 1 260px;
+    min-width: 0;
+    height: 48px;
+    padding: 0 16px;
+    border: 1px solid var(--color-graphite);
+    background: transparent;
+    color: #fff;
+    font-size: 16px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .field::placeholder {
+    color: var(--color-ash);
+  }
+  .field:focus-visible {
+    border-color: var(--color-accent);
+  }
+  /* Reminder from EarlyAccessForm.nudge(): a shake once the section has faded in */
+  .field.is-nudged {
+    animation: shake 0.5s 0.4s ease-in-out;
+  }
+  @keyframes shake {
+    0%,
+    100% {
+      transform: translateX(0);
+    }
+    20%,
+    60% {
+      transform: translateX(-8px);
+    }
+    40%,
+    80% {
+      transform: translateX(8px);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .field.is-nudged {
+      animation: none;
+    }
+  }
+  /* .btn-on-black (brand SKILL): white fill, black text */
+  .submit {
+    flex: 0 0 auto;
+    height: 48px;
+    padding: 0 24px;
+    border: 1px solid #fff;
+    border-radius: 16px;
+    background: #fff;
+    color: #000;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+  .submit:hover:not(:disabled) {
+    opacity: 0.88;
+  }
+  .submit:disabled {
+    opacity: 0.6;
+    cursor: wait;
+  }
+  .submit:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+  .status {
+    flex-basis: 100%;
+    color: var(--color-negative);
+    font-size: 14px;
+    line-height: 20px;
+  }
+  .status:empty {
+    display: none;
+  }
+  @media (width < 768px) {
+    .submit {
+      flex-basis: 100%;
+    }
+  }
+
+  @media (width >= 768px) {
+    .reserve {
+      padding: calc(160 * var(--fx)) calc(146 * var(--fx));
+    }
+    .heading {
+      font-size: calc(80 * var(--fx));
+      line-height: calc(88 * var(--fx));
+    }
+    .lead {
+      font-size: calc(16 * var(--fx));
+      line-height: calc(24 * var(--fx));
+    }
+  }
+</style>

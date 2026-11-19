@@ -1,5 +1,6 @@
 // Content of the site footer (src/components/Footer.astro). Targets follow the nav and the legacy footer;
 // "#" marks pages and accounts that don't exist yet.
+import { RESERVE_HREF } from "./reserve";
 
 export interface FooterLink {
   label: string;
@@ -32,7 +33,7 @@ export const FOOTER_COLUMNS: { title: string; links: FooterLink[] }[] = [
       { label: "FAQ", href: "/#faq" },
       { label: "Privacy", href: "/privacy" },
       { label: "Terms", href: "/terms" },
-      { label: "Reserve your spot", href: "/software#early" },
+      { label: "Reserve your spot", href: RESERVE_HREF },
     ],
   },
 ];
