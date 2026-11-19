@@ -1,5 +1,6 @@
 ---
-// Fixed site header (Figma: UI (editable)): wordmark, primary links (hidden ≤ 900px), "Reserve your spot" CTA. With `overHero` it has no background
+// Fixed site header (Figma: UI (editable)): wordmark, primary links (≤ 900px: behind a menu toggle, src/scripts/NavMenu.ts),
+// "Reserve your spot" CTA. With `overHero` it has no background
 // while over the hero and turns solid black past it (src/scripts/NavBackdrop.ts).
 import Logo from "./Logo.astro";
 import { RESERVE_HREF } from "../config/reserve";
@@ -27,20 +28,42 @@ const links = [
   <ul class="mr-8 ml-auto hidden gap-8 text-[16px]/6 min-[901px]:flex">
     {links.map((link) => <li><a href={link.href} class="opacity-70 hover:opacity-100">{link.label}</a></li>)}
   </ul>
-  <!-- Figma: 192×52.8 white pill, 16 semibold -->
+  <!-- Figma: 192×52.8 white pill, 16 semibold; compact 36px pill on mobile -->
   <a
     data-ref="cta"
-    class="ml-auto inline-flex h-[52px] items-center rounded-full bg-white px-5 text-[16px]/6 font-semibold text-[#111] min-[901px]:ml-0"
+    class="ml-auto inline-flex h-9 items-center rounded-full bg-white px-4 text-[14px]/5 font-semibold text-[#111] min-[901px]:ml-0 min-[901px]:h-[52px] min-[901px]:px-5 min-[901px]:text-[16px]/6"
     href={RESERVE_HREF}>Reserve your spot</a
   >
+  <!-- Mobile menu toggle: two bars that cross into an X while open -->
+  <button
+    data-ref="menu-toggle"
+    type="button"
+    aria-label="Menu"
+    aria-expanded="false"
+    aria-controls="nav-menu"
+    class="-mr-2 ml-2 flex size-10 flex-col items-center justify-center gap-[6px] min-[901px]:hidden"
+  >
+    <span class="bar"></span><span class="bar"></span>
+  </button>
+  <ul
+    id="nav-menu"
+    data-ref="menu-panel"
+    hidden
+    class="absolute inset-x-0 top-full flex-col border-b border-[#161618] bg-black px-4 py-2 text-[18px]/6 min-[901px]:hidden!"
+  >
+    {links.map((link) => <li><a href={link.href} class="block py-3 opacity-70 hover:opacity-100">{link.label}</a></li>)}
+  </ul>
 </nav>
 
 <script>
   import { NavBackdrop } from "../scripts/NavBackdrop";
+  import { NavMenu } from "../scripts/NavMenu";
   const nav = document.querySelector<HTMLElement>("[data-nav][data-over-hero]");
   // The hero is the first section of the page
   const hero = document.querySelector<HTMLElement>("main > section");
   if (nav && hero) new NavBackdrop(nav, hero);
+  // Every page's nav gets the mobile menu
+  new NavMenu(document.querySelector<HTMLElement>("[data-nav]")!);
 </script>
 
 <style>
@@ -55,6 +78,27 @@ const links = [
     border-color: transparent;
     background-color: transparent;
   }
+  /* The open mobile menu keeps the bar solid so it joins the panel below */
+  nav[data-over-hero].is-menu-open {
+    border-color: #161618;
+    background-color: #000;
+  }
+  [data-ref="menu-panel"]:not([hidden]) {
+    display: flex;
+  }
+  .bar {
+    display: block;
+    width: 20px;
+    height: 2px;
+    background: currentColor;
+    transition: transform 0.2s;
+  }
+  [aria-expanded="true"] .bar:first-child {
+    transform: translateY(4px) rotate(45deg);
+  }
+  [aria-expanded="true"] .bar:last-child {
+    transform: translateY(-4px) rotate(-45deg);
+  }
   /* Over [data-nav-light] sections (Figma: Software · D · 03 header): frosted paper bar, ink text, ink CTA */
   nav.is-light {
     border-color: rgb(17 17 16 / 8%);
@@ -64,6 +108,10 @@ const links = [
   }
   nav.is-light :global(.brand) {
     color: var(--color-ink);
+  }
+  nav.is-light [data-ref="menu-panel"] {
+    border-color: rgb(17 17 16 / 8%);
+    background-color: rgb(250 250 247 / 96%);
   }
   nav.is-light [data-ref="cta"] {
     background: var(--color-ink);
