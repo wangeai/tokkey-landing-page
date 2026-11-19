@@ -1,7 +1,8 @@
 // Autoplaying card carousel (prototype `#c5`): the active card sits in place, neighbours slide one step aside and dim,
 // a spring eases between slides. Autoplay advances every `slideMs` and fills the active pager pill as it runs; it pauses
 // while the carousel is less than half on screen, while dragging and while the tab is hidden, and loops at the end.
-// Drag / swipe, horizontal wheel, arrow keys (when focused), pager dots and a play / pause button also drive it.
+// Drag / swipe, horizontal wheel, arrow keys (when focused) and pager dots also drive it. Hovering or clicking a dot
+// jumps to its slide and pauses there; autoplay resumes when the pointer leaves the pager.
 import { gsap } from "./gsap";
 
 export class FeatureCarousel {
@@ -19,7 +20,6 @@ export class FeatureCarousel {
   private readonly cards: HTMLElement[];
   private readonly dots: HTMLButtonElement[];
   private readonly fills: HTMLElement[];
-  private readonly toggle: HTMLButtonElement;
   /** Target slide */
   private current = 0;
   /** Where the strip is (slides; fractional while moving) */
@@ -41,7 +41,6 @@ export class FeatureCarousel {
     this.cards = [...root.querySelectorAll<HTMLElement>("[data-ref=card]")];
     this.dots = [...root.querySelectorAll<HTMLButtonElement>("[data-ref=dot]")];
     this.fills = this.dots.map((dot) => dot.querySelector<HTMLElement>("i")!);
-    this.toggle = root.querySelector<HTMLButtonElement>("[data-ref=toggle]")!;
 
     this.bindInput();
     // Reduced motion: no autoplay, slides jump instead of sliding
@@ -63,8 +62,12 @@ export class FeatureCarousel {
 
   private setPlaying(playing: boolean): void {
     this.playing = playing;
-    this.toggle.dataset.paused = String(!playing);
-    this.toggle.setAttribute("aria-label", playing ? "Pause autoplay" : "Play autoplay");
+  }
+
+  /** Jump to slide `index` and hold it there until the pointer leaves the pager */
+  private pauseOn(index: number): void {
+    this.go(index);
+    this.setPlaying(false);
   }
 
   /** Distance between two slides (px): card width plus the track's column gap */
@@ -108,8 +111,12 @@ export class FeatureCarousel {
   }
 
   private bindInput(): void {
-    this.dots.forEach((dot, i) => dot.addEventListener("click", () => this.go(i)));
-    this.toggle.addEventListener("click", () => this.setPlaying(!this.playing));
+    this.dots.forEach((dot, i) => {
+      dot.addEventListener("pointerenter", () => this.pauseOn(i));
+      dot.addEventListener("click", () => this.pauseOn(i));
+    });
+    // Leaving the pager resumes autoplay (never under reduced motion)
+    this.root.querySelector("[data-ref=pills]")!.addEventListener("pointerleave", () => this.setPlaying(!this.reducedMotion));
 
     // Drag / swipe the strip; a press without movement on a side card selects it
     this.track.addEventListener("pointerdown", (e) => {
