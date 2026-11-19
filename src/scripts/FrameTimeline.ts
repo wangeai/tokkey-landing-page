@@ -8,7 +8,7 @@ type FramesSegment = Extract<TimelineSegment, { kind: "frames" }>;
 interface Span {
   segment: TimelineSegment;
   /** Frames segment whose look (fit, filter) shows here: itself, or the one before an effect */
-  look: FramesSegment | null;
+  look: FramesSegment;
   /** Position where the segment starts */
   start: number;
   /** Scroll length in source frames */
@@ -52,7 +52,8 @@ export class FrameTimeline {
     // An effect before any frames holds the first frame of the first frames segment
     const opening = segments.find((s): s is FramesSegment => s.kind === "frames")!;
     let start = 0;
-    let look: FramesSegment | null = null;
+    // An effect before any frames also takes the opening frames' look (mobile fit, filter)
+    let look: FramesSegment = opening;
     for (const segment of segments) {
       if (segment.kind === "frames") {
         look = segment;
@@ -82,8 +83,8 @@ export class FrameTimeline {
     return {
       sequence: span.sequence,
       frame,
-      fit: this.mobile && span.look ? span.look.mobileFit : "cover",
-      filter: span.look?.filter ?? "",
+      fit: this.mobile ? span.look.mobileFit : "cover",
+      filter: span.look.filter ?? "",
       lowered: this.lowered(position),
     };
   }

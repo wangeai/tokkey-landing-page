@@ -4,7 +4,7 @@
 import { gsap, ScrollTrigger } from "../gsap";
 import { FrameStage, type StageProfile } from "../FrameStage";
 import { MOBILE_MAX_WIDTH } from "../../config/breakpoints";
-import { FRAME_SIZES } from "../../config/frames";
+import { FRAME_SIZES, type FrameSize } from "../../config/frames";
 import { TIMELINE } from "../../config/timeline";
 
 /** Detail of EFFECT_EVENT */
@@ -44,10 +44,11 @@ export class FrameStageScene {
     if (!location.hash) window.scrollTo(0, 0);
   }
 
-  /** Full-size videos only when the screen would show more than the small set's pixels */
+  /** The smallest video size that covers the screen's pixels (with 25% upscale headroom), else the full size */
   private static desktopProfile(): StageProfile {
     const screenPx = window.innerWidth * Math.min(window.devicePixelRatio || 1, 2);
-    const size = screenPx > FRAME_SIZES.sm.width * 1.25 ? "lg" : "sm";
+    const sizes = Object.keys(FRAME_SIZES) as FrameSize[];
+    const size = sizes.find((s) => FRAME_SIZES[s].width * 1.25 >= screenPx) ?? "lg";
     // One mouse notch (~100px) ≈ 10 frames
     return { size, mobile: false, framesPerPx: 0.1 };
   }

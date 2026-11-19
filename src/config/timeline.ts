@@ -35,7 +35,7 @@ export const LOWER_VH = 8;
 export const TIMELINE: TimelineSegment[] = [
   { kind: "effect", id: "heroTitle", length: 10 }, // "Own Your Intelligence." fades out on the first slight scroll (HeroTitleScene)
   { kind: "frames", sequence: "001", mobileFit: "contain" }, // lid lifts, logo glows
-  { kind: "frames", sequence: "002", mobileFit: "cover" }, // laptop opens, camera moves in to the plugged-in key
+  { kind: "frames", sequence: "002", mobileFit: "contain" }, // laptop opens, camera moves in to the plugged-in key
   { kind: "effect", id: "aiMac", length: 120 }, // "Turn your Mac into an AI Mac.": agent chips fly into the key (AiMacScene)
   { kind: "frames", sequence: "003", mobileFit: "contain", lower: true }, // camera pulls back to the laptop's front view
   { kind: "effect", id: "privateAgent", length: 200 }, // "A private agent on your Mac.": agent UI plays on the screen (PrivateAgentScene)

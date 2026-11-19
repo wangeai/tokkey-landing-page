@@ -14,10 +14,12 @@ export const FRAME_SEQUENCES = {
 
 export type SequenceName = keyof typeof FRAME_SEQUENCES;
 
-/** Video sizes: full width, and the half-width copy for phones / small viewports */
+/** Video sizes, smallest first (like Apple's small / medium / large tiers): phones and small viewports, 1080p-class
+ *  screens, and retina / large screens */
 export const FRAME_SIZES = {
-  lg: { width: 2560, suffix: "" },
   sm: { width: 1280, suffix: "-sm" },
+  md: { width: 1920, suffix: "-md" },
+  lg: { width: 2560, suffix: "" },
 } as const;
 
 export type FrameSize = keyof typeof FRAME_SIZES;

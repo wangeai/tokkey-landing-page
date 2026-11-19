@@ -1,6 +1,7 @@
-// Helpers shared by the overlays in FrameStage's slot (AiMacScene, PrivateAgentScene): where the cover-fit frame sits
+// Helpers shared by the overlays in FrameStage's slot (AiMacScene, PrivateAgentScene): where the fitted frame sits
 // on screen, so an overlay can pin itself to something drawn in it, and the prototype's clamped range progress.
 import { gsap } from "./gsap";
+import type { FrameFit } from "../config/timeline";
 
 /** A box in px, relative to an overlay root */
 export interface Box {
@@ -19,11 +20,11 @@ export class StageOverlay {
     return gsap.utils.clamp(0, 1, (p - a) / (b - a));
   }
 
-  /** Box of the frame drawn cover-fit on `canvas` (see FrameCanvas), relative to `root` */
-  static frameBox(canvas: HTMLElement, root: HTMLElement): Box {
+  /** Box of the frame drawn with `fit` on `canvas` (see FrameCanvas), relative to `root` */
+  static frameBox(canvas: HTMLElement, root: HTMLElement, fit: FrameFit = "cover"): Box {
     const box = canvas.getBoundingClientRect();
     const origin = root.getBoundingClientRect();
-    const width = Math.max(box.width, box.height * StageOverlay.ASPECT);
+    const width = (fit === "cover" ? Math.max : Math.min)(box.width, box.height * StageOverlay.ASPECT);
     const height = width / StageOverlay.ASPECT;
     return {
       left: box.left - origin.left + (box.width - width) / 2,
@@ -34,8 +35,8 @@ export class StageOverlay {
   }
 
   /** Part of the frame given as shares of it (0..1), as a box relative to `root` */
-  static inFrame(canvas: HTMLElement, root: HTMLElement, share: Box): Box {
-    const frame = StageOverlay.frameBox(canvas, root);
+  static inFrame(canvas: HTMLElement, root: HTMLElement, share: Box, fit: FrameFit = "cover"): Box {
+    const frame = StageOverlay.frameBox(canvas, root, fit);
     return {
       left: frame.left + share.left * frame.width,
       top: frame.top + share.top * frame.height,

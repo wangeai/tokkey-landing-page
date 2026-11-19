@@ -1,13 +1,14 @@
 // "A private agent on your Mac." (markup: src/components/PrivateAgent.astro), ported from the prototype's `#s3`.
 // Runs on the "privateAgent" effect, which holds scene 003's last frame (the laptop from the front): the heading rises
 // in above the laptop and the agent UI fades in on its screen, then plays its loop (AgentDialog) while shown. Both
-// fade out before scene 004 turns the laptop over. Desktop pins the UI onto the screen in the frame; phones, where the
-// contained frame is too small to read, show it as a card under the heading (layout in the component's CSS).
+// fade out before scene 004 turns the laptop over. The UI is pinned onto the screen in the frame on every viewport; on
+// phones the frame is drawn with scene 003's mobile fit, and the heading stays in the flow at the top.
 import { gsap } from "../gsap";
 import { AgentDialog } from "../AgentDialog";
 import { StageOverlay, type Box } from "../StageOverlay";
 import { FrameStageScene, type StageEffect } from "./FrameStageScene";
 import { MOBILE_MAX_WIDTH } from "../../config/breakpoints";
+import { TIMELINE, type FrameFit, type TimelineSegment } from "../../config/timeline";
 
 export class PrivateAgentScene {
   /** Effect segment in TIMELINE that drives the scene */
@@ -19,14 +20,18 @@ export class PrivateAgentScene {
   /** Space between the heading and the laptop, px */
   private static readonly TITLE_GAP = 24;
   private static readonly ease = gsap.parseEase("power3.inOut");
+  /** How phones fit the frame this effect holds (scene 003's) */
+  private static readonly MOBILE_FIT: FrameFit = TIMELINE.find(
+    (s): s is Extract<TimelineSegment, { kind: "frames" }> => s.kind === "frames" && s.sequence === "003",
+  )!.mobileFit;
 
   private readonly title: HTMLElement;
   private readonly screen: HTMLElement;
   private readonly canvas: HTMLElement;
   private readonly dialog: AgentDialog;
   private readonly reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
-  /** Desktop: the UI is pinned onto the laptop screen; phones: it's a card in the flow */
-  private onScreen = true;
+  /** Desktop: cover-fit frame, heading placed above the laptop; phones: mobile-fit frame, heading in the flow */
+  private desktop = true;
   private progress = 0;
 
   constructor(
@@ -50,15 +55,11 @@ export class PrivateAgentScene {
       .add(`(max-width: ${MOBILE_MAX_WIDTH}px)`, () => this.useLayout(false));
   }
 
-  private useLayout(onScreen: boolean): () => void {
-    this.onScreen = onScreen;
+  private useLayout(desktop: boolean): () => void {
+    this.desktop = desktop;
     this.render(this.progress);
-    // Leave no desktop placement behind for the phone card
-    return () => {
-      this.screen.style.removeProperty("transform");
-      this.screen.style.removeProperty("height");
-      this.title.style.removeProperty("top");
-    };
+    // Leave no desktop heading placement behind for phones
+    return () => this.title.style.removeProperty("top");
   }
 
   private render(progress: number): void {
@@ -68,7 +69,7 @@ export class PrivateAgentScene {
     const exit = seg(progress, 0.9, 1);
     const title = seg(progress, 0, 0.1) * (1 - exit);
     const ui = seg(progress, 0.04, 0.14) * (1 - exit);
-    if (this.onScreen) this.place();
+    this.place();
     this.title.style.opacity = String(title);
     this.title.style.translate = `0 ${gsap.utils.interpolate(24, 0, ease(seg(progress, 0, 0.15))) - ease(exit) * 40}px`;
     this.screen.style.opacity = String(ui);
@@ -78,12 +79,14 @@ export class PrivateAgentScene {
     else this.dialog.stop();
   }
 
-  /** Scale the design box onto the laptop screen, and sit the heading just above the laptop */
+  /** Scale the design box onto the laptop screen; on desktop also sit the heading just above the laptop */
   private place(): void {
-    const screen = StageOverlay.inFrame(this.canvas, this.root, PrivateAgentScene.SCREEN);
+    const fit = this.desktop ? "cover" : PrivateAgentScene.MOBILE_FIT;
+    const screen = StageOverlay.inFrame(this.canvas, this.root, PrivateAgentScene.SCREEN, fit);
     const scale = screen.width / PrivateAgentScene.DESIGN_WIDTH;
     this.screen.style.transform = `translate(${screen.left}px, ${screen.top}px) scale(${scale})`;
     this.screen.style.height = `${screen.height / scale}px`;
+    if (!this.desktop) return;
     const canvasTop = this.canvas.offsetTop;
     this.title.style.top = `${Math.max(canvasTop, screen.top - this.title.offsetHeight - PrivateAgentScene.TITLE_GAP)}px`;
   }

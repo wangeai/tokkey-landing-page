@@ -1,8 +1,8 @@
 ---
 // "A private agent on your Mac." over the end of scene 003 (effect "privateAgent", prototype `#s3` / `#p0`): the
 // heading appears above the laptop and the agent UI lights up on its screen, looping ask → think → answer while a
-// gradient ring turns around the screen. Desktop draws the UI onto the screen in the frame; phones show it as a card
-// under the heading. Goes in FrameStage's slot. Behavior: src/scripts/scenes/PrivateAgentScene.ts + AgentDialog.ts.
+// gradient ring turns around the screen. The UI is drawn onto the screen in the frame on every viewport (phones
+// included, where the laptop is contained and small). Goes in FrameStage's slot. Behavior: src/scripts/scenes/PrivateAgentScene.ts + AgentDialog.ts.
 const QUESTION = "“Summarize this week’s meeting notes and list the open actions.”";
 const ACTIONS = ["Finalize the launch page copy", "Review the shipping timeline", "Send the revised product brief"];
 /** Slogans that take turns under the dialog; each word animates on its own (`--i` staggers them) */
@@ -23,11 +23,9 @@ const SLOGANS = [
     A private agent <span class="text-white">on your Mac</span><span class="dot" aria-hidden="true"></span>
   </h2>
 
-  <!-- Desktop: 1000px-wide design box, placed and scaled onto the laptop screen by JS -->
+  <!-- 1000px-wide design box, placed and scaled onto the laptop screen by JS -->
   <div data-ref="screen" class="screen" role="img" aria-label="An on-device agent answering on the Mac, run locally via Tokkey">
     <div data-ref="stage" class="stage ag-idle" aria-hidden="true">
-      <!-- Phones have no laptop screen behind the card, so the card brings the frame's wallpaper -->
-      <img class="wall md:hidden" src="/assets/images/private-agent/wallpaper.webp" alt="" loading="lazy" decoding="async" />
       <div class="glow"><i></i></div>
 
       <div class="dialog">
@@ -91,10 +89,14 @@ const SLOGANS = [
     opacity: 0;
   }
 
-  /* Agent UI, in the prototype's design px (1000 wide). Desktop: JS sets left/top/scale/height to cover the screen */
+  /* Agent UI, in the prototype's design px (1000 wide). JS sets left/top/scale/height to cover the laptop screen */
   .screen {
-    position: relative;
-    height: 556px;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 1000px;
+    height: 645px;
+    transform-origin: 0 0;
   }
   .stage {
     --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
@@ -112,29 +114,9 @@ const SLOGANS = [
     );
     position: absolute;
     inset: 0;
-    border-radius: 18px;
+    border-radius: 14px;
     overflow: hidden;
     color: var(--color-white);
-  }
-  @media (min-width: 768px) {
-    .screen {
-      position: absolute;
-      left: 0;
-      top: 0;
-      width: 1000px;
-      height: 645px;
-      transform-origin: 0 0;
-    }
-    .stage {
-      border-radius: 14px;
-    }
-  }
-  .wall {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
   }
 
   /* Gradient ring around the screen, with a blurred copy as its glow */
@@ -486,35 +468,6 @@ const SLOGANS = [
   }
   .ag-done .slogan:not(.off) .em {
     animation: sweep 1800ms ease-in-out 900ms both;
-  }
-
-  /* Phone card (prototype `.agm`): full width, the dialog stretches, the panel sits under it, the slogan wraps */
-  @media (max-width: 767px) {
-    .dialog {
-      left: 12px;
-      right: 12px;
-      top: 38px;
-      width: auto;
-    }
-    .ask,
-    .answer {
-      right: 17px;
-      width: auto;
-    }
-    .panel {
-      left: 12px;
-      top: 302px;
-    }
-    .slogan {
-      inset: auto 18px 22px;
-      font-size: 30px;
-      line-height: 36px;
-      white-space: normal;
-    }
-    .glow i {
-      padding: 14px;
-      border-radius: 22px;
-    }
   }
 
   @keyframes orb {
