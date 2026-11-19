@@ -470,6 +470,27 @@ const SLOGANS = [
     animation: sweep 1800ms ease-in-out 900ms both;
   }
 
+  /* Phones: drop the blur layers. The ring's per-frame --angle/--glow updates repaint them every frame, and on iOS
+     Safari that runs out of GPU memory and crashes the tab. At the phone's scale the blur is barely visible anyway */
+  @media (max-width: 767px) {
+    .glow {
+      display: none;
+    }
+    .dialog,
+    .panel {
+      backdrop-filter: none;
+    }
+    .dialog {
+      background: rgb(46 46 50 / 0.94);
+    }
+    .panel {
+      background: rgb(38 38 42 / 0.94);
+    }
+    .slogan {
+      filter: none;
+    }
+  }
+
   @keyframes orb {
     50% {
       transform: scale(1.07);
