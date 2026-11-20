@@ -1,0 +1,208 @@
+---
+// Homepage deposit offer (Figma 871:1952): headline, Tokkey shot, the VIP / Super Early Bird price cards and the
+// "Pay $5 Deposit" bar. Desktop sizes are Figma px via --fx (frame 1920×762); stacks into one column on phones.
+import { DEPOSIT_TIERS, DEPOSIT_URL } from "../config/deposit";
+---
+
+<section data-deposit-offer data-nav-light class="offer text-black">
+  <h2 data-reveal class="heading text-center font-bold">
+    Pay <span class="green">$5 Deposit</span>, Lock the VIP Exclusive <span class="green">$129</span>
+  </h2>
+
+  <div class="body">
+    <img data-reveal class="product" src="/assets/images/deposit/product.webp" alt="Tokkey" width="1150" height="1005" loading="lazy" />
+
+    <div class="side">
+      <ul class="tiers">
+        {
+          DEPOSIT_TIERS.map((tier) => (
+            <li data-reveal class:list={["tier", { highlight: tier.highlight }]}>
+              <p class="tier-label font-bold">{tier.label}</p>
+              <div class="tier-row">
+                <p class="tier-price font-bold">{tier.price}</p>
+                {tier.badge && <p class="tier-badge font-bold">{tier.badge}</p>}
+              </div>
+              <p class="tier-msrp line-through">{tier.msrp}</p>
+            </li>
+          ))
+        }
+      </ul>
+      <a data-reveal href={DEPOSIT_URL} class="pay font-semibold">
+        Pay $5 Deposit
+        <img src="/assets/images/deposit/arrow.svg" alt="" width="30" height="30" />
+      </a>
+    </div>
+  </div>
+</section>
+
+<script>
+  import { ScrollReveal } from "../scripts/ScrollReveal";
+  const section = document.querySelector<HTMLElement>("[data-deposit-offer]");
+  if (section) ScrollReveal.section(section);
+</script>
+
+<style>
+  /* Figma: #F5F5F5 section, #197C3C offer green (one-off values from the store design, not brand tokens) */
+  .offer {
+    --green: #197c3c;
+    padding: 64px var(--spacing-gutter-sm);
+    background: #f5f5f5;
+  }
+  .green {
+    color: var(--green);
+  }
+  .heading {
+    font-size: 28px;
+    line-height: 36px;
+  }
+  .body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+    margin-top: 32px;
+  }
+  .product {
+    width: 240px;
+    height: auto;
+  }
+  .side {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    width: 100%;
+  }
+  .tiers {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .tier {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 24px;
+    border: 1px solid #d9d9d9;
+    border-radius: 20px;
+    background: rgb(255 255 255 / 0.1);
+    color: #818181;
+    text-align: center;
+  }
+  .tier.highlight {
+    border-color: var(--green);
+    color: var(--green);
+  }
+  .tier-label {
+    font-size: 18px;
+  }
+  .tier.highlight .tier-label {
+    color: #000;
+  }
+  .tier-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .tier-price {
+    font-size: 48px;
+    line-height: 1.2;
+  }
+  .tier-badge {
+    padding: 6px;
+    border: 1px solid var(--green);
+    border-radius: 10px;
+    font-size: 22px;
+  }
+  .tier-msrp {
+    color: #949494;
+    font-size: 18px;
+  }
+  .pay {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    padding: 16px 20px;
+    border-radius: 20px;
+    background: var(--green);
+    color: #fff;
+    font-size: 18px;
+    line-height: normal;
+  }
+  .pay img {
+    width: 20px;
+    height: 20px;
+  }
+  .pay:focus-visible {
+    outline: 2px solid var(--green);
+    outline-offset: 4px;
+  }
+
+  /* Desktop: product (402) | 51 | cards (508 + 23 + 357) over the 888-wide pay bar */
+  @media (width >= 768px) {
+    .offer {
+      padding: calc(130 * var(--fx)) 0;
+    }
+    .heading {
+      font-size: calc(58 * var(--fx));
+      line-height: calc(80 * var(--fx));
+    }
+    .body {
+      flex-direction: row;
+      align-items: flex-start;
+      justify-content: center;
+      gap: calc(51 * var(--fx));
+      margin-top: calc(70 * var(--fx));
+    }
+    .product {
+      width: calc(402 * var(--fx));
+    }
+    .side {
+      gap: calc(30 * var(--fx));
+      width: calc(888 * var(--fx));
+    }
+    .tiers {
+      flex-direction: row;
+      gap: calc(23 * var(--fx));
+    }
+    .tier {
+      gap: calc(10 * var(--fx));
+      height: calc(243 * var(--fx));
+      padding: 0;
+    }
+    .tier.highlight {
+      width: calc(508 * var(--fx));
+    }
+    .tier:not(.highlight) {
+      width: calc(357 * var(--fx));
+    }
+    .tier-label,
+    .tier-msrp {
+      font-size: calc(30 * var(--fx));
+    }
+    .tier-row {
+      gap: calc(25 * var(--fx));
+    }
+    .tier-price {
+      font-size: calc(80 * var(--fx));
+    }
+    .tier:not(.highlight) .tier-price {
+      font-size: calc(70 * var(--fx));
+    }
+    .tier-badge {
+      padding: calc(10 * var(--fx));
+      font-size: calc(40 * var(--fx));
+    }
+    .pay {
+      gap: calc(30 * var(--fx));
+      padding: calc(20 * var(--fx)) calc(30 * var(--fx));
+      font-size: calc(30 * var(--fx));
+    }
+    .pay img {
+      width: calc(30 * var(--fx));
+      height: calc(30 * var(--fx));
+    }
+  }
+</style>

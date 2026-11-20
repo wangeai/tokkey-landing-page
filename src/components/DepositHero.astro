@@ -1,0 +1,170 @@
+---
+// Homepage opening section (Figma 869:20): gradient headline and "Deposit Now" pill over the blurred model dashboard, with
+// the hand holding Tokkey and its "Local AI" callout. Desktop sizes are Figma px via --fx (frame 1920×1166); on phones the
+// artwork is scaled to the section height and shifted so Tokkey stays in view. The site nav stays in place of the Figma wordmark.
+import { DEPOSIT_URL } from "../config/deposit";
+---
+
+<section class="deposit-hero relative overflow-hidden bg-black text-white">
+  <!-- Artwork in Figma frame coordinates (1 unit = var(--s)) -->
+  <div class="art" aria-hidden="true">
+    <img class="dashboard" src="/assets/images/deposit/dashboard-bg.webp" alt="" fetchpriority="high" />
+    <img class="hand" src="/assets/images/deposit/hand.webp" alt="" />
+    <!-- Edge shades: top band and right band darken the dashboard behind the text and pill -->
+    <div class="shade-top"></div>
+    <div class="shade-right"></div>
+    <img class="callout-line" src="/assets/images/deposit/callout-line.svg" alt="" width="72.5" height="66.5" />
+    <p class="callout">Local AI</p>
+  </div>
+
+  <div class="content relative flex flex-col items-center px-gutter-sm text-center">
+    <h2 class="headline font-bold">
+      <span class="block">Turn Your PC into AI PC.</span>
+      <span class="block">This Time, Own Your Intelligence</span>
+    </h2>
+    <a href={DEPOSIT_URL} class="cta inline-flex items-center font-semibold">
+      Deposit Now
+      <img src="/assets/images/deposit/arrow.svg" alt="" width="30" height="30" />
+    </a>
+  </div>
+</section>
+
+<style>
+  .deposit-hero {
+    /* One Figma px for the artwork, and the Figma x drawn at the section's center. On phones the art fills the
+       760px section (760 / 1166) and centers on Tokkey rather than the frame */
+    --s: 0.652px;
+    --center-x: 1020;
+    min-height: 760px;
+  }
+  .art {
+    position: absolute;
+    bottom: 0;
+    left: calc(50% - var(--center-x) * var(--s));
+    width: calc(1920 * var(--s));
+    height: calc(1166 * var(--s));
+  }
+  .art > * {
+    position: absolute;
+    max-width: none;
+  }
+  .dashboard {
+    top: calc(-4 * var(--s));
+    left: calc(-30 * var(--s));
+    width: calc(2089.556 * var(--s));
+    height: calc(1176 * var(--s));
+    object-fit: cover;
+  }
+  /* Figma rotates the 2434×1358 hand -57.8° about the center of its bounding box (971, 902) */
+  .hand {
+    top: calc((902 - 1358.476 / 2) * var(--s));
+    left: calc((971 - 2434.084 / 2) * var(--s));
+    width: calc(2434.084 * var(--s));
+    height: calc(1358.476 * var(--s));
+    transform: rotate(-57.8deg);
+  }
+  .shade-top {
+    top: 0;
+    left: calc(4 * var(--s));
+    width: calc(2379 * var(--s));
+    height: calc(491 * var(--s));
+    background: linear-gradient(to bottom, rgb(0 0 0 / 0.68), transparent);
+  }
+  .shade-right {
+    top: 0;
+    left: calc(1580 * var(--s));
+    width: calc(769 * var(--s));
+    height: calc(1199 * var(--s));
+    background: linear-gradient(to right, transparent, rgb(0 0 0 / 0.52));
+  }
+  /* Connector from the pill down to Tokkey; Figma draws the frame rotated 180° */
+  .callout-line {
+    top: calc(689 * var(--s));
+    left: calc(1147 * var(--s));
+    width: calc(72 * var(--s));
+    height: calc(66 * var(--s));
+    transform: rotate(180deg);
+  }
+  .callout {
+    top: calc(644 * var(--s));
+    left: calc(1239 * var(--s));
+    width: calc(308.899 * var(--s));
+    height: calc(89.189 * var(--s));
+    border-radius: 999px;
+    background: rgb(255 255 255 / 0.2);
+    font-size: calc(32.12 * var(--s));
+    font-weight: 700;
+    line-height: calc(89.189 * var(--s));
+    text-align: center;
+    /* Figma: label at 80% opacity on the 20% white pill */
+    color: rgb(255 255 255 / 0.8);
+  }
+  /* The callout is too small to read once the artwork shrinks on phones */
+  .callout,
+  .callout-line {
+    display: none;
+  }
+
+  .content {
+    padding-top: calc(var(--spacing-header) + 40px);
+  }
+  /* Figma: Inter Bold, -1% tracking, white fading to #999 over the last fifth of the block */
+  .headline {
+    background: linear-gradient(to bottom, #fff 79.399%, #999);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+    font-size: var(--text-h2-sm);
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+  }
+  /* Figma: green gradient pill, Inter Semibold, arrow after the label */
+  .cta {
+    gap: 16px;
+    margin-top: 32px;
+    padding: 14px 20px;
+    border-radius: 100px;
+    background: linear-gradient(to bottom, #82ea57 73.573%, #49bd18 108.53%);
+    font-size: 18px;
+    line-height: normal;
+  }
+  .cta img {
+    width: 20px;
+    height: 20px;
+  }
+  .cta:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 4px;
+  }
+
+  @media (width >= 768px) {
+    .deposit-hero {
+      --s: var(--fx);
+      --center-x: 960;
+      height: calc(1166 * var(--fx));
+      min-height: 0;
+    }
+    .callout,
+    .callout-line {
+      display: block;
+    }
+    .content {
+      padding-top: calc(174 * var(--fx));
+    }
+    .headline {
+      font-size: calc(80 * var(--fx));
+    }
+    .cta {
+      gap: calc(30 * var(--fx));
+      margin-top: calc(47 * var(--fx));
+      padding: calc(20 * var(--fx)) calc(30 * var(--fx));
+      font-size: calc(30 * var(--fx));
+    }
+    .cta img {
+      width: calc(30 * var(--fx));
+      height: calc(30 * var(--fx));
+    }
+  }
+</style>

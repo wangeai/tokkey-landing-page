@@ -1,6 +1,9 @@
 ---
-// Homepage: being redesigned. Opens with the scroll-driven frame stage; new sections go after it inside BaseLayout.
+// Homepage: being redesigned. Opens with the deposit hero and offer (from the Shopify home page), then the scroll-driven
+// frame stage; new sections go after it inside BaseLayout.
 import BaseLayout from "../layouts/BaseLayout.astro";
+import DepositHero from "../components/DepositHero.astro";
+import DepositOffer from "../components/DepositOffer.astro";
 import FrameStage from "../components/FrameStage.astro";
 import AiMacEffect from "../components/AiMacEffect.astro";
 import PrivateAgent from "../components/PrivateAgent.astro";
@@ -28,6 +31,8 @@ const schemas = [StructuredData.webSite(), StructuredData.organization(), Struct
     href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;1,400&family=Cormorant+Garamond:wght@300&family=EB+Garamond:ital,wght@1,400&family=Bodoni+Moda:opsz,wght@6..96,400&family=DM+Serif+Display:ital@1&family=Josefin+Slab:wght@300&family=Space+Grotesk:wght@300&family=Bebas+Neue&family=Courier+Prime&display=swap"
   />
   <script slot="head" type="application/ld+json" set:html={JSON.stringify(schemas)} is:inline />
+  <DepositHero />
+  <DepositOffer />
   <FrameStage>
     <!-- Hero headline over the first frames; scrolls away as the stage starts playing (HeroTitleScene).
          Figma 1157:61: Inter Medium 128px / 0.95 on a 1920 frame (scales with the viewport), top at 31%, 0.12em word gap (two lines on mobile), round accent dot -->
