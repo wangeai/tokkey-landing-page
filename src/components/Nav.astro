@@ -3,7 +3,7 @@
 // "Reserve your spot" CTA. With `overHero` it has no background
 // while over the hero and turns solid black past it (src/scripts/NavBackdrop.ts).
 import Logo from "./Logo.astro";
-import { RESERVE_HREF } from "../config/reserve";
+import { RESERVE_LINK_ATTRS } from "../config/reserve";
 
 interface Props {
   /** Share the hero's background instead of a solid bar (software page) */
@@ -32,7 +32,7 @@ const links = [
   <a
     data-ref="cta"
     class="ml-auto inline-flex h-9 items-center rounded-full bg-white px-4 text-[14px]/5 font-semibold text-[#111] min-[901px]:ml-0 min-[901px]:h-[52px] min-[901px]:px-5 min-[901px]:text-[16px]/6"
-    href={RESERVE_HREF}>Reserve your spot</a
+    {...RESERVE_LINK_ATTRS}>Reserve your spot</a
   >
   <!-- Mobile menu toggle: two bars that cross into an X while open -->
   <button

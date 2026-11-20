@@ -5,6 +5,8 @@ import { RESERVE_HREF } from "./reserve";
 export interface FooterLink {
   label: string;
   href: string;
+  /** Open in a new tab (external pages such as the shop) */
+  newTab?: boolean;
 }
 
 /** Link columns, left to right */
@@ -33,7 +35,7 @@ export const FOOTER_COLUMNS: { title: string; links: FooterLink[] }[] = [
       { label: "FAQ", href: "/#faq" },
       { label: "Privacy", href: "/privacy" },
       { label: "Terms", href: "/terms" },
-      { label: "Reserve your spot", href: RESERVE_HREF },
+      { label: "Reserve your spot", href: RESERVE_HREF, newTab: true },
     ],
   },
 ];

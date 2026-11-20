@@ -7,6 +7,7 @@ import ChapterPrometheus from "../components/about/ChapterPrometheus.astro";
 import ChapterArchimedes from "../components/about/ChapterArchimedes.astro";
 import ChapterArthur from "../components/about/ChapterArthur.astro";
 import { ABOUT_INDEX } from "../config/about";
+import { RESERVE_LINK_ATTRS } from "../config/reserve";
 import "../styles/about.css";
 
 // Marquee phrases, repeated twice so the -50% loop is seamless
@@ -73,7 +74,7 @@ const marquee = ["Local first", "Private by default", "Plug in, light up", "No c
       <canvas id="embers" aria-hidden="true"></canvas>
       <h2>Take the <em>fire</em><span class="p">.</span></h2>
       <p>Tokkey Editions. Winter '26.</p>
-      <a class="cta-btn" href="/#reserve"><span class="led"></span>Reserve your spot</a>
+      <a class="cta-btn" {...RESERVE_LINK_ATTRS}><span class="led"></span>Reserve your spot</a>
     </section>
   </div>
 </BaseLayout>
